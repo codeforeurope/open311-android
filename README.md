@@ -1,3 +1,5 @@
+This repository is compatible with Android Studio.
+
 ## About
 open311-android is a reference client for the Open311 API.
 open311-android should work for any organizations with an Open311 GeoReport v2 compliant endpoint server.
