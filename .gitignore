@@ -1,0 +1,24 @@
+
+*.class
+# OSX
+.DS_Store
+
+# Package Files #
+
+*.war
+*.ear
+target/
+build/
+
+# IntelliJ Idea
+.idea/
+*.iml
+
+# Eclipse
+.classpath
+.project
+.settings/
+.*.md.html
+
+# Default cache file
+cache.prop
