@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Open311</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="Import">Import</string>
+    <string name="Gallery">Gallery</string>
+    <string name="Slideshow">Slideshow</string>
+    <string name="Tools">Tools</string>
+    <string name="Communicate">Communicate</string>
+    <string name="Share">Share</string>
+    <string name="Send">Send</string>
+    <string name="ApplicationTitle">311</string>
+    <string name="ApplicationEmail">Contact your City</string>
+    <string name="ApplicationIcon">Application Icon</string>
+    <string name="setting_general">General</string>
+    <string name="setting_user">User</string>
+    <string name="setting_cloud">Servers</string>
+    <string name="list_latest_messages">Recent reports</string>
+    <string name="list_user_messages">My reports</string>
+    <string name="dialog_loading_services">___</string>
+    <string name="failure_loading_services">___</string>
+    <string name="menu_search">Search</string>
+</resources>

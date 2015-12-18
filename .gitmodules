@@ -1,0 +1,3 @@
+[submodule "org.codeforamerica.open311"]
+	path = org.codeforamerica.open311
+	url = git@github.com:CodeForEindhoven/open311_java.git

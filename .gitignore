@@ -13,7 +13,7 @@ build/
 # IntelliJ Idea
 .idea/
 *.iml
-
+!open311-android.iml
 # Eclipse
 .classpath
 .project
