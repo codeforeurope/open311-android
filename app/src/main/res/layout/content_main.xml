@@ -6,10 +6,20 @@
     android:layout_height="match_parent"
     android:id="@+id/swipe_container"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="org.open311.android.MainActivity"
+    tools:context=".activities.MainActivity"
     tools:showIn="@layout/app_bar_main">
-
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:dividerHeight="10dp"
+        android:listSelector="@android:color/transparent"
+        android:cacheColorHint="@android:color/transparent"
+        android:headerDividersEnabled="true"
+        android:footerDividersEnabled="true"
+        android:id="@+id/service_list"
+        />
+<!--    <ListView
         android:id="@+id/service_list"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
@@ -18,5 +28,5 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true">
-    </ListView>
+    </ListView>-->
 </android.support.v4.widget.SwipeRefreshLayout>

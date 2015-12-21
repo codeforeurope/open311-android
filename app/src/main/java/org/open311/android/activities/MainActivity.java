@@ -5,7 +5,7 @@
  * @license http://www.gnu.org/licenses/gpl.txt GNU/GPL, see LICENSE.txt
  * @author Cliff Ingham <inghamn@bloomington.in.gov>
  */
-package org.open311.android;
+package org.open311.android.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,10 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,17 +31,26 @@ import android.widget.ListView;
 
 import org.codeforamerica.open311.facade.City;
 import org.codeforamerica.open311.facade.data.Service;
+import org.codeforamerica.open311.facade.data.ServiceRequest;
+import org.open311.android.R;
+import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ServiceListAdapter;
+import org.open311.android.receivers.GetRequestsReceiver;
 import org.open311.android.receivers.GetServicesListReceiver;
+import org.open311.android.services.GetRequestsService;
 import org.open311.android.services.GetServicesListService;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
     private SwipeRefreshLayout refreshLayout;
     private ServiceListAdapter listAdapter;
+    private RequestsAdapter requestsAdapter;
+    private List<ServiceRequest> requestsCollection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +62,7 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(getResources().getString(R.string.list_latest_messages));
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,6 +100,7 @@ public class MainActivity extends AppCompatActivity
         MenuItem item = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) item.getActionView();
         searchView.setOnQueryTextListener(this);
+        //((MenuItem)findViewById(R.id.list_recent_messages)).setChecked(true);
         return true;
     }
 
@@ -130,7 +144,41 @@ public class MainActivity extends AppCompatActivity
 
     // Services
     public void setupServices() {
-        setupGetServiceListServiceReceiver();
+        //setupGetServiceListServiceReceiver();
+        setupGetRequestsServiceReceiver();
+    }
+
+
+    public void setupGetRequestsServiceReceiver() {
+        // Initialize
+        GetRequestsReceiver receiver;
+
+        // Service Interfacing
+        receiver = new GetRequestsReceiver(new Handler());
+        receiver.setReceiver(new GetRequestsReceiver.Receiver() {
+            @Override
+            public void onReceiveResult(int resultCode, Bundle resultData) {
+                if (resultCode == RESULT_OK) {
+                    ArrayList<ServiceRequest> result = resultData.getParcelableArrayList("Requests");
+                    if (result != null) {
+                        RecyclerView rv = (RecyclerView) findViewById(R.id.service_list);
+                        LinearLayoutManager llm = new LinearLayoutManager(getApplicationContext());
+                        rv.setLayoutManager(llm);
+                        requestsCollection = result;
+                        requestsAdapter = new RequestsAdapter(requestsCollection);
+                        rv.setAdapter(requestsAdapter);
+                    }
+                } else {
+                    Log.d("Ooops", resultData.toString());
+                }
+            }
+        });
+
+        // Activate
+        Intent i = new Intent(this, GetRequestsService.class);
+        i.putExtra("receiver", receiver);
+        i.putExtra("city", City.BALTIMORE);
+        startService(i);
     }
 
     public void setupGetServiceListServiceReceiver() {
@@ -199,13 +247,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        listAdapter.getFilter().filter(query);
-        return true;
+        return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        listAdapter.getFilter().filter(newText);
+        requestsAdapter.getFilter().filter(newText.toLowerCase());
         return true;
     }
 }

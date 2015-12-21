@@ -17,6 +17,7 @@
     <string name="ApplicationIcon">Application Icon</string>
     <string name="setting_general">General</string>
     <string name="setting_user">User</string>
+    <string name="request_image">Image</string>
     <string name="setting_cloud">Servers</string>
     <string name="list_latest_messages">Recent reports</string>
     <string name="list_user_messages">My reports</string>
