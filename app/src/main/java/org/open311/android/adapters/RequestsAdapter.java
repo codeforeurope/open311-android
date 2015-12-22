@@ -28,7 +28,7 @@ import java.util.List;
 public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.RequestViewHolder> implements Filterable {
 
     private final List<ServiceRequest> requests;
-    private final List<ServiceRequest> filteredRequests;
+    private final ArrayList<ServiceRequest> filteredRequests;
 
     public RequestsAdapter(List<ServiceRequest> requests) {
         this.requests = requests;
@@ -66,7 +66,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
         //Media
         URL url = filteredRequests.get(position).getMediaUrl();
         if (url != null) {
-            new DownloadImageTask((ImageView) holder.requestImage)
+            new DownloadImageTask(holder.requestImage)
                     .execute(url.toString());
         } else {
             holder.requestImage.setImageDrawable(null);

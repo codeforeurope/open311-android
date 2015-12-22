@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Open311</string>
+    <string name="first_name">Voornaam</string>
+    <string name="format">Formaat</string>
+    <string name="gallery"></string>
+    <string name="last_name">Achternaam</string>
+    <string name="list_latest_messages">Recente meldingen</string>
+    <string name="menu_search">Zoek</string>
+    <string name="menu_settings">Instellingen</string>
+    <string name="name">Naam</string>
+    <string name="no">Nee</string>
+    <string name="phone">Telefoon</string>
+    <string name="yes">Ja</string>
+    <string name="action_settings">Instellingen</string>
+    <string name="Import">Importeren</string>
+    <string name="Send">Versturen</string>
+    <string name="Share">Delen</string>
+    <string name="Tools"></string>
+    <string name="camera"></string>
+    <string name="cancel">Annuleren</string>
+    <string name="delete">Verwijderen</string>
+    <string name="email">E-mail</string>
+    <string name="list_user_messages">Mijn meldingen</string>
+</resources>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:checkableBehavior="single">
-
+    <group
+        android:id="@+id/menu_top"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/list_user_messages"
             android:icon="@drawable/ic_notifications_on_24dp"
@@ -13,21 +14,20 @@
             android:title="@string/list_latest_messages" />
     </group>
 
-    <item android:title="@string/action_settings">
-        <menu>
-            <item
-                android:id="@+id/setting_general"
-                android:icon="@drawable/ic_settings_24dp"
-                android:title="@string/setting_general" />
-            <item
-                android:id="@+id/setting_user"
-                android:icon="@drawable/ic_timer_auto_24dp"
-                android:title="@string/setting_user" />
-            <item
-                android:id="@+id/setting_cloud"
-                android:icon="@drawable/ic_settings_system_daydream_24dp"
-                android:title="@string/setting_cloud" />
-        </menu>
-    </item>
-
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/setting_general"
+            android:icon="@drawable/ic_settings_24dp"
+            android:title="@string/setting_general" />
+        <item
+            android:id="@+id/setting_user"
+            android:icon="@drawable/ic_timer_auto_24dp"
+            android:title="@string/setting_user" />
+        <item
+            android:id="@+id/setting_cloud"
+            android:icon="@drawable/ic_settings_system_daydream_24dp"
+            android:title="@string/setting_cloud" />
+    </group>
 </menu>
