@@ -9,6 +9,15 @@ Open311 GeoReport v2 is an open standard for sharing non-emergency issues in pub
 
 The current version of the specification is documented at http://wiki.open311.org/GeoReport_v2
 
+## Getting started
+
+* Clone this repository (recursive as it depends on open311_java)
+```
+git clone --recursive https://github.com/CodeForEindhoven/open311-android.git
+```
+* Start Android Studio
+* Select __import project__ and point the dialog to the directory containing the created github repository 
+
 ## Contributing
 Online documentation is in the [Wiki](https://github.com/City-of-Bloomington/open311-android/wiki) here on GitHub.  Questions not addressed in the wiki should be sent to the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/open311-mobile).
 
