@@ -1,12 +1,9 @@
 package org.open311.android.adapters;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
+import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,30 +12,77 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.R;
+import org.open311.android.fragments.RequestsFragment;
+import org.open311.android.filters.RequestsFilter;
 
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
-public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.RequestViewHolder> implements Filterable {
+public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHolder> implements Filterable {
 
-    private final List<ServiceRequest> requests;
-    private final ArrayList<ServiceRequest> filteredRequests;
+    private List<ServiceRequest> requests;
+    private ArrayList<ServiceRequest> filteredRequests;
+    private final RequestsFragment.OnListFragmentInteractionListener mListener;
+    private Context context;
 
-    public RequestsAdapter(List<ServiceRequest> requests) {
+    public ArrayList<ServiceRequest> getFilteredRequests() {
+        return filteredRequests;
+    }
+
+    public List<ServiceRequest> getRequests() {
+        return requests;
+    }
+
+    public void appendRequests(List<ServiceRequest> requests) {
+        this.requests.addAll(requests);
+        if (this.requests != null) {
+            setFilteredRequests(this.requests);
+        }
+    }
+
+    public void setRequests(List<ServiceRequest> requests) {
         this.requests = requests;
-        filteredRequests = new ArrayList<>(requests);
+
+        if (requests != null) {
+            setFilteredRequests(requests);
+        }
+    }
+
+    public void setFilteredRequests(List<ServiceRequest> requests) {
+        ArrayList<ServiceRequest> filteredRequests = new ArrayList<ServiceRequest>(requests);
+        this.filteredRequests.clear();
+        // TODO sort?
+        for (final ServiceRequest sr : filteredRequests) {
+            this.filteredRequests.add(sr);
+        }
+        Collections.reverse(this.filteredRequests);
+        // TODO filter?
+        this.notifyDataSetChanged();
+    }
+
+    public RequestsAdapter(List<ServiceRequest> requests, RequestsFragment.OnListFragmentInteractionListener mListener) {
+        this.requests = requests;
+        this.mListener = mListener;
+        if (requests != null) {
+            filteredRequests = new ArrayList<ServiceRequest>(requests);
+        } else {
+            filteredRequests = null;
+        }
+        context = null;
     }
 
     @Override
-    public RequestViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.request_cardview, parent, false);
-        return new RequestViewHolder(v);
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        context = parent.getContext();
+        View v = LayoutInflater.from(context).inflate(R.layout.cardview_request, parent, false);
+        return new ViewHolder(v);
     }
 
     @Override
@@ -47,7 +91,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
     }
 
     @Override
-    public void onBindViewHolder(RequestViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         String id = filteredRequests.get(position).getServiceRequestId();
         Date requested = filteredRequests.get(position).getRequestedDatetime();
         Date updated = filteredRequests.get(position).getUpdatedDatetime();
@@ -66,8 +110,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
         //Media
         URL url = filteredRequests.get(position).getMediaUrl();
         if (url != null) {
-            new DownloadImageTask(holder.requestImage)
-                    .execute(url.toString());
+            Picasso.with(context).load(url.toString()).fit().centerCrop().into(holder.requestImage);
+            holder.requestImage.setVisibility(View.VISIBLE);
         } else {
             holder.requestImage.setImageDrawable(null);
             holder.requestImage.setVisibility(View.GONE);
@@ -80,11 +124,21 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
 
 
         holder.requestName.setText(name);
+        holder.requestAddress.setText(address);
+        if (status != null) {
+            holder.requestStatus.setText(status.toString());
+            holder.requestDescription.setVisibility(View.VISIBLE);
+        } else {
+            holder.requestStatus.setVisibility(View.GONE);
+        }
+        if (updated != null && requested != null) {
+            holder.requestUpdated.setText(DateUtils.getRelativeTimeSpanString(updated.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS));
 
-        holder.requestUpdated.setText(DateUtils.getRelativeTimeSpanString(updated.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS));
-        holder.requestRequested.setText(DateUtils.getRelativeTimeSpanString(requested.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS));
-        if (updated.equals(requested)) {
-            holder.requestUpdated.setVisibility(View.GONE);
+            //holder.requestRequested.setText(DateUtils.getRelativeTimeSpanString(requested.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE));
+
+            if (updated.equals(requested)) {
+                holder.requestUpdated.setVisibility(View.GONE);
+            }
         }
         if (description != null && description.length() > 0) {
             holder.requestDescription.setText(description);
@@ -97,7 +151,11 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
 
     @Override
     public int getItemCount() {
-        return filteredRequests.size();
+        if (filteredRequests != null) {
+            return filteredRequests.size();
+        } else {
+            return this.requests.size();
+        }
     }
 
     @Override
@@ -105,88 +163,35 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
         return new RequestsFilter(this, requests);
     }
 
-    class RequestsFilter extends Filter {
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View mView;
+        public final CardView requestCardView;
+        public final TextView requestName;
+        public final TextView requestDescription;
+        //public final TextView requestRequested;
+        public final TextView requestUpdated;
+        public final TextView requestStatus;
+        public final TextView requestAddress;
+        public final ImageView requestImage;
+        public ServiceRequest mItem;
 
-        private final RequestsAdapter adapter;
-        private final List<ServiceRequest> originalList;
-        private final List<ServiceRequest> filteredList;
-
-        private RequestsFilter(RequestsAdapter adapter, List<ServiceRequest> originalList) {
-            super();
-            this.adapter = adapter;
-            this.originalList = new LinkedList<>(originalList);
-            this.filteredList = new ArrayList<>();
+        ViewHolder(View view) {
+            super(view);
+            mView = view;
+            requestCardView = (CardView) view.findViewById(R.id.requests_list);
+            requestName = (TextView) view.findViewById(R.id.request_title);
+            requestAddress = (TextView) view.findViewById(R.id.request_address);
+            requestDescription = (TextView) view.findViewById(R.id.request_description);
+            //requestRequested = (TextView) view.findViewById(R.id.request_requested);
+            requestUpdated = (TextView) view.findViewById(R.id.request_updated);
+            requestImage = (ImageView) view.findViewById(R.id.request_image);
+            requestStatus = (TextView) view.findViewById(R.id.request_status);
         }
 
         @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            filteredList.clear();
-            final FilterResults results = new FilterResults();
-
-            if (constraint.length() == 0) {
-                filteredList.addAll(originalList);
-            } else {
-                for (final ServiceRequest sr : originalList) {
-                    final String text = sr.getServiceName().toLowerCase() + " " + sr.getDescription().toLowerCase();
-                    if (text.contains(constraint)) {
-                        filteredList.add(sr);
-                    }
-                }
-            }
-            results.values = filteredList;
-            results.count = filteredList.size();
-            return results;
+        public String toString() {
+            return super.toString() + " '" + requestDescription.getText() + "'";
         }
 
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            adapter.filteredRequests.clear();
-            adapter.filteredRequests.addAll((ArrayList<ServiceRequest>) results.values);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    public static class RequestViewHolder extends RecyclerView.ViewHolder {
-        CardView requestCardView;
-        TextView requestName;
-        TextView requestDescription;
-        TextView requestRequested;
-        TextView requestUpdated;
-        ImageView requestImage;
-
-        RequestViewHolder(View itemView) {
-            super(itemView);
-            requestCardView = (CardView) itemView.findViewById(R.id.service_list);
-            requestName = (TextView) itemView.findViewById(R.id.request_title);
-            requestDescription = (TextView) itemView.findViewById(R.id.request_description);
-            requestRequested = (TextView) itemView.findViewById(R.id.request_requested);
-            requestUpdated = (TextView) itemView.findViewById(R.id.request_updated);
-            requestImage = (ImageView) itemView.findViewById(R.id.request_image);
-        }
-    }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
     }
 }

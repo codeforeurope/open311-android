@@ -15,14 +15,11 @@ import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-public class GetRequestsService extends IntentService {
-
-    public GetRequestsService() {
-        super("GetRequests-service");
+public class GetServiceRequestsService extends IntentService {
+    public GetServiceRequestsService() {
+        super("GetServiceRequests-service");
     }
 
     @Override
@@ -30,23 +27,24 @@ public class GetRequestsService extends IntentService {
 
         ResultReceiver rec = intent.getParcelableExtra("receiver");
         City city = (City) intent.getSerializableExtra("city");
-        Bundle bundle = new Bundle();
 
+        Bundle bundle = new Bundle();
+        APIWrapperFactory factory;
         try {
-            APIWrapperFactory factory = new APIWrapperFactory(city).setCache(new NoCache());
+            if (city != null) {
+                factory = new APIWrapperFactory(city).setCache(new NoCache()).withLogs();
+            } else {
+                factory = new APIWrapperFactory(intent.getStringExtra("endpointUrl"), intent.getStringExtra("jurisdictionId")).setCache(new NoCache()).withLogs();
+            }
+
             APIWrapper wrapper = factory.build();
             GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
             List<ServiceRequest> result = wrapper.getServiceRequests(filter);
-            ArrayList<ServiceRequest> requests = new ArrayList<>();
+            ArrayList<ServiceRequest> requests = new ArrayList<ServiceRequest>();
             for (ServiceRequest request : result) {
                 requests.add(request);
 
             }
-            //Collections.sort(requests, new Comparator<ServiceRequest>() {
-            //    public int compare(ServiceRequest emp1, ServiceRequest emp2) {
-            //        return emp1.getServiceName().compareToIgnoreCase(emp2.getServiceName());
-            //    }
-            //});
             bundle.putParcelableArrayList("Requests", requests);
         } catch (APIWrapperException e) {
             e.printStackTrace();
@@ -55,7 +53,4 @@ public class GetRequestsService extends IntentService {
 
         rec.send(Activity.RESULT_OK, bundle);
     }
-
 }
-
-

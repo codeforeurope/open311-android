@@ -5,11 +5,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.os.ResultReceiver;
 
+import org.codeforamerica.open311.facade.data.ServiceRequest;
+
+import java.util.List;
+
 @SuppressLint("ParcelCreator")
-public class GetRequestsReceiver extends ResultReceiver {
+public class ServiceRequestsReceiver  extends ResultReceiver {
     private Receiver receiver;
 
-    public GetRequestsReceiver(Handler handler) {
+    public ServiceRequestsReceiver(Handler handler) {
         super(handler);
     }
 
@@ -18,7 +22,7 @@ public class GetRequestsReceiver extends ResultReceiver {
     }
 
     public interface Receiver {
-        public void onReceiveResult(int resultCode, Bundle resultData);
+        List<ServiceRequest> onReceiveResult(int resultCode, Bundle resultData);
     }
 
     @Override

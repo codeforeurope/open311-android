@@ -5,29 +5,26 @@
         android:id="@+id/menu_top"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/list_user_messages"
+            android:id="@+id/nav_reports_my"
             android:icon="@drawable/ic_notifications_on_24dp"
-            android:title="@string/list_user_messages" />
+            android:title="@string/menu_reports_my" />
         <item
-            android:id="@+id/list_recent_messages"
+            android:id="@+id/nav_reports_recent"
             android:icon="@drawable/ic_notifications_24dp"
-            android:title="@string/list_latest_messages" />
+            android:title="@string/menu_reports_recent" />
     </group>
 
     <group
         android:id="@+id/menu_bottom"
         android:checkableBehavior="none">
         <item
-            android:id="@+id/setting_general"
+            android:id="@+id/nav_settings"
             android:icon="@drawable/ic_settings_24dp"
-            android:title="@string/setting_general" />
+            android:title="@string/menu_settings" />
         <item
-            android:id="@+id/setting_user"
-            android:icon="@drawable/ic_timer_auto_24dp"
-            android:title="@string/setting_user" />
-        <item
-            android:id="@+id/setting_cloud"
-            android:icon="@drawable/ic_settings_system_daydream_24dp"
-            android:title="@string/setting_cloud" />
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_info_24dp"
+            android:title="@string/menu_about" />
     </group>
+
 </menu>

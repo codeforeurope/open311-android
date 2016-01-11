@@ -21,7 +21,7 @@ public class ServiceListAdapter extends ArrayAdapter<Service> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Service service = getItem(position);
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.service_row, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.cardview_service, parent, false);
         }
         TextView title = (TextView) convertView.findViewById(R.id.service_title);
         TextView description = (TextView) convertView.findViewById(R.id.service_description);

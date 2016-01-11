@@ -42,7 +42,7 @@ public class GetServicesListService extends IntentService {
             APIWrapperFactory factory = new APIWrapperFactory(city).setCache(AndroidCache.getInstance(getApplicationContext()));
             APIWrapper wrapper = factory.build();
             List<Service> result = wrapper.getServiceList();
-            ArrayList<Service> serviceList = new ArrayList<>();
+            ArrayList<Service> serviceList = new ArrayList<Service>();
             for (Service service : result) {
                 serviceList.add(service);
 
