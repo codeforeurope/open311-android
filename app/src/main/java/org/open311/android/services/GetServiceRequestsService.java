@@ -14,6 +14,7 @@ import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilte
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,13 +38,32 @@ public class GetServiceRequestsService extends IntentService {
                 factory = new APIWrapperFactory(intent.getStringExtra("endpointUrl"), intent.getStringExtra("jurisdictionId")).setCache(new NoCache()).withLogs();
             }
 
-            APIWrapper wrapper = factory.build();
+            APIWrapper wrapper = null;
+            try {
+                wrapper = factory.build();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                rec.send(Activity.RESULT_CANCELED, null);
+            }
             GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
-            List<ServiceRequest> result = wrapper.getServiceRequests(filter);
+            List<ServiceRequest> result = null;
+            try {
+                if (wrapper != null) {
+                    result = wrapper.getServiceRequests(filter);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                rec.send(Activity.RESULT_CANCELED, null);
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+                rec.send(Activity.RESULT_CANCELED, null);
+            }
             ArrayList<ServiceRequest> requests = new ArrayList<ServiceRequest>();
-            for (ServiceRequest request : result) {
-                requests.add(request);
+            if (result != null) {
+                for (ServiceRequest request : result) {
+                    requests.add(request);
 
+                }
             }
             bundle.putParcelableArrayList("Requests", requests);
         } catch (APIWrapperException e) {

@@ -15,6 +15,7 @@ import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.AndroidCache;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,6 +56,12 @@ public class GetServicesListService extends IntentService {
 
             bundle.putParcelableArrayList("ServiceList", serviceList);
         } catch (APIWrapperException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (IOException e) {
             e.printStackTrace();
             rec.send(Activity.RESULT_CANCELED, null);
         }

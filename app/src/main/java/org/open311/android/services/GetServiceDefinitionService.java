@@ -9,15 +9,11 @@ import android.support.v4.os.ResultReceiver;
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.City;
-import org.codeforamerica.open311.facade.EndpointType;
-import org.codeforamerica.open311.facade.Format;
-import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.AndroidCache;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 
 public class GetServiceDefinitionService extends IntentService {
 
@@ -39,6 +35,12 @@ public class GetServiceDefinitionService extends IntentService {
             ServiceDefinition result = wrapper.getServiceDefinition(serviceCode);
             bundle.putParcelable("ServiceList", result);
         } catch (APIWrapperException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (IOException e) {
             e.printStackTrace();
             rec.send(Activity.RESULT_CANCELED, null);
         }

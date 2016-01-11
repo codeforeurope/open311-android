@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    app:cardUseCompatPadding="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="6dp">
+        android:padding="8dp">
 
         <LinearLayout
             android:id="@+id/request_header"
@@ -23,7 +25,7 @@
 
                 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/request_title"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="6"
                     android:gravity="center_vertical|start"
@@ -62,8 +64,8 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:src="@drawable/ic_place_12dp"
-                    android:contentDescription="location" />
+                    android:contentDescription="location"
+                    android:src="@drawable/ic_place_12dp" />
 
                 <TextView
                     android:id="@+id/request_address"
