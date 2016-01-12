@@ -14,6 +14,7 @@ import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilte
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +54,12 @@ public class GetServiceRequestsService extends IntentService {
             }
             bundle.putParcelableArrayList("Requests", requests);
         } catch (APIWrapperException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (IOException e) {
             e.printStackTrace();
             rec.send(Activity.RESULT_CANCELED, null);
         }

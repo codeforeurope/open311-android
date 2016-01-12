@@ -58,6 +58,12 @@ public class GetServicesListService extends IntentService {
         } catch (APIWrapperException e) {
             e.printStackTrace();
             rec.send(Activity.RESULT_CANCELED, null);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
+        } catch (IOException e) {
+            e.printStackTrace();
+            rec.send(Activity.RESULT_CANCELED, null);
         }
 
         rec.send(Activity.RESULT_OK, bundle);
