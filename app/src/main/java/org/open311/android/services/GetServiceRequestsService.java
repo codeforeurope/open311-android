@@ -14,7 +14,6 @@ import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilte
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,25 +37,12 @@ public class GetServiceRequestsService extends IntentService {
                 factory = new APIWrapperFactory(intent.getStringExtra("endpointUrl"), intent.getStringExtra("jurisdictionId")).setCache(new NoCache()).withLogs();
             }
 
-            APIWrapper wrapper = null;
-            try {
-                wrapper = factory.build();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                rec.send(Activity.RESULT_CANCELED, null);
-            }
+            APIWrapper wrapper;
+            wrapper = factory.build();
             GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
             List<ServiceRequest> result = null;
-            try {
-                if (wrapper != null) {
-                    result = wrapper.getServiceRequests(filter);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-                rec.send(Activity.RESULT_CANCELED, null);
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-                rec.send(Activity.RESULT_CANCELED, null);
+            if (wrapper != null) {
+                result = wrapper.getServiceRequests(filter);
             }
             ArrayList<ServiceRequest> requests = new ArrayList<ServiceRequest>();
             if (result != null) {
