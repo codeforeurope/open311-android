@@ -45,3 +45,5 @@ proguard/
 .gradle/
 build/
 bin/
+local.properties
+

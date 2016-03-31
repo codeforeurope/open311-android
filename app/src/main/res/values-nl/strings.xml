@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Open311</string>
+    <string name="app_name">Meldloket</string>
     <string name="first_name">Voornaam</string>
     <string name="format">Formaat</string>
     <string name="gallery"></string>
+    <string name="location">Locatie</string>
+    <string name="description">Omschrijving</string>
+    <string name="report_hint_service">Selecteer het soort overlast</string>
+    <string name="report_hint_photo">Neem een foto</string>
+    <string name="report_hint_location">Selecteer een locatie</string>
+    <string name="report_hint_description">Wat is het probleem?</string>
+    <string name="report_status">Status</string>
+    <string name="report_attributes">Attributen</string>
+    <string name="report_description">Omschrijving van het probleem</string>
+    <string name="report_date">Datum</string>
+    <string name="report_photo">Foto</string>
+    <string name="report_location">Locatie</string>
+    <string name="report_address">Vul een adres in</string>
+    <string name="report_visibility">Deel met het publiek</string>
     <string name="last_name">Achternaam</string>
     <string name="list_latest_messages">Recente meldingen</string>
     <string name="menu_search">Zoek</string>
@@ -18,8 +32,10 @@
     <string name="Share">Delen</string>
     <string name="Tools"></string>
     <string name="camera"></string>
+    <string name="submit">Verstuur</string>
     <string name="cancel">Annuleren</string>
     <string name="delete">Verwijderen</string>
+    <string name="save">Opslaan</string>
     <string name="email">E-mail</string>
     <string name="list_user_messages">Mijn meldingen</string>
 </resources>

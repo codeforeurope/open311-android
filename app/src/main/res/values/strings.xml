@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Open311</string>
+    <string name="app_name">Civic Helpdesk</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="Import">Import</string>
@@ -45,10 +45,26 @@
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="location">Location</string>
+    <string name="description">Description</string>
+    <string name="report_hint_service">Select the type of service request</string>
+    <string name="report_hint_photo">Take a photo</string>
+    <string name="report_hint_location">Select a location</string>
+    <string name="report_hint_description">Describe the problem</string>
+    <string name="report_service">Service</string>
     <string name="report_status">Status</string>
     <string name="report_attributes">Attributes</string>
     <string name="report_description">Description of problem</string>
     <string name="report_date">Reported Date</string>
+    <string name="report_photo">Photo</string>
+    <string name="report_location">Location</string>
+    <string name="report_address">Enter an address</string>
+    <string name="report_visibility">Share request with public</string>
+    <string name="report_required_field">Required field</string>
+    <string name="report_dialog_title">Service Request</string>
+    <string name="report_dialog_message">Wait while sending</string>
+    <string name="report_success_message">Your service request has been sent</string>
+    <string name="report_failure_message">Unsuccessful, please try again later</string>
+    <string name="next">Next step</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>

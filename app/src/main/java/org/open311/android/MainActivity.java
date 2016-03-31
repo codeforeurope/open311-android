@@ -6,15 +6,11 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,17 +21,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import org.codeforamerica.open311.facade.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
-import org.open311.android.dummy.DummyContent;
-import org.open311.android.fragments.IntroFragment;
+import org.open311.android.dummy.DummyContent.DummyItem;
+import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.ItemFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.fragments.SettingsFragment;
+import org.open311.android.helpers.Installation;
 import org.open311.android.receivers.ServiceRequestsReceiver;
 import org.open311.android.services.GetServiceRequestsService;
 
@@ -45,16 +40,23 @@ import java.util.List;
 import static org.open311.android.helpers.Utils.*;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
+        implements
+        NavigationView.OnNavigationItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener,
-        IntroFragment.OnFragmentInteractionListener,
+        ReportFragment.OnFragmentInteractionListener,
         RequestsFragment.OnListFragmentInteractionListener,
         SettingsFragment.OnFragmentInteractionListener,
-        ItemFragment.OnListFragmentInteractionListener, SearchView.OnQueryTextListener, FragmentManager.OnBackStackChangedListener {
+        ItemFragment.OnListFragmentInteractionListener,
+        SearchView.OnQueryTextListener,
+        FragmentManager.OnBackStackChangedListener {
     private ActionBarDrawerToggle toggle;
     private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private String installationId;
+    private ReportFragment reportFragment;
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     public SharedPreferences getSettings() {
         return settings;
@@ -66,24 +68,19 @@ public class MainActivity extends AppCompatActivity
 
     protected SharedPreferences settings;
 
+    public String getInstallationId() {
+        return installationId;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         settings = openSettings(this);
+        installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
@@ -98,6 +95,12 @@ public class MainActivity extends AppCompatActivity
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        if (savedInstanceState != null) {
+            //Restore the fragment's instance
+            reportFragment = (ReportFragment) getSupportFragmentManager().getFragment(
+                    savedInstanceState, "reportFragment");
+        }
     }
 
     @Override
@@ -148,15 +151,23 @@ public class MainActivity extends AppCompatActivity
 
         Fragment fragment = null;
         Class fragmentClass = null;
+
         int id = item.getItemId();
-        if (id == R.id.nav_reports_my) {
-            fragmentClass = ItemFragment.class;
-        } else if (id == R.id.nav_reports_recent) {
-            fragmentClass = RequestsFragment.class;
-        } else if (id == R.id.nav_settings) {
-            fragmentClass = SettingsFragment.class;
-        } else if (id == R.id.nav_about) {
-            fragmentClass = IntroFragment.class;
+
+        switch (id) {
+            case R.id.nav_reports_my:
+                fragmentClass = ItemFragment.class;
+                break;
+            case R.id.nav_reports_recent:
+                fragmentClass = RequestsFragment.class;
+                break;
+            case R.id.nav_settings:
+                fragmentClass = SettingsFragment.class;
+                break;
+            case R.id.nav_about:
+                fragmentClass = ReportFragment.class;
+                break;
+            default: // fragmentClass = null
         }
 
         try {
@@ -186,12 +197,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
+        // Dummy method. No implementation needed...
     }
 
     @Override
@@ -217,6 +223,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onBackStackChanged() {
 
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        if (reportFragment != null) {
+            // Save the fragment's instance
+            getSupportFragmentManager().putFragment(
+                    savedInstanceState, "reportFragment", reportFragment);
+        }
     }
 
     @Override
@@ -253,7 +269,9 @@ public class MainActivity extends AppCompatActivity
                         return null;
                     }
                 } else {
-                    Log.e("open311", resultData.toString());
+                    if (resultData != null) {
+                        Log.e("open311", resultData.toString());
+                    }
                     return null;
                 }
             }
@@ -269,10 +287,15 @@ public class MainActivity extends AppCompatActivity
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), MainActivity.this);
-        adapter.addFragment(new RequestsFragment(), "ONE");
-        adapter.addFragment(new ItemFragment(), "TWO");
-        adapter.addFragment(new IntroFragment(), "THREE");
-        adapter.addFragment(new SettingsFragment(), "FOUR");
+        adapter.addFragment(new RequestsFragment(), "Requests");
+        adapter.addFragment(new ItemFragment(), "Item");
+        adapter.addFragment(new ReportFragment(), "Report");
+        adapter.addFragment(new SettingsFragment(), "Settings");
         viewPager.setAdapter(adapter);
+    }
+
+    @Override
+    public void onListFragmentInteraction(DummyItem item) {
+
     }
 }
