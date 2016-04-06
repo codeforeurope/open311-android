@@ -21,15 +21,18 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
 import org.open311.android.dummy.DummyContent.DummyItem;
+import org.open311.android.fragments.MyReportsFragment;
+import org.open311.android.fragments.PolicyFragment;
+import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.ItemFragment;
 import org.open311.android.fragments.RequestsFragment;
-import org.open311.android.fragments.SettingsFragment;
 import org.open311.android.helpers.Installation;
 import org.open311.android.receivers.ServiceRequestsReceiver;
 import org.open311.android.services.GetServiceRequestsService;
@@ -45,12 +48,12 @@ public class MainActivity extends AppCompatActivity
         SwipeRefreshLayout.OnRefreshListener,
         ReportFragment.OnFragmentInteractionListener,
         RequestsFragment.OnListFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener,
+        MyReportsFragment.OnFragmentInteractionListener,
+        ProfileFragment.OnFragmentInteractionListener,
         ItemFragment.OnListFragmentInteractionListener,
         SearchView.OnQueryTextListener,
         FragmentManager.OnBackStackChangedListener {
     private ActionBarDrawerToggle toggle;
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private String installationId;
@@ -85,11 +88,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.setDrawerIndicatorEnabled(false); // Hide the hamburger icon
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView.setNavigationItemSelectedListener(this);
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
@@ -118,9 +123,23 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(this);
-        //((MenuItem)findViewById(R.id.list_recent_messages)).setChecked(true);
+
+        // Hide the search feature for now ...
+        item.setVisible(false);
+        // SearchView searchView = (SearchView) item.getActionView();
+        // searchView.setOnQueryTextListener(this);
+
+        // Add click listener to action item -> not yet implemented
+        // See: res/menu/main.xml
+        MenuItem actionItem = menu.findItem(R.id.action_settings);
+        actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                String msg = "Not yet implemented";
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
         return true;
     }
 
@@ -156,13 +175,13 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_reports_my:
-                fragmentClass = ItemFragment.class;
+                fragmentClass = PolicyFragment.class; // ItemFragment.class;
                 break;
             case R.id.nav_reports_recent:
-                fragmentClass = RequestsFragment.class;
+                fragmentClass = MyReportsFragment.class; // RequestsFragment.class;
                 break;
             case R.id.nav_settings:
-                fragmentClass = SettingsFragment.class;
+                fragmentClass = ProfileFragment.class;
                 break;
             case R.id.nav_about:
                 fragmentClass = ReportFragment.class;
@@ -287,10 +306,11 @@ public class MainActivity extends AppCompatActivity
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), MainActivity.this);
-        adapter.addFragment(new RequestsFragment(), "Requests");
-        adapter.addFragment(new ItemFragment(), "Item");
+        //adapter.addFragment(new RequestsFragment(), "Requests");
+        adapter.addFragment(new MyReportsFragment(), "MyReports");
         adapter.addFragment(new ReportFragment(), "Report");
-        adapter.addFragment(new SettingsFragment(), "Settings");
+        adapter.addFragment(new ProfileFragment(), "Profile");
+        adapter.addFragment(new PolicyFragment(), "Policy");
         viewPager.setAdapter(adapter);
     }
 

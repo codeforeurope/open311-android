@@ -60,6 +60,7 @@
     <string name="report_address">Enter an address</string>
     <string name="report_visibility">Share request with public</string>
     <string name="report_required_field">Required field</string>
+    <string name="report_loading">Loading</string>
     <string name="report_dialog_title">Service Request</string>
     <string name="report_dialog_message">Wait while sending</string>
     <string name="report_success_message">Your service request has been sent</string>
@@ -84,6 +85,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_email">Email</string>
     <string name="hint_name">Name</string>
+    <string name="hint_phone">Phone</string>
     <string name="hint_password">Password</string>
     <string name="btn_sign_up">Sign Up</string>
     <string name="request_image">Image</string>

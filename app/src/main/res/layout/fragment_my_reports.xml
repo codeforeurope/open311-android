@@ -1,0 +1,28 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.MyReportsFragment">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:dividerHeight="16dp"
+            android:padding="10dp">
+
+            <include layout="@layout/cardview_request"
+                android:id="@+id/dummy_card_1" />
+
+            <include layout="@layout/cardview_request"
+                android:id="@+id/dummy_card_2" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

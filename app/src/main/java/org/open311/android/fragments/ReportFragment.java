@@ -238,7 +238,6 @@ public class ReportFragment extends Fragment {
 
         btnLocation.setIcon(R.drawable.ic_location_on_black_24dp);
         btnLocation.setHint(getString(R.string.report_hint_location));
-
         btnLocation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -565,6 +564,11 @@ public class ReportFragment extends Fragment {
     }
 
     private void onLocationButtonClicked() {
+        progress = new ProgressDialog(getContext());
+        progress.setMessage(getString(R.string.report_loading) + "...");
+        //progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress.show();
+
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
             startActivityForResult(builder.build(getActivity()), LOCATION_REQUEST);
@@ -583,7 +587,7 @@ public class ReportFragment extends Fragment {
             return;
         }
 
-        progress = new ProgressDialog(getActivity());
+        progress = new ProgressDialog(getContext());
         progress.setTitle(getString(R.string.report_dialog_title));
         progress.setMessage(getString(R.string.report_dialog_message) + "...");
         progress.show();
@@ -640,6 +644,9 @@ public class ReportFragment extends Fragment {
         }
 
         if (requestCode == LOCATION_REQUEST) {
+            if (progress != null) {
+                progress.dismiss();
+            }
             if (resultCode == getActivity().RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, getActivity());
                 LatLng position = place.getLatLng();
@@ -685,7 +692,7 @@ public class ReportFragment extends Fragment {
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
 
-                progress.dismiss();
+                if (progress != null) progress.dismiss();
 
                 if (response != null) {
                     success = true;

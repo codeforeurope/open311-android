@@ -10,6 +10,7 @@
     <string name="report_hint_photo">Neem een foto</string>
     <string name="report_hint_location">Selecteer een locatie</string>
     <string name="report_hint_description">Wat is het probleem?</string>
+    <string name="report_service">Soort Overlast</string>
     <string name="report_status">Status</string>
     <string name="report_attributes">Attributen</string>
     <string name="report_description">Omschrijving van het probleem</string>
@@ -18,10 +19,21 @@
     <string name="report_location">Locatie</string>
     <string name="report_address">Vul een adres in</string>
     <string name="report_visibility">Deel met het publiek</string>
+    <string name="report_required_field">Verplicht veld</string>
+    <string name="report_loading">Wordt geladen</string>
+    <string name="report_dialog_title">Overlast Melding</string>
+    <string name="report_dialog_message">Wordt verstuurd</string>
+    <string name="report_success_message">Uw melding is verstuurd</string>
+    <string name="report_failure_message">Mislukt, probeer nogmaals</string>
     <string name="last_name">Achternaam</string>
     <string name="list_latest_messages">Recente meldingen</string>
     <string name="menu_search">Zoek</string>
     <string name="menu_settings">Instellingen</string>
+    <string name="menu_reports_my">Mijn Meldingen</string>
+    <string name="menu_reports_recent">Recente Meldingen</string>
+    <string name="menu_report">Melding</string>
+    <string name="menu_archive">Archief</string>
+    <string name="menu_about">Over het Meldloket</string>
     <string name="name">Naam</string>
     <string name="no">Nee</string>
     <string name="phone">Telefoon</string>
@@ -38,4 +50,8 @@
     <string name="save">Opslaan</string>
     <string name="email">E-mail</string>
     <string name="list_user_messages">Mijn meldingen</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_name">Naam</string>
+    <string name="hint_phone">Telefoon</string>
+    <string name="hint_password">Wachtwoord</string>
 </resources>

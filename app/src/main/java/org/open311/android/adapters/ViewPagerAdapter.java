@@ -22,9 +22,11 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     private FragmentManager manager;
     private int[] imageResId = {
             R.drawable.ic_home_white_24dp,
-            R.drawable.ic_search_white_24dp,
             R.drawable.ic_chat_bubble_white_24dp,
-            R.drawable.ic_settings_white_24dp
+            R.drawable.ic_person_white_24dp,
+            R.drawable.ic_info_white_24dp
+            //R.drawable.ic_search_white_24dp,
+            //R.drawable.ic_settings_white_24dp
     };
     public ViewPagerAdapter(FragmentManager manager, Context context) {
         super(manager);

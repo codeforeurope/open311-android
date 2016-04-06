@@ -1,0 +1,54 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.PolicyFragment">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="Privacybeleid" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Wij zijn er van bewust dat u vertrouwen stelt in ons. Wij zien het dan ook als onze verantwoordelijkheid om uw privacy te beschermen. Op deze pagina laten we u weten welke gegevens we verzamelen als u onze app gebruikt en waarom we deze gegevens verzamelen. Zo snapt u precies hoe wij werken." />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Dit privacybeleid is van toepassing op de diensten van Meldloket. Door gebruik te maken van deze app geeft u aan het privacy beleid te accepteren." />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Meldloket respecteert de privacy van alle gebruikers van haar dienst en draagt er zorg voor dat de persoonlijke informatie die u ons verschaft vertrouwelijk wordt behandeld." />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="..." />
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="Vragen en feedback" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="We controleren regelmatig of we aan dit privacybeleid voldoen. Als u vragen heeft over dit privacybeleid, kunt u contact met ons opnemen:" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Meldloket\nGemeente Eindhoven\n040 - 2525 4646\nvragen@eindhoven.meldloket.nl" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>
