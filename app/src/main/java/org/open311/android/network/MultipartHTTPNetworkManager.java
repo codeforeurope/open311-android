@@ -87,7 +87,7 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri);
 
-                // Create scaled version of the image
+                // FIXME: create scaled version of the image
                 int width = bitmap.getWidth() / 5;
                 int height = bitmap.getHeight() / 5;
                 bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);

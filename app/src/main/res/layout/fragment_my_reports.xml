@@ -9,17 +9,20 @@
         android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/cardview_list"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:dividerHeight="16dp"
             android:padding="10dp">
 
+            <!--
             <include layout="@layout/cardview_request"
                 android:id="@+id/dummy_card_1" />
 
             <include layout="@layout/cardview_request"
                 android:id="@+id/dummy_card_2" />
+            -->
 
         </LinearLayout>
 

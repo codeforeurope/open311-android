@@ -54,4 +54,7 @@
     <string name="hint_name">Naam</string>
     <string name="hint_phone">Telefoon</string>
     <string name="hint_password">Wachtwoord</string>
+    <string name="invalid_email">Ongeldig email adres</string>
+    <string name="settings_saved">Gegevens zijn opgeslagen</string>
+    <string name="error_occurred">Er is een fout opgetreden</string>
 </resources>

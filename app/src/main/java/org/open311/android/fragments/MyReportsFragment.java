@@ -3,17 +3,36 @@ package org.open311.android.fragments;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.CardView;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import org.codeforamerica.open311.internals.parsing.DataParser;
 import org.open311.android.R;
+
+import java.io.EOFException;
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.OptionalDataException;
+import java.io.StreamCorruptedException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 
 
 /**
@@ -71,7 +90,77 @@ public class MyReportsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_my_reports, container, false);
+        LinearLayout myRequests = (LinearLayout) view.findViewById(R.id.cardview_list);
+        try {
+            ArrayList<Hashtable> list = loadServiceRequests();
 
+            System.out.println("NUMBER OF STORED SERVICE REQUESTS: " + list.size());
+
+            for (Hashtable record : list) {
+
+                Iterator iterator = record.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry entry = (Map.Entry) iterator.next();
+                    System.out.println(entry.getKey() + ": " + entry.getValue());
+                }
+
+                File imgFile = null;
+                if (record.containsKey(DataParser.MEDIA_URL_TAG)) {
+                    String filePath = (String) record.get(DataParser.MEDIA_URL_TAG);
+                    imgFile = new File(filePath);
+                }
+
+                CardView card = (CardView) LayoutInflater.from(container.getContext())
+                        .inflate(R.layout.cardview_request, myRequests, false);
+
+                TextView title = (TextView) card.findViewById(R.id.request_title);
+                TextView address = (TextView) card.findViewById(R.id.request_address);
+                TextView updated = (TextView) card.findViewById(R.id.request_updated);
+                TextView description = (TextView) card.findViewById(R.id.request_description);
+                TextView status = (TextView) card.findViewById(R.id.request_status);
+                ImageView image = (ImageView) card.findViewById(R.id.request_image);
+
+                if (imgFile == null) {
+                    image.setImageDrawable(null);
+                    image.setVisibility(View.GONE);
+                } else {
+                    Picasso.with(getContext()).load(imgFile).fit().centerCrop().into(image);
+                    image.setVisibility(View.VISIBLE);
+                }
+
+                title.setText((String) record.get(DataParser.SERVICE_NAME_TAG));
+                address.setText((String) record.get("address_string"));
+                status.setText((String) record.get("onbekend")); // has to be retrieved separately - DataParser.STATUS_TAG
+                description.setText((String) record.get(DataParser.DESCRIPTION_TAG));
+
+                Date date = null;
+                /*
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+                Date updated = null;
+                try {
+                    updated = df.parse((String) record.get(DataParser.UPDATED_DATETIME_TAG));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (updated != null) {
+                    CharSequence elapsedTime = DateUtils.getRelativeTimeSpanString(
+                            date.getTime(),
+                            (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS
+                    );
+                    updated.setText(elapsedTime);
+                } else {
+                    updated.setVisibility(View.GONE);
+                }*/
+                updated.setVisibility(View.GONE);
+
+                myRequests.addView(card);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        /*
         DummyCard cardOne = new DummyCard((CardView) view.findViewById(R.id.dummy_card_1));
         DummyCard cardTwo = new DummyCard((CardView) view.findViewById(R.id.dummy_card_2));
 
@@ -94,6 +183,7 @@ public class MyReportsFragment extends Fragment {
 
         Picasso.with(getContext()).load(mediaUrl).fit().centerCrop().into(cardTwo.image);
         cardTwo.image.setVisibility(View.VISIBLE);
+        */
 
         return view;
     }
@@ -135,6 +225,30 @@ public class MyReportsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private ArrayList<Hashtable> loadServiceRequests() throws IOException {
+        ArrayList<Hashtable> list = new ArrayList<Hashtable>();
+        ObjectInputStream file = null;
+        try {
+            file = new ObjectInputStream(getActivity().openFileInput(""));
+            while (true) {
+                list.add((Hashtable) file.readObject());
+            }
+        } catch (EOFException ignored) {
+            // as expected
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (OptionalDataException e) {
+            e.printStackTrace();
+        } catch (StreamCorruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (file != null) file.close();
+        }
+        return list;
     }
 
     private class DummyCard {

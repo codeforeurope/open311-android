@@ -42,6 +42,7 @@ import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
+import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
@@ -697,6 +698,8 @@ public class ReportFragment extends Fragment {
                 if (response != null) {
                     success = true;
                     result = getString(R.string.report_success_message);
+                    saveServiceRequestId(response.getServiceRequestId());
+                    System.out.println("SERVICE REQUEST ID: " + response.getServiceRequestId());
                 } else {
                     success = false;
                     result = getString(R.string.report_failure_message);
@@ -709,6 +712,16 @@ public class ReportFragment extends Fragment {
                 result = e.getMessage();
             }
             return result;
+        }
+
+        private boolean saveServiceRequestId(String id) {
+            MyReportsFile file = new MyReportsFile(getContext());
+            try {
+                return file.addServiceRequestId(id);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
         }
 
         protected void onPostExecute(String result) {

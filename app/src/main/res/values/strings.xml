@@ -80,6 +80,9 @@
     <string name="failure_loading_services">Failed to load service information</string>
     <string name="failure_posting_service">Posting report failed</string>
     <string name="error_403">This app does not have permission</string>
+    <string name="invalid_email">Invalid email address</string>
+    <string name="settings_saved">Settings are saved</string>
+    <string name="error_occurred">An error occurred</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

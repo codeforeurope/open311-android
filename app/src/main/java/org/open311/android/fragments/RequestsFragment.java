@@ -1,16 +1,13 @@
 package org.open311.android.fragments;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
+
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,9 +16,6 @@ import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
-import org.open311.android.dummy.DummyServiceRequests;
-import org.open311.android.receivers.ServiceRequestsReceiver;
-import org.open311.android.services.GetServiceRequestsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +28,7 @@ public class RequestsFragment extends Fragment {
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
     private RequestsAdapter recyclerViewAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,25 +57,29 @@ public class RequestsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.requests_list);
-
-        if (recyclerView instanceof RecyclerView) {
+        RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        if (listView instanceof RecyclerView) {
             Context context = view.getContext();
-            //RecyclerView recyclerView = (RecyclerView) recyclerView;
             if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
+                listView.setLayoutManager(new LinearLayoutManager(context));
             } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
+                listView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerViewAdapter =new RequestsAdapter(DummyServiceRequests.ITEMS, mListener);
-            recyclerView.setAdapter(recyclerViewAdapter);
+            List<ServiceRequest> items = new ArrayList<ServiceRequest>();
+            recyclerViewAdapter = new RequestsAdapter(items, mListener);
+            listView.setAdapter(recyclerViewAdapter);
             MainActivity myActivity = (MainActivity) getActivity();
             myActivity.setupGetRequestsServiceReceiver(recyclerViewAdapter);
-
         }
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                stopRefreshAnimation();
+            }
+        });
         return view;
     }
 
@@ -113,5 +112,9 @@ public class RequestsFragment extends Fragment {
      */
     public interface OnListFragmentInteractionListener {
         void onListFragmentInteraction(ServiceRequest item);
+    }
+
+    private void stopRefreshAnimation() {
+        swipeRefreshLayout.setRefreshing(false);
     }
 }

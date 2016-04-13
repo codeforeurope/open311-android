@@ -1,17 +1,23 @@
 package org.open311.android.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import org.open311.android.R;
 
 /**
- * A fragment with a Google +1 button.
+ * A Profile fragment.
+ *
  * Activities that contain this fragment must implement the
  * {@link ProfileFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
@@ -29,8 +35,20 @@ public class ProfileFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private SharedPreferences settings;
+
     public ProfileFragment() {
         // Required empty public constructor
+    }
+
+    /**
+     * Find a view by id - convenience method
+     *
+     * @param viewId
+     * @return View
+     */
+    private View findViewById(int viewId) {
+        return getActivity().findViewById(viewId);
     }
 
     /**
@@ -58,13 +76,29 @@ public class ProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        settings = getActivity().getPreferences(Context.MODE_PRIVATE);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        EditText name  = (EditText) view.findViewById(R.id.input_name);
+        EditText email = (EditText) view.findViewById(R.id.input_email);
+        EditText phone = (EditText) view.findViewById(R.id.input_phone);
+
+        name.setText(settings.getString("name", null));
+        email.setText(settings.getString("email", null));
+        phone.setText(settings.getString("phone", null));
+
+        Button submit = (Button) view.findViewById(R.id.btn_submit);
+        submit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onSubmitButtonClicked();
+            }
+        });
 
         return view;
     }
@@ -89,6 +123,39 @@ public class ProfileFragment extends Fragment {
         super.onDetach();
     }
 
+    private void onSubmitButtonClicked() {
+        SharedPreferences.Editor editor = settings.edit();
+        String result;
+        EditText name = (EditText) findViewById(R.id.input_name);
+        EditText email = (EditText) findViewById(R.id.input_email);
+        EditText phone = (EditText) findViewById(R.id.input_phone);
+
+        boolean isValid = true;
+
+        String strEmail = email.getText().toString();
+        if (! strEmail.isEmpty()) {
+            if (! isValidEmail(strEmail)) {
+                isValid = false;
+                email.setError(getString(R.string.invalid_email));
+                email.requestFocus();
+            } else {
+                editor.putString("email", strEmail);
+            }
+        }
+
+        if (! isValid) return;
+
+        editor.putString("name", name.getText().toString());
+        editor.putString("phone", phone.getText().toString());
+
+        if (editor.commit()) {
+            result = getString(R.string.settings_saved);
+        } else {
+            result = getString(R.string.error_occurred);
+        }
+        Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -104,4 +171,11 @@ public class ProfileFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    private boolean isValidEmail(CharSequence target) {
+        if (target == null) {
+            return false;
+        } else {
+            return Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
+    }
 }

@@ -25,6 +25,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
+                    android:inputType="textPersonName|textCapWords"
                     android:hint="@string/hint_name" />
             </android.support.design.widget.TextInputLayout>
 
@@ -56,7 +57,7 @@
                     android:hint="@string/hint_phone" />
             </android.support.design.widget.TextInputLayout>
 
-            <Button android:id="@+id/btn_signup"
+            <Button android:id="@+id/btn_submit"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/save"

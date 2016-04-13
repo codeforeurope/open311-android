@@ -26,12 +26,9 @@ import android.widget.Toast;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
-import org.open311.android.dummy.DummyContent.DummyItem;
-import org.open311.android.fragments.MyReportsFragment;
 import org.open311.android.fragments.PolicyFragment;
 import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
-import org.open311.android.fragments.ItemFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
 import org.open311.android.receivers.ServiceRequestsReceiver;
@@ -48,9 +45,7 @@ public class MainActivity extends AppCompatActivity
         SwipeRefreshLayout.OnRefreshListener,
         ReportFragment.OnFragmentInteractionListener,
         RequestsFragment.OnListFragmentInteractionListener,
-        MyReportsFragment.OnFragmentInteractionListener,
         ProfileFragment.OnFragmentInteractionListener,
-        ItemFragment.OnListFragmentInteractionListener,
         SearchView.OnQueryTextListener,
         FragmentManager.OnBackStackChangedListener {
     private ActionBarDrawerToggle toggle;
@@ -175,10 +170,10 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_reports_my:
-                fragmentClass = PolicyFragment.class; // ItemFragment.class;
+                fragmentClass = PolicyFragment.class;
                 break;
             case R.id.nav_reports_recent:
-                fragmentClass = MyReportsFragment.class; // RequestsFragment.class;
+                fragmentClass = RequestsFragment.class;
                 break;
             case R.id.nav_settings:
                 fragmentClass = ProfileFragment.class;
@@ -299,23 +294,17 @@ public class MainActivity extends AppCompatActivity
         // Activate
         Intent i = new Intent(getApplicationContext(), GetServiceRequestsService.class);
         i.putExtra("receiver", receiver);
-        i.putExtra("endpointUrl", settings.getString("endpointUrl", "http://311.baltimorecity.gov/open311/v2"));
-        i.putExtra("jurisdictionId", settings.getString("jurisdictionId", "baltimorecity.gov"));
+        i.putExtra("endpointUrl", settings.getString("endpointUrl", "http://eindhoven.meldloket.nl/crm/open311/v2"));
+        //i.putExtra("jurisdictionId", settings.getString("jurisdictionId", ""));
         startService(i);
     }
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), MainActivity.this);
-        //adapter.addFragment(new RequestsFragment(), "Requests");
-        adapter.addFragment(new MyReportsFragment(), "MyReports");
+        adapter.addFragment(new RequestsFragment(), "Requests");
         adapter.addFragment(new ReportFragment(), "Report");
         adapter.addFragment(new ProfileFragment(), "Profile");
         adapter.addFragment(new PolicyFragment(), "Policy");
         viewPager.setAdapter(adapter);
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyItem item) {
-
     }
 }

@@ -13,6 +13,7 @@ import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
+import org.open311.android.helpers.MyReportsFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +42,14 @@ public class GetServiceRequestsService extends IntentService {
             APIWrapper wrapper;
             wrapper = factory.build();
             GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
+
+            MyReportsFile file = new MyReportsFile(getBaseContext());
+            String id = file.getServiceRequestIds();
+            if (id == null || id.isEmpty()) {
+                id = "9999"; // FIXME: 12-04-16 temporary fix; id cannot be empty
+            }
+            filter.setServiceRequestId(id);
+
             List<ServiceRequest> result = null;
             if (wrapper != null) {
                 result = wrapper.getServiceRequests(filter);
@@ -66,4 +75,6 @@ public class GetServiceRequestsService extends IntentService {
 
         rec.send(Activity.RESULT_OK, bundle);
     }
+
+
 }
