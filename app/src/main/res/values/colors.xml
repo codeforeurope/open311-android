@@ -10,4 +10,5 @@
     <color name="colorAccent">#C0C0C0</color>
     <color name="textColorPrimary">#32000000</color>
     <color name="textColorDark">#000000</color>
+    <color name="transparent">#00000000</color>
 </resources>

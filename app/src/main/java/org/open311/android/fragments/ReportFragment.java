@@ -565,9 +565,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void onLocationButtonClicked() {
-        progress = new ProgressDialog(getContext());
-        progress.setMessage(getString(R.string.report_loading) + "...");
-        //progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
         progress.show();
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
