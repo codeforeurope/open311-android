@@ -1,10 +1,12 @@
 package org.open311.android.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -43,6 +45,7 @@ import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
 import org.open311.android.helpers.MyReportsFile;
+import org.open311.android.helpers.Utils;
 import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
@@ -68,13 +71,14 @@ import java.util.Map;
  */
 public class ReportFragment extends Fragment {
 
-    private final String ENDPOINT = "http://eindhoven.meldloket.nl/crm/open311/v2";
+    private static final String ENDPOINT = "http://eindhoven.meldloket.nl/crm/open311/v2";
 
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
     private List<Service> services;
     private Uri imageUri;
     private Uri thumbnailUri;
+    private Activity activity;
     private ProgressDialog progress;
 
     private Float latitude;
@@ -110,6 +114,12 @@ public class ReportFragment extends Fragment {
         // args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        this.activity = activity;
     }
 
     /**
@@ -697,6 +707,7 @@ public class ReportFragment extends Fragment {
                     success = true;
                     result = getString(R.string.report_success_message);
                     saveServiceRequestId(response.getServiceRequestId());
+                    saveHasReportsSetting(true);
                     System.out.println("SERVICE REQUEST ID: " + response.getServiceRequestId());
                 } else {
                     success = false;
@@ -710,6 +721,13 @@ public class ReportFragment extends Fragment {
                 result = e.getMessage();
             }
             return result;
+        }
+
+        private boolean saveHasReportsSetting(boolean flag) {
+            SharedPreferences settings = Utils.getSettings(getActivity());
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("has_reports", flag);
+            return editor.commit();
         }
 
         private boolean saveServiceRequestId(String id) {
@@ -785,10 +803,9 @@ public class ReportFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... params) {
             if (services != null) return null;
-            String url = ENDPOINT + "/services.xml";
             APIWrapper wrapper;
             try {
-                wrapper = new APIWrapperFactory(url).build();
+                wrapper = new APIWrapperFactory(ENDPOINT).build();
                 services = wrapper.getServiceList();
 
             } catch (APIWrapperException e) {

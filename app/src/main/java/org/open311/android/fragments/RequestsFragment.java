@@ -1,6 +1,7 @@
 package org.open311.android.fragments;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -16,6 +17,7 @@ import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
+import org.open311.android.helpers.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,13 @@ public class RequestsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        SharedPreferences settings = Utils.getSettings(getActivity());
+        boolean hasReports = settings.getBoolean("has_reports", false);
+        if (! hasReports) {
+            return inflater.inflate(R.layout.fragment_intro, container, false);
+        }
+
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);

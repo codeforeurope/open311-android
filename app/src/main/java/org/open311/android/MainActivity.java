@@ -31,6 +31,7 @@ import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
+import org.open311.android.helpers.Utils;
 import org.open311.android.receivers.ServiceRequestsReceiver;
 import org.open311.android.services.GetServiceRequestsService;
 
@@ -56,14 +57,6 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    public SharedPreferences getSettings() {
-        return settings;
-    }
-
-    public void setSettings(SharedPreferences settings) {
-        this.settings = settings;
-    }
-
     protected SharedPreferences settings;
 
     public String getInstallationId() {
@@ -73,7 +66,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        settings = openSettings(this);
+        settings = getSettings(this);
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

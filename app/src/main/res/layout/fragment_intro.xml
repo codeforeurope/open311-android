@@ -1,0 +1,34 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.IntroFragment">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="Meldloket Eindhoven" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Het meldloket is Eindhoven's meldpunt voor niet noodgevallen." />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="Als u iets meldt dan wordt het hier getoond. Swipe naar beneden om de lijst te verversen." />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>
