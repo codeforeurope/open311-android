@@ -1,6 +1,5 @@
 package org.open311.android.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -78,8 +77,8 @@ public class ReportFragment extends Fragment {
     private List<Service> services;
     private Uri imageUri;
     private Uri thumbnailUri;
-    private Activity activity;
     private ProgressDialog progress;
+    private PostServiceRequestTask bgTask;
 
     private Float latitude;
     private Float longitude;
@@ -114,12 +113,6 @@ public class ReportFragment extends Fragment {
         // args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        this.activity = activity;
     }
 
     /**
@@ -214,6 +207,10 @@ public class ReportFragment extends Fragment {
             // mParam1 = getArguments().getString(ARG_PARAM1);
             // mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        // Retain this fragment across configuration changes
+        setRetainInstance(true);
+
         attributes = new LinkedList<Attribute>();
         attrInfoList = new LinkedList<AttributeInfo>();
         installationId = ((MainActivity) getActivity()).getInstallationId();
@@ -360,7 +357,7 @@ public class ReportFragment extends Fragment {
         updatePhotoButtonImage();
         updateServiceButton();
         updateLocationButton();
-        updateAttributeButtons();
+        //updateAttributeButtons();
     }
 
     @Override
@@ -378,6 +375,16 @@ public class ReportFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (progress != null && progress.isShowing()) {
+            progress.dismiss();
+        }
+        progress = null;
+
     }
 
     /**
@@ -596,11 +603,6 @@ public class ReportFragment extends Fragment {
             return;
         }
 
-        progress = new ProgressDialog(getContext());
-        progress.setTitle(getString(R.string.report_dialog_title));
-        progress.setMessage(getString(R.string.report_dialog_message) + "...");
-        progress.show();
-
         CustomButton address = (CustomButton) findViewById(R.id.report_location_button);
         EditText description = (EditText) findViewById(R.id.report_description_textbox);
 
@@ -619,7 +621,8 @@ public class ReportFragment extends Fragment {
             .setAddress(address.getText().toString())
             .setDescription(description.getText().toString());
 
-        new PostServiceRequestTask(data).execute();
+        bgTask = new PostServiceRequestTask(ENDPOINT, data, imageUri);
+        bgTask.execute();
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -674,10 +677,14 @@ public class ReportFragment extends Fragment {
     private class PostServiceRequestTask extends AsyncTask<Void, Void, String> {
 
         private POSTServiceRequestData data;
+        private String url;
+        private Uri imageUri;
         private boolean success = true;
 
-        public PostServiceRequestTask(POSTServiceRequestData data) {
+        public PostServiceRequestTask(String url, POSTServiceRequestData data, Uri imageUri) {
+            this.url = url;
             this.data = data;
+            this.imageUri = imageUri;
         }
 
         /**
@@ -687,7 +694,6 @@ public class ReportFragment extends Fragment {
          */
         @Override
         protected String doInBackground(Void... params) {
-            String url = ENDPOINT;
             String result;
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(url);
@@ -700,8 +706,6 @@ public class ReportFragment extends Fragment {
 
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
-
-                if (progress != null) progress.dismiss();
 
                 if (response != null) {
                     success = true;
@@ -740,7 +744,18 @@ public class ReportFragment extends Fragment {
             return false;
         }
 
+        protected void onPreExecute() {
+            progress = new ProgressDialog(getContext());
+            progress.setTitle(getString(R.string.report_dialog_title));
+            progress.setMessage(getString(R.string.report_dialog_message) + "...");
+            progress.show();
+        }
+
         protected void onPostExecute(String result) {
+            if (progress != null && progress.isShowing()) {
+                progress.dismiss();
+            }
+            System.out.println("POST RESULT: " + result);
             Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
             if (success) cleanUpForm();
         }

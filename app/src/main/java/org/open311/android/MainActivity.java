@@ -31,7 +31,6 @@ import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
-import org.open311.android.helpers.Utils;
 import org.open311.android.receivers.ServiceRequestsReceiver;
 import org.open311.android.services.GetServiceRequestsService;
 
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity
         tabLayout.setupWithViewPager(viewPager);
 
         if (savedInstanceState != null) {
-            //Restore the fragment's instance
+            // Restore the fragment's instance
             reportFragment = (ReportFragment) getSupportFragmentManager().getFragment(
                     savedInstanceState, "reportFragment");
         }
