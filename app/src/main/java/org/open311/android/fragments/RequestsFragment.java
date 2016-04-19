@@ -2,6 +2,7 @@ package org.open311.android.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
@@ -9,16 +10,24 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.codeforamerica.open311.facade.APIWrapper;
+import org.codeforamerica.open311.facade.APIWrapperFactory;
+import org.codeforamerica.open311.facade.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
-import org.open311.android.MainActivity;
+import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
+import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
+import org.codeforamerica.open311.internals.caching.NoCache;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
+import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.helpers.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +77,7 @@ public class RequestsFragment extends Fragment {
         }
 
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
-        RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
+        final RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         if (listView instanceof RecyclerView) {
             Context context = view.getContext();
@@ -80,13 +89,12 @@ public class RequestsFragment extends Fragment {
             List<ServiceRequest> items = new ArrayList<ServiceRequest>();
             recyclerViewAdapter = new RequestsAdapter(items, mListener);
             listView.setAdapter(recyclerViewAdapter);
-            MainActivity myActivity = (MainActivity) getActivity();
-            myActivity.setupGetRequestsServiceReceiver(recyclerViewAdapter);
+            updateServiceRequests();
         }
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                stopRefreshAnimation();
+                updateServiceRequests();
             }
         });
         return view;
@@ -123,7 +131,92 @@ public class RequestsFragment extends Fragment {
         void onListFragmentInteraction(ServiceRequest item);
     }
 
-    private void stopRefreshAnimation() {
-        swipeRefreshLayout.setRefreshing(false);
+    private void updateServiceRequests() {
+        RetrieveServiceRequestsTask bgTask = new RetrieveServiceRequestsTask();
+        bgTask.setEndpointUrl("http://eindhoven.meldloket.nl/crm/open311/v2");
+        bgTask.execute();
+    }
+
+    private class RetrieveServiceRequestsTask extends AsyncTask<Void, Void, Bundle> {
+
+        private City city = null;
+        private String endpointUrl = null;
+        private String jurisdictionId = null;
+
+        public void setCity(City city) {
+            this.city = city;
+        }
+
+        public void setEndpointUrl(String endpointUrl) {
+            this.endpointUrl = endpointUrl;
+        }
+
+        public void setJurisdictionId(String jurisdictionId) {
+            this.jurisdictionId = jurisdictionId;
+        }
+
+        /**
+         * Retrieve service requests in the background.
+         *
+         * @param ignore the parameters of the task.
+         */
+        @Override
+        protected Bundle doInBackground(Void... ignore) {
+
+            Bundle bundle = null;
+            APIWrapperFactory factory;
+            try {
+                if (city != null) {
+                    factory = new APIWrapperFactory(city).setCache(new NoCache()).withLogs();
+                } else {
+                    factory = new APIWrapperFactory(endpointUrl, jurisdictionId)
+                            .setCache(new NoCache()).withLogs();
+                }
+
+                APIWrapper wrapper;
+                wrapper = factory.build();
+                GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
+
+                MyReportsFile file = new MyReportsFile(getContext());
+                String id = file.getServiceRequestIds();
+                if (id == null || id.isEmpty()) {
+                    id = "9999"; // FIXME: 12-04-16 temporary fix; id cannot be empty
+                }
+                filter.setServiceRequestId(id);
+
+                List<ServiceRequest> result = null;
+                if (wrapper != null) {
+                    result = wrapper.getServiceRequests(filter);
+                }
+                ArrayList<ServiceRequest> requests = new ArrayList<ServiceRequest>();
+                if (result != null) {
+                    for (ServiceRequest request : result) {
+                        requests.add(request);
+
+                    }
+                }
+                bundle = new Bundle();
+                bundle.putParcelableArrayList("Requests", requests);
+            } catch (APIWrapperException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bundle;
+        }
+
+        protected void onPostExecute(Bundle data) {
+            ArrayList<ServiceRequest> result = data.getParcelableArrayList("Requests");
+            if (result != null) {
+                Log.d("open311", result.toString());
+                // Update the adapter with the result.
+                recyclerViewAdapter.setRequests(result);
+            } else {
+                Log.w("open311", "No data received!");
+            }
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 }

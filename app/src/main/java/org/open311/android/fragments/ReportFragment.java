@@ -43,6 +43,7 @@ import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
+import org.open311.android.helpers.Image;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.helpers.Utils;
 import org.open311.android.network.MultipartHTTPNetworkManager;
@@ -582,7 +583,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void onLocationButtonClicked() {
-        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
+        ProgressDialog progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
         progress.show();
 
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -592,6 +593,8 @@ public class ReportFragment extends Fragment {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
+        } finally {
+            progress.dismiss();
         }
     }
 
@@ -634,11 +637,8 @@ public class ReportFragment extends Fragment {
             if (resultCode == getActivity().RESULT_OK) {
                 if (imageUri == null) return;
                 try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                            getActivity().getContentResolver(), imageUri);
-                    int width = bitmap.getWidth() / 10;
-                    int height = bitmap.getHeight() / 10;
-                    bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
+                    // FIXME: appropriate width and height depend on device's screen size
+                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), 320, 240);
                     File file = createTemporaryFile("thumb", ".bmp");
                     FileOutputStream out = new FileOutputStream(file);
                     // PNG is a loss-less format, the compression factor (100) is ignored
@@ -656,9 +656,6 @@ public class ReportFragment extends Fragment {
         }
 
         if (requestCode == LOCATION_REQUEST) {
-            if (progress != null) {
-                progress.dismiss();
-            }
             if (resultCode == getActivity().RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, getActivity());
                 LatLng position = place.getLatLng();
@@ -690,16 +687,15 @@ public class ReportFragment extends Fragment {
         /**
          * Post service request in the background.
          *
-         * @param params The parameters of the task (none in this case).
+         * @param ignore the parameters of the task
          */
         @Override
-        protected String doInBackground(Void... params) {
+        protected String doInBackground(Void... ignore) {
             String result;
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(url);
                 if (imageUri != null) {
                     MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(imageUri);
-                    networkManager.setContentResolver(getActivity().getContentResolver());
                     wrapperFactory.setNetworkManager(networkManager);
                 }
                 wrapperFactory.setApiKey("56b074c9495b1"); // FIXME: make configurable
@@ -772,10 +768,10 @@ public class ReportFragment extends Fragment {
         /**
          * Get service attributes in the background.
          *
-         * @param params The parameters of the task (none in this case).
+         * @param ignore the parameters of the task
          */
         @Override
-        protected Integer doInBackground(Void... params) {
+        protected Integer doInBackground(Void... ignore) {
             String url = ENDPOINT + "/services/" + this.serviceCode + ".xml";
             APIWrapper wrapper;
             ServiceDefinition definition;
@@ -813,10 +809,10 @@ public class ReportFragment extends Fragment {
         /**
          * Get services in the background.
          *
-         * @param params The parameters of the task (none in this case).
+         * @param ignore the parameters of the task
          */
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Void doInBackground(Void... ignore) {
             if (services != null) return null;
             APIWrapper wrapper;
             try {

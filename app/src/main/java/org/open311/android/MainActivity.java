@@ -1,11 +1,8 @@
 package org.open311.android;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,24 +15,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import org.codeforamerica.open311.facade.data.ServiceRequest;
-import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
 import org.open311.android.fragments.PolicyFragment;
 import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
-import org.open311.android.receivers.ServiceRequestsReceiver;
-import org.open311.android.services.GetServiceRequestsService;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.open311.android.helpers.Utils.*;
 
@@ -252,43 +242,6 @@ public class MainActivity extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         saveSettings(this);
-    }
-
-    public void setupGetRequestsServiceReceiver(final RequestsAdapter adapter) {
-        // Initialize
-        ServiceRequestsReceiver receiver;
-
-        // Service Interfacing
-        receiver = new ServiceRequestsReceiver(new Handler());
-        receiver.setReceiver(new ServiceRequestsReceiver.Receiver() {
-            @Override
-            public List<ServiceRequest> onReceiveResult(int resultCode, Bundle resultData) {
-                if (resultCode == Activity.RESULT_OK) {
-                    ArrayList<ServiceRequest> result = resultData.getParcelableArrayList("Requests");
-                    if (result != null) {
-                        Log.d("open311", result.toString());
-                        //Update the adapter with the result.
-                        adapter.appendRequests(result);
-                        return result;
-                    } else {
-                        Log.w("open311", "No data received!");
-                        return null;
-                    }
-                } else {
-                    if (resultData != null) {
-                        Log.e("open311", resultData.toString());
-                    }
-                    return null;
-                }
-            }
-        });
-
-        // Activate
-        Intent i = new Intent(getApplicationContext(), GetServiceRequestsService.class);
-        i.putExtra("receiver", receiver);
-        i.putExtra("endpointUrl", settings.getString("endpointUrl", "http://eindhoven.meldloket.nl/crm/open311/v2"));
-        //i.putExtra("jurisdictionId", settings.getString("jurisdictionId", ""));
-        startService(i);
     }
 
     private void setupViewPager(ViewPager viewPager) {

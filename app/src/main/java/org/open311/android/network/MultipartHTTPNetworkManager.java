@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -13,6 +12,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import org.codeforamerica.open311.facade.Format;
 import org.codeforamerica.open311.internals.network.NetworkManager;
+import org.open311.android.helpers.Image;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -33,14 +33,9 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
     private static final int TIMEOUT = 5000;
     private static final String FILENAME = "media.jpg";
     private Uri imageUri;
-    private ContentResolver contentResolver;
 
     public MultipartHTTPNetworkManager(Uri imageUri) {
         this.imageUri = imageUri;
-    }
-
-    public void setContentResolver(ContentResolver contentResolver) {
-        this.contentResolver = contentResolver;
     }
 
     /**
@@ -85,13 +80,7 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
         if (imageUri != null) {
             Bitmap bitmap;
             try {
-                bitmap = MediaStore.Images.Media.getBitmap(contentResolver, imageUri);
-
-                // FIXME: create scaled version of the image
-                int width = bitmap.getWidth() / 5;
-                int height = bitmap.getHeight() / 5;
-                bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
-
+                bitmap = Image.decodeSampledBitmap(imageUri.getPath(), Image.WIDTH, Image.HEIGHT);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 ContentType contentType = ContentType.create("image/jpg");
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream);
