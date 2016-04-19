@@ -62,7 +62,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         for (final ServiceRequest sr : filteredRequests) {
             this.filteredRequests.add(sr);
         }
-        Collections.reverse(this.filteredRequests);
+        // The latest version of the API returns a descending list, ordered by input date
+        // Collections.reverse(this.filteredRequests);
         // TODO filter?
         this.notifyDataSetChanged();
     }
