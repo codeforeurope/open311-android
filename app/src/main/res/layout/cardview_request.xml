@@ -18,44 +18,29 @@
             android:gravity="center_vertical|center_horizontal"
             android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                <TextView
                     android:id="@+id/request_title"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="6"
-                    android:gravity="center_vertical|start"
+                    android:layout_alignParentLeft="true"
                     android:text="Title"
                     android:textStyle="bold" />
 
-                <LinearLayout
-                    android:id="@+id/request_header_ago"
+                <TextView
+                    android:id="@+id/request_updated"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center_vertical|center_horizontal"
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:layout_marginRight="3dp"
-                        android:contentDescription="@string/request_ago_icon"
-                        android:src="@drawable/ic_schedule_12dp" />
-
-                    <TextView
-                        android:id="@+id/request_updated"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="3"
-                        android:gravity="center_vertical|end"
-                        android:text="Updated" />
-                </LinearLayout>
-            </LinearLayout>
+                    android:layout_alignParentRight="true"
+                    android:text="Updated"
+                    android:singleLine="true"
+                    android:drawablePadding="4dp"
+                    android:drawableLeft="@drawable/ic_schedule_12dp"/>
+            </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"

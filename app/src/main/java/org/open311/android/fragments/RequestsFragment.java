@@ -208,11 +208,15 @@ public class RequestsFragment extends Fragment {
         }
 
         protected void onPostExecute(Bundle data) {
-            ArrayList<ServiceRequest> result = data.getParcelableArrayList("Requests");
-            if (result != null) {
-                Log.d("open311", result.toString());
-                // Update the adapter with the result.
-                recyclerViewAdapter.setRequests(result);
+            if (data != null) {
+                ArrayList<ServiceRequest> result = data.getParcelableArrayList("Requests");
+                if (result != null) {
+                    Log.d("open311", result.toString());
+                    // Update the adapter with the result.
+                    recyclerViewAdapter.setRequests(result);
+                } else {
+                    Log.w("open311", "No data received!");
+                }
             } else {
                 Log.w("open311", "No data received!");
             }

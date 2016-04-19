@@ -132,14 +132,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         } else {
             holder.requestStatus.setVisibility(View.GONE);
         }
-        if (updated != null && requested != null) {
-            holder.requestUpdated.setText(DateUtils.getRelativeTimeSpanString(updated.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS));
-
-            //holder.requestRequested.setText(DateUtils.getRelativeTimeSpanString(requested.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE));
-
-            if (updated.equals(requested)) {
-                holder.requestUpdated.setVisibility(View.GONE);
-            }
+        if (updated != null) {
+            holder.requestUpdated.setText(getElapsedTime(updated));
         }
         if (description != null && description.length() > 0) {
             holder.requestDescription.setText(description);
@@ -162,6 +156,13 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     @Override
     public Filter getFilter() {
         return new RequestsFilter(this, requests);
+    }
+
+    private CharSequence getElapsedTime(Date updated) {
+        return DateUtils.getRelativeTimeSpanString(
+                updated.getTime(),
+                (new Date()).getTime(),
+                DateUtils.SECOND_IN_MILLIS);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

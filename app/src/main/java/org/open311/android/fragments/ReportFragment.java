@@ -585,7 +585,6 @@ public class ReportFragment extends Fragment {
     private void onLocationButtonClicked() {
         ProgressDialog progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
         progress.show();
-
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
             startActivityForResult(builder.build(getActivity()), LOCATION_REQUEST);
@@ -593,9 +592,8 @@ public class ReportFragment extends Fragment {
             e.printStackTrace();
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
-        } finally {
-            progress.dismiss();
         }
+        progress.dismiss();
     }
 
     private void onSubmitButtonClicked() {
