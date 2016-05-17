@@ -699,7 +699,7 @@ public class ReportFragment extends Fragment {
                     MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(imageUri);
                     wrapperFactory.setNetworkManager(networkManager);
                 }
-                wrapperFactory.setApiKey("56b074c9495b1"); // FIXME: make configurable
+                wrapperFactory.setApiKey(Constants.API_KEY);
 
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
