@@ -51,6 +51,6 @@ public class MyReportsFile {
         } finally {
             if (fis != null) fis.close();
         }
-        return identifiers;
+        return identifiers.startsWith(",") ? identifiers.substring(1) : identifiers;
     }
 }
