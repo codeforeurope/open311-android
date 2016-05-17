@@ -45,8 +45,20 @@ public class POSTServiceRequestDataWrapper extends POSTServiceRequestData {
      * @return Same instance with the new parameter added.
      */
     @Override
-    public POSTServiceRequestData setAddress(String address) {
+    public POSTServiceRequestDataWrapper setAddress(String address) {
         tryToAddString(ADDRESS_TAG, address);
+        return this;
+    }
+
+    /**
+     * Sets the name.
+     *
+     * @param name
+     *          The name of the person submitting the request.
+     * @return Same instance with the new parameter added.
+     */
+    public POSTServiceRequestDataWrapper setName(String name) {
+        this.setFirstName(name); // uReport will just use a (full) name field
         return this;
     }
 

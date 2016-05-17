@@ -40,6 +40,7 @@ import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
+import org.open311.android.Constants;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
@@ -70,8 +71,6 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class ReportFragment extends Fragment {
-
-    private static final String ENDPOINT = "http://eindhoven.meldloket.nl/crm/open311/v2";
 
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
@@ -607,22 +606,26 @@ public class ReportFragment extends Fragment {
         CustomButton address = (CustomButton) findViewById(R.id.report_location_button);
         EditText description = (EditText) findViewById(R.id.report_description_textbox);
 
-        POSTServiceRequestData data = new POSTServiceRequestDataWrapper(
+        POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
             serviceCode,
             latitude,
             longitude,
             attributes);
 
-        // FIXME: get profile values
-        data.setFirstName("John")
-            .setLastName("Doe")
-            .setEmail("john.doe@nobody.com")
-            .setPhone("818-555-7348")
-            .setDeviceId(installationId)
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String name  = settings.getString("name", null);
+        String email = settings.getString("email", null);
+        String phone = settings.getString("phone", null);
+
+        if (name  != null) data.setName(name);
+        if (email != null) data.setEmail(email);
+        if (phone != null) data.setPhone(phone);
+
+        data.setDeviceId(installationId)
             .setAddress(address.getText().toString())
             .setDescription(description.getText().toString());
 
-        bgTask = new PostServiceRequestTask(ENDPOINT, data, imageUri);
+        bgTask = new PostServiceRequestTask(Constants.ENDPOINT, data, imageUri);
         bgTask.execute();
     }
 
@@ -770,7 +773,7 @@ public class ReportFragment extends Fragment {
          */
         @Override
         protected Integer doInBackground(Void... ignore) {
-            String url = ENDPOINT + "/services/" + this.serviceCode + ".xml";
+            String url = Constants.ENDPOINT + "/services/" + this.serviceCode + ".xml";
             APIWrapper wrapper;
             ServiceDefinition definition;
             Integer count = 0;
@@ -814,7 +817,7 @@ public class ReportFragment extends Fragment {
             if (services != null) return null;
             APIWrapper wrapper;
             try {
-                wrapper = new APIWrapperFactory(ENDPOINT).build();
+                wrapper = new APIWrapperFactory(Constants.ENDPOINT).build();
                 services = wrapper.getServiceList();
 
             } catch (APIWrapperException e) {
