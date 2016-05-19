@@ -33,9 +33,7 @@ public class MainActivity extends AppCompatActivity
         implements
         NavigationView.OnNavigationItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener,
-        ReportFragment.OnFragmentInteractionListener,
         RequestsFragment.OnListFragmentInteractionListener,
-        ProfileFragment.OnFragmentInteractionListener,
         SearchView.OnQueryTextListener,
         FragmentManager.OnBackStackChangedListener {
     private ActionBarDrawerToggle toggle;
@@ -189,11 +187,6 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             return false;
         }
-    }
-
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        // Dummy method. No implementation needed...
     }
 
     @Override
