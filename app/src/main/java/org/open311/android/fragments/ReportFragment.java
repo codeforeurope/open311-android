@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -601,10 +603,10 @@ public class ReportFragment extends Fragment {
             if (resultCode == getActivity().RESULT_OK) {
                 if (imageUri == null) return;
                 try {
-                    int width = getPhotoButtonWidth();
-                    // We use a 4:3 aspect ratio
-                    int height = (3 / 4) * width;
-                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), width, height);
+                    // int width = getPhotoButtonWidth();
+                    // int height = Math.round((3 / (float) 4) * width); // 4:3 aspect ratio
+                    // Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), width, height);
+                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), 320, 240);
                     File file = createTemporaryFile("thumb", ".bmp");
                     FileOutputStream out = new FileOutputStream(file);
                     // PNG is a loss-less format, the compression factor (100) is ignored
