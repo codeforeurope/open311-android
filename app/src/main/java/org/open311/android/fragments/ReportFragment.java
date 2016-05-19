@@ -391,7 +391,6 @@ public class ReportFragment extends Fragment {
             progress.dismiss();
         }
         progress = null;
-
     }
 
     /**
@@ -589,7 +588,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void onLocationButtonClicked() {
-        ProgressDialog progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
+        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
         progress.show();
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
@@ -599,7 +598,6 @@ public class ReportFragment extends Fragment {
         } catch (GooglePlayServicesNotAvailableException e) {
             e.printStackTrace();
         }
-        progress.dismiss();
     }
 
     private void onSubmitButtonClicked() {
@@ -639,7 +637,9 @@ public class ReportFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // TODO: refactor this stuff...
+        if (progress != null && progress.isShowing()) {
+            progress.dismiss();
+        }
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == getActivity().RESULT_OK) {
