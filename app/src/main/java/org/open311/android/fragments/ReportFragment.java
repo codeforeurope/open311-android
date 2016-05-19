@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -83,6 +84,8 @@ public class ReportFragment extends Fragment {
     private Float latitude;
     private Float longitude;
 
+    public static final int BORDER_SIZE = 20; // border size of photo thumbnail
+
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
 
@@ -154,8 +157,12 @@ public class ReportFragment extends Fragment {
     public void updatePhotoButtonImage(Bitmap photo) {
         if (photoButton != null) {
             photoButton.setHint("");
-            photoButton.setImageBitmap(photo);
+            photoButton.setImageBitmap(addWhiteBorder(photo, BORDER_SIZE));
         }
+    }
+
+    public int getPhotoButtonWidth() {
+        return photoButton.getWidth() - BORDER_SIZE * 2;
     }
 
     public void updateAttributeButtons() {
@@ -638,8 +645,10 @@ public class ReportFragment extends Fragment {
             if (resultCode == getActivity().RESULT_OK) {
                 if (imageUri == null) return;
                 try {
-                    // FIXME: appropriate width and height depend on device's screen size
-                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), 320, 240);
+                    int width = getPhotoButtonWidth();
+                    // We use a 4:3 aspect ratio
+                    int height = (3 / 4) * width;
+                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), width, height);
                     File file = createTemporaryFile("thumb", ".bmp");
                     FileOutputStream out = new FileOutputStream(file);
                     // PNG is a loss-less format, the compression factor (100) is ignored
@@ -843,5 +852,23 @@ public class ReportFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
 
+    }
+
+    /**
+     * Add a white border to a bitmap image
+     *
+     * @param bmp Bitmap
+     * @param borderSize int
+     * @return Bitmap
+     */
+    private Bitmap addWhiteBorder(Bitmap bmp, int borderSize) {
+        Bitmap bmpWithBorder = Bitmap.createBitmap(
+                bmp.getWidth() + borderSize * 2,
+                bmp.getHeight() + borderSize * 2,
+                bmp.getConfig());
+        Canvas canvas = new Canvas(bmpWithBorder);
+        canvas.drawColor(Color.WHITE);
+        canvas.drawBitmap(bmp, borderSize, borderSize, null);
+        return bmpWithBorder;
     }
 }

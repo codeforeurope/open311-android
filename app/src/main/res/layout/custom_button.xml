@@ -25,7 +25,7 @@
         android:id="@+id/report_button_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp"
+        android:layout_margin="0dp"
         android:layout_gravity="center"
         android:visibility="invisible" />
 
