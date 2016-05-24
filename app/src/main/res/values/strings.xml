@@ -83,6 +83,9 @@
     <string name="invalid_email">Invalid email address</string>
     <string name="settings_saved">Settings are saved</string>
     <string name="error_occurred">An error occurred</string>
+    <string name="status_open">open</string>
+    <string name="status_closed">closed</string>
+    <string name="status_unknown">unknown</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

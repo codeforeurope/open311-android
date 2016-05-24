@@ -57,4 +57,7 @@
     <string name="invalid_email">Ongeldig email adres</string>
     <string name="settings_saved">Gegevens zijn opgeslagen</string>
     <string name="error_occurred">Er is een fout opgetreden</string>
+    <string name="status_open">open</string>
+    <string name="status_closed">gesloten</string>
+    <string name="status_unknown">onbekend</string>
 </resources>

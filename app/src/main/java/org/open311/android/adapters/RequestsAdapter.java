@@ -122,11 +122,11 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         String notice = filteredRequests.get(position).getServiceNotice();
         String agency = filteredRequests.get(position).getAgencyResponsible();
 
-
         holder.requestName.setText(name);
         holder.requestAddress.setText(address);
+
         if (status != null) {
-            holder.requestStatus.setText(status.toString());
+            holder.requestStatus.setText(context.getText(getResId(status)));
             holder.requestDescription.setVisibility(View.VISIBLE);
         } else {
             holder.requestStatus.setVisibility(View.GONE);
@@ -164,6 +164,21 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
                 DateUtils.SECOND_IN_MILLIS);
     }
 
+    private int getResId(ServiceRequest.Status status) {
+        int resId;
+        switch (status) {
+            case OPEN:
+                resId = R.string.status_open;
+                break;
+            case CLOSED:
+                resId = R.string.status_closed;
+                break;
+            default:
+                resId = R.string.status_unknown;
+        }
+        return resId;
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final View mView;
         public final CardView requestCardView;
@@ -193,6 +208,5 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         public String toString() {
             return super.toString() + " '" + requestDescription.getText() + "'";
         }
-
     }
 }
