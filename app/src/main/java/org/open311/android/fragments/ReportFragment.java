@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.text.Normalizer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -382,6 +383,15 @@ public class ReportFragment extends Fragment {
         CustomButton service = (CustomButton) findViewById(R.id.report_service_button);
         CustomButton location = (CustomButton) findViewById(R.id.report_location_button);
         EditText description = (EditText) findViewById(R.id.report_description_textbox);
+
+        String descText = description.getText().toString();
+
+        // Filter description text. Replace everything that is not a word character,
+        // whitespace or one of the symbols .?(),!:;@
+        String pattern = "[^\\w\\s\\.\\?\\(\\),!:;@]";
+        description.setText(
+            Normalizer.normalize(descText, Normalizer.Form.NFD).replaceAll(pattern, "")
+        );
 
         if (serviceCode == null) {
             isValid = false;

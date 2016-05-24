@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import org.open311.android.R;
 
+import java.text.Normalizer;
+
 /**
  * Profile {@link Fragment} subclass.
  *
@@ -73,9 +75,16 @@ public class ProfileFragment extends Fragment {
         EditText email = (EditText) findViewById(R.id.input_email);
         EditText phone = (EditText) findViewById(R.id.input_phone);
 
+        String strName = name.getText().toString();
+        String strEmail = email.getText().toString();
+        String strPhone = phone.getText().toString();
+
+        // Filter name text. Replace everything that is not a letter or whitespace.
+        String pattern = "[^a-zA-Z\\s]";
+        name.setText(Normalizer.normalize(strName, Normalizer.Form.NFD).replaceAll(pattern, ""));
+
         boolean isValid = true;
 
-        String strEmail = email.getText().toString();
         if (! strEmail.isEmpty()) {
             if (! isValidEmail(strEmail)) {
                 isValid = false;
@@ -88,8 +97,8 @@ public class ProfileFragment extends Fragment {
 
         if (! isValid) return;
 
-        editor.putString("name", name.getText().toString());
-        editor.putString("phone", phone.getText().toString());
+        editor.putString("name", strName);
+        editor.putString("phone", strPhone);
 
         if (editor.commit()) {
             result = getString(R.string.settings_saved);

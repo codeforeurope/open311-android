@@ -80,6 +80,7 @@
                     android:ems="5"
                     android:hint="@string/report_hint_description"
                     android:cursorVisible="true"
+                    android:maxLength="500"
                     android:background="@android:color/transparent" />
 
             </LinearLayout>
