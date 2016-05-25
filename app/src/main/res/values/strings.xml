@@ -73,6 +73,7 @@
     <string name="pending">Pending</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="okay">Ok</string>
     <string name="uncategorized">Uncategorized</string>
     <string name="radio_button_normal">Standard</string>
     <string name="radio_button_hybrid">Hybrid</string>

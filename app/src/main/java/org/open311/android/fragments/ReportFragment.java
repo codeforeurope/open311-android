@@ -681,7 +681,7 @@ public class ReportFragment extends Fragment {
 
                 if (response != null) {
                     success = true;
-                    result = getString(R.string.report_success_message);
+                    result = response.getServiceNotice();
                     saveServiceRequestId(response.getServiceRequestId());
                     saveHasReportsSetting(true);
                     System.out.println("SERVICE REQUEST ID: " + response.getServiceRequestId());
@@ -728,8 +728,18 @@ public class ReportFragment extends Fragment {
                 progress.dismiss();
             }
             System.out.println("POST RESULT: " + result);
-            Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+
             if (success) cleanUpForm();
+
+            new AlertDialog.Builder(getContext())
+                .setTitle(getString(R.string.report_dialog_title))
+                .setMessage(result)
+                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .show();
         }
     }
 
