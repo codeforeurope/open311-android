@@ -38,8 +38,7 @@
         android:id="@+id/intro_container"
         android:background="@android:color/white"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".fragments.IntroFragment">
+        android:layout_height="match_parent">
 
         <ScrollView
             android:layout_width="fill_parent"
