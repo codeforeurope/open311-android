@@ -47,7 +47,6 @@ import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
 import org.open311.android.helpers.Image;
 import org.open311.android.helpers.MyReportsFile;
-import org.open311.android.helpers.Utils;
 import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
@@ -683,7 +682,6 @@ public class ReportFragment extends Fragment {
                     success = true;
                     result = response.getServiceNotice();
                     saveServiceRequestId(response.getServiceRequestId());
-                    saveHasReportsSetting(true);
                     System.out.println("SERVICE REQUEST ID: " + response.getServiceRequestId());
                 } else {
                     success = false;
@@ -697,13 +695,6 @@ public class ReportFragment extends Fragment {
                 result = e.getMessage();
             }
             return result;
-        }
-
-        private boolean saveHasReportsSetting(boolean flag) {
-            SharedPreferences settings = Utils.getSettings(getActivity());
-            SharedPreferences.Editor editor = settings.edit();
-            editor.putBoolean("has_reports", flag);
-            return editor.commit();
         }
 
         private boolean saveServiceRequestId(String id) {

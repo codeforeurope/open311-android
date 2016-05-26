@@ -1,7 +1,6 @@
 package org.open311.android.fragments;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ViewSwitcher;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
@@ -26,7 +26,6 @@ import org.open311.android.Constants;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.helpers.MyReportsFile;
-import org.open311.android.helpers.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,6 +43,7 @@ public class RequestsFragment extends Fragment {
     private OnListFragmentInteractionListener mListener;
     private RequestsAdapter recyclerViewAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ViewSwitcher switcher; // this view can switch between the Intro and Requests list
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -63,15 +63,10 @@ public class RequestsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        SharedPreferences settings = Utils.getSettings(getActivity());
-        boolean hasReports = settings.getBoolean("has_reports", false);
-        if (! hasReports) {
-            return inflater.inflate(R.layout.fragment_intro, container, false);
-        }
-
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         final RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
+        switcher = (ViewSwitcher) view.findViewById(R.id.view_switcher);
         if (listView instanceof RecyclerView) {
             Context context = view.getContext();
             if (mColumnCount <= 1) {
@@ -207,6 +202,15 @@ public class RequestsFragment extends Fragment {
                     Log.d("open311", result.toString());
                     // Update the adapter with the result.
                     recyclerViewAdapter.setRequests(result);
+                    //
+                    // Show the intro text when there are no results available,
+                    // i.e. the user hasn't reported any issues yet.
+                    //
+                    if (result.size() == 0) {
+                        switcher.setDisplayedChild(
+                                switcher.indexOfChild(
+                                        getActivity().findViewById(R.id.intro_container)));
+                    }
                 } else {
                     Log.w("open311", "No data received!");
                 }
