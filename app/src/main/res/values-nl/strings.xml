@@ -60,4 +60,8 @@
     <string name="status_open">open</string>
     <string name="status_closed">gesloten</string>
     <string name="status_unknown">onbekend</string>
+    <string name="notImplemented">Nog niet geimplementeerd</string>
+    <string name="okay">Ok</string>
+    <string name="url"></string>
+    <string name="title_activity_main">Meldloket</string>
 </resources>

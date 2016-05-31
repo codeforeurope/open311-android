@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity
         actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                String msg = "Not yet implemented";
+                String msg = getString(R.string.notImplemented);
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
                 return true;
             }
