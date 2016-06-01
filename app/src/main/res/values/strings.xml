@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Civic Helpdesk</string>
+    <string name="app_name">Open311</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="Import">Import</string>
@@ -101,4 +101,7 @@
     <string name="notImplemented">Not yet implemented</string>
     <string name="serviceListUnavailable">Service list is unavailable</string>
     <string name="storageNotWritable">External storage is not writable</string>
+    <string name="privacyPolicy">Privacy Policy</string>
+    <string name="questionsAndFeedback">Questions and feedback</string>
+    <string name="contactEmail">info@open311.io</string>
 </resources>

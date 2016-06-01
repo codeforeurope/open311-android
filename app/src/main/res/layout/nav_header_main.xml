@@ -29,6 +29,6 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="info@meldloket.nl" />
+        android:text="@string/contactEmail" />
 
 </LinearLayout>

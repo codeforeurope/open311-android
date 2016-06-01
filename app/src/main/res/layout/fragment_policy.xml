@@ -17,7 +17,7 @@
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"
-                android:text="Privacybeleid" />
+                android:text="@string/privacyPolicy" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
@@ -37,7 +37,7 @@
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"
-                android:text="Vragen en feedback" />
+                android:text="@string/questionsAndFeedback" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"

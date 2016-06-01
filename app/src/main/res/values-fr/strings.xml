@@ -46,4 +46,5 @@
     <string name="error_403">Cette application n\'est pas authorisée</string>
     <string name="list_user_messages">Mes demandes</string>
     <string name="list_latest_messages">Demandes récent</string>
+    <string name="ApplicationTitle">311</string>
 </resources>
