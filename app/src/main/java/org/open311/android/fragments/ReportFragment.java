@@ -1,5 +1,6 @@
 package org.open311.android.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -98,7 +99,7 @@ public class ReportFragment extends Fragment {
     /**
      * Find a view by id - convenience method
      *
-     * @param viewId
+     * @param viewId the id of the view to find
      * @return View
      */
     private View findViewById(int viewId) {
@@ -135,16 +136,6 @@ public class ReportFragment extends Fragment {
         if (photoButton != null) {
             photoButton.setHint("");
             photoButton.setImageBitmap(addWhiteBorder(photo, BORDER_SIZE));
-        }
-    }
-
-    public int getPhotoButtonWidth() {
-        return photoButton.getWidth() - BORDER_SIZE * 2;
-    }
-
-    public void updateAttributeButtons() {
-        if (attrInfoList != null) {
-            addAttributesToForm();
         }
     }
 
@@ -352,8 +343,8 @@ public class ReportFragment extends Fragment {
     /**
      * Create a temporary file
      *
-     * @param name
-     * @param ext
+     * @param name Filename
+     * @param ext File Extension
      * @return File
      * @throws Exception
      */
@@ -422,10 +413,7 @@ public class ReportFragment extends Fragment {
      */
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private void addAttributesToForm() {
@@ -503,7 +491,7 @@ public class ReportFragment extends Fragment {
     private void onServiceButtonClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (services == null) {
-            String msg = "Service list is unavailable";
+            String msg = getString(R.string.serviceListUnavailable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -532,7 +520,7 @@ public class ReportFragment extends Fragment {
     private void onPhotoButtonClicked() {
 
         if (! isExternalStorageWritable()) {
-            String msg = "External storage is not writable";
+            String msg = getString(R.string.storageNotWritable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -607,7 +595,7 @@ public class ReportFragment extends Fragment {
         }
 
         if (requestCode == CAMERA_REQUEST) {
-            if (resultCode == getActivity().RESULT_OK) {
+            if (resultCode == Activity.RESULT_OK) {
                 if (imageUri == null) return;
                 try {
                     // int width = getPhotoButtonWidth();
@@ -631,17 +619,21 @@ public class ReportFragment extends Fragment {
         }
 
         if (requestCode == LOCATION_REQUEST) {
-            if (resultCode == getActivity().RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, getActivity());
+            if (resultCode == Activity.RESULT_OK) {
+                Place place = PlacePicker.getPlace(getActivity(), data);
                 LatLng position = place.getLatLng();
                 location = place.getName().toString();
-                latitude = new Float(position.latitude);
-                longitude = new Float(position.longitude);
+                latitude = (float) position.latitude;
+                longitude = (float) position.longitude;
                 CustomButton location = (CustomButton) getActivity()
                         .findViewById(R.id.report_location_button);
                 location.setText(place.getName());
             } else {
-                System.out.println("LOCATION REQUEST RESULT CODE: " + resultCode);
+                if(resultCode == 2){
+                    System.out.println("Your API key is invalid, enter it in local.properties");
+                } else {
+                    System.out.println("LOCATION REQUEST RESULT CODE: " + resultCode);
+                }
             }
         }
     }

@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -109,6 +110,7 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
         //conn.setReadTimeout(TIMEOUT); // 10000
 
         // Request header fields
+        conn.setRequestProperty("Accept-Language", Locale.getDefault().toString().replace("_", "-"));
         conn.setRequestProperty("Accept-Charset", "UTF-8");
         conn.setRequestProperty("Connection", "Keep-Alive");
         conn.addRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
