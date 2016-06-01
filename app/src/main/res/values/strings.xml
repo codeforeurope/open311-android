@@ -104,4 +104,11 @@
     <string name="privacyPolicy">Privacy Policy</string>
     <string name="questionsAndFeedback">Questions and feedback</string>
     <string name="contactEmail">info@open311.io</string>
+    <string name="contactAuthority">Open311.io</string>
+    <string name="contactPhone">n/a</string>
+    <string name="contactTitle">Contact</string>
+    <string name="privacyPar1">We are aware of your trust in us. That is why we take it as our primary responsibility to protect your privacy. We will however collect information. We will explain why and what.</string>
+    <string name="privacyPar2">Our privacy policy applies to the application and the services. By using our application, you accept our privacy policy.</string>
+    <string name="privacyPar3">We respect the privacy of all users and make sure that personal information is used confidential.</string>
+    <string name="questionsPar1">We will monitor constantly if we comply to our privacy policy. For questions regarding privacy, please contact us.</string>
 </resources>

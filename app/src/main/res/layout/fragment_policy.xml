@@ -21,19 +21,19 @@
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="Wij zijn er van bewust dat u vertrouwen stelt in ons. Wij zien het dan ook als onze verantwoordelijkheid om uw privacy te beschermen. Op deze pagina laten we u weten welke gegevens we verzamelen als u onze app gebruikt en waarom we deze gegevens verzamelen. Zo snapt u precies hoe wij werken." />
+                android:text="@string/privacyPar1" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="Dit privacybeleid is van toepassing op de diensten van Meldloket. Door gebruik te maken van deze app geeft u aan het privacy beleid te accepteren." />
+                android:text="@string/privacyPar2" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="Meldloket respecteert de privacy van alle gebruikers van haar dienst en draagt er zorg voor dat de persoonlijke informatie die u ons verschaft vertrouwelijk wordt behandeld." />
+                android:text="@string/privacyPar3" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="..." />
+                 />
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"
@@ -41,11 +41,24 @@
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="We controleren regelmatig of we aan dit privacybeleid voldoen. Als u vragen heeft over dit privacybeleid, kunt u contact met ons opnemen:" />
-
+                android:text="@string/questionsPar1" />
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="Meldloket\nGemeente Eindhoven\n040 - 2525 4646\nvragen@eindhoven.meldloket.nl" />
+                />
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="@string/contactTitle" />
+
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactAuthority" />
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactPhone" />
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactEmail" />
 
         </LinearLayout>
 

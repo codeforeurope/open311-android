@@ -38,6 +38,10 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="AppTheme.ContactText" parent="android:Widget.TextView">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
     <style name="AppTheme.PolicyText" parent="android:Widget.TextView">
         <item name="android:paddingBottom">10dp</item>
         <item name="android:layout_width">wrap_content</item>

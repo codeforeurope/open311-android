@@ -90,4 +90,11 @@
     <string name="ApplicationEmail">Contact met de overheid</string>
     <string name="tab_personal_info">Persoonlijke informatie</string>
     <string name="uncategorized">Geen categorie</string>
+    <string name="privacyPar1">Wij zijn er van bewust dat u vertrouwen stelt in ons. Wij zien het dan ook als onze verantwoordelijkheid om uw privacy te beschermen. Op deze pagina laten we u weten welke gegevens we verzamelen als u onze app gebruikt en waarom we deze gegevens verzamelen. Zo snapt u precies hoe wij werken.</string>
+    <string name="privacyPar2">Dit privacybeleid is van toepassing op de diensten van Meldloket. Door gebruik te maken van deze app geeft u aan het privacy beleid te accepteren.</string>
+    <string name="privacyPar3">Meldloket respecteert de privacy van alle gebruikers van haar dienst en draagt er zorg voor dat de persoonlijke informatie die u ons verschaft vertrouwelijk wordt behandeld.</string>
+    <string name="questionsPar1">We controleren regelmatig of we aan dit privacybeleid voldoen. Als u vragen heeft over dit privacybeleid, kunt u contact met ons opnemen:</string>
+    <string name="contactPhone">040 - 2525 4646</string>
+    <string name="contactAuthority">Gemeente Eindhoven</string>
+    <string name="contactTitle">Contact</string>
 </resources>
