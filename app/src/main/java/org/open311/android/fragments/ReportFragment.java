@@ -1,5 +1,6 @@
 package org.open311.android.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -64,7 +67,6 @@ import java.util.Map;
 
 /**
  * Report {@link Fragment} subclass.
- *
  */
 public class ReportFragment extends Fragment {
 
@@ -344,14 +346,14 @@ public class ReportFragment extends Fragment {
      * Create a temporary file
      *
      * @param name Filename
-     * @param ext File Extension
+     * @param ext  File Extension
      * @return File
      * @throws Exception
      */
     private File createTemporaryFile(String name, String ext) throws Exception {
         File tempDir = Environment.getExternalStorageDirectory();
         tempDir = new File(tempDir.getAbsolutePath() + "/.temp/");
-        if (! tempDir.exists()) {
+        if (!tempDir.exists()) {
             tempDir.mkdir();
         }
         File file = new File(tempDir, name + ext);
@@ -380,7 +382,7 @@ public class ReportFragment extends Fragment {
         // whitespace or one of the symbols .?(),!:;@
         String pattern = "[^\\w\\s\\.\\?\\(\\),!:;@]";
         description.setText(
-            Normalizer.normalize(descText, Normalizer.Form.NFD).replaceAll(pattern, "")
+                Normalizer.normalize(descText, Normalizer.Form.NFD).replaceAll(pattern, "")
         );
 
         if (serviceCode == null) {
@@ -518,8 +520,40 @@ public class ReportFragment extends Fragment {
     }
 
     private void onPhotoButtonClicked() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{Manifest.permission.CAMERA},
+                    CAMERA_REQUEST);
+        } else {
+            handleCamera();
+        }
+    }
 
-        if (! isExternalStorageWritable()) {
+    private void onLocationButtonClicked() {
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission_group.LOCATION) == PackageManager.PERMISSION_DENIED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_REQUEST);
+        } else {
+            handleLocation();
+        }
+
+
+    }
+
+    private void handleLocation() {
+        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
+        progress.show();
+        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {
+            startActivityForResult(builder.build(getActivity()), LOCATION_REQUEST);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+    }
+    private void handleCamera() {
+        if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
             return;
@@ -540,24 +574,11 @@ public class ReportFragment extends Fragment {
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
-    private void onLocationButtonClicked() {
-        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
-        progress.show();
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {
-            startActivityForResult(builder.build(getActivity()), LOCATION_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
-    }
-
     private void onSubmitButtonClicked() {
         Log.d("open311", "Submit Button was clicked.");
 
         // Check the form result and post the service request
-        if (! isValidFormContent()) {
+        if (!isValidFormContent()) {
             return;
         }
 
@@ -565,23 +586,23 @@ public class ReportFragment extends Fragment {
         EditText description = (EditText) findViewById(R.id.report_description_textbox);
 
         POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
-            serviceCode,
-            latitude,
-            longitude,
-            attributes);
+                serviceCode,
+                latitude,
+                longitude,
+                attributes);
 
         SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String name  = settings.getString("name", null);
+        String name = settings.getString("name", null);
         String email = settings.getString("email", null);
         String phone = settings.getString("phone", null);
 
-        if (name  != null) data.setName(name);
+        if (name != null) data.setName(name);
         if (email != null) data.setEmail(email);
         if (phone != null) data.setPhone(phone);
 
         data.setDeviceId(installationId)
-            .setAddress(address.getText().toString())
-            .setDescription(description.getText().toString());
+                .setAddress(address.getText().toString())
+                .setDescription(description.getText().toString());
 
         bgTask = new PostServiceRequestTask(Constants.ENDPOINT, data, imageUri);
         bgTask.execute();
@@ -629,7 +650,7 @@ public class ReportFragment extends Fragment {
                         .findViewById(R.id.report_location_button);
                 location.setText(place.getName());
             } else {
-                if(resultCode == 2){
+                if (resultCode == 2) {
                     System.out.println("Your API key is invalid, enter it in local.properties");
                 } else {
                     System.out.println("LOCATION REQUEST RESULT CODE: " + resultCode);
@@ -715,14 +736,14 @@ public class ReportFragment extends Fragment {
             if (success) cleanUpForm();
 
             new AlertDialog.Builder(getContext())
-                .setTitle(getString(R.string.report_dialog_title))
-                .setMessage(result)
-                .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                })
-                .show();
+                    .setTitle(getString(R.string.report_dialog_title))
+                    .setMessage(result)
+                    .setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            dialog.cancel();
+                        }
+                    })
+                    .show();
         }
     }
 
@@ -802,7 +823,7 @@ public class ReportFragment extends Fragment {
     /**
      * Add a white border to a bitmap image
      *
-     * @param bmp Bitmap
+     * @param bmp        Bitmap
      * @param borderSize int
      * @return Bitmap
      */
@@ -815,5 +836,18 @@ public class ReportFragment extends Fragment {
         canvas.drawColor(Color.WHITE);
         canvas.drawBitmap(bmp, borderSize, borderSize, null);
         return bmpWithBorder;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == CAMERA_REQUEST
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            handleCamera();
+        }
+        if (requestCode == LOCATION_REQUEST
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            handleLocation();
+        }
     }
 }
