@@ -97,4 +97,6 @@
     <string name="contactPhone">040 - 2525 4646</string>
     <string name="contactAuthority">Gemeente Eindhoven</string>
     <string name="contactTitle">Contact</string>
+    <string name="introText1">Het meldloket is Eindhoven\'s meldpunt voor niet noodgevallen.</string>
+    <string name="introText2">Als u iets meldt dan wordt het hier getoond. Swipe naar beneden om de lijst te verversen.</string>
 </resources>

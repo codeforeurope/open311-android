@@ -111,4 +111,6 @@
     <string name="privacyPar2">Our privacy policy applies to the application and the services. By using our application, you accept our privacy policy.</string>
     <string name="privacyPar3">We respect the privacy of all users and make sure that personal information is used confidential.</string>
     <string name="questionsPar1">We will monitor constantly if we comply to our privacy policy. For questions regarding privacy, please contact us.</string>
+    <string name="introText1">Communicate Service Requests with your Government</string>
+    <string name="introText2">Your previous request will be shown here after you have created your first request</string>
 </resources>
