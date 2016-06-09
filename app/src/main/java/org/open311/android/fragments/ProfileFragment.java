@@ -81,7 +81,8 @@ public class ProfileFragment extends Fragment {
 
         // Filter name text. Replace everything that is not a letter or whitespace.
         String pattern = "[^a-zA-Z\\s]";
-        name.setText(Normalizer.normalize(strName, Normalizer.Form.NFD).replaceAll(pattern, ""));
+        strEmail = Normalizer.normalize(strName, Normalizer.Form.NFD).replaceAll(pattern, "");
+        name.setText(strEmail);
 
         boolean isValid = true;
 
