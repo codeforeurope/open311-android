@@ -46,4 +46,5 @@
     <string name="error_403">Sovelluksella ei ole oikeuksia lähettää palautetta valitulle palvelimelle</string>
     <string name="list_latest_messages">Omat palautteet</string>
     <string name="list_user_messages">raporttini</string>
+    <string name="ApplicationTitle">311</string>
 </resources>

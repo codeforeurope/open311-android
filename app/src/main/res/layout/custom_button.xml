@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/report_button_frame"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="2dp"
+    android:layout_marginBottom="10dp"
+    android:padding="5dp"
+    android:clickable="true"
+    android:background="@drawable/button_shape">
+
+    <TextView
+        android:id="@+id/report_button_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:gravity="left|center_vertical"
+        android:textSize="14sp"
+        android:singleLine="true"
+        android:drawablePadding="10dp"
+        android:drawableLeft="@drawable/ic_add_circle_black_24dp"/>
+
+    <ImageView
+        android:id="@+id/report_button_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:layout_gravity="center"
+        android:visibility="invisible" />
+
+    <!--
+    <ImageButton
+        android:id="@+id/report_button_clear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="6dp"
+        android:layout_gravity="right|center_vertical"
+        android:background="@drawable/ic_clear_black_24dp" />
+        -->
+
+</FrameLayout>

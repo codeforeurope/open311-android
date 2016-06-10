@@ -15,8 +15,7 @@ import java.util.Random;
 public class Utils {
     public static final String OPEN311_SETTINGS = "open311_settings";
 
-    public static SharedPreferences openSettings(Activity activity) {
-        // Restore preferences
+    public static SharedPreferences getSettings(Activity activity) {
         return activity.getSharedPreferences(OPEN311_SETTINGS, 0);
 
     }

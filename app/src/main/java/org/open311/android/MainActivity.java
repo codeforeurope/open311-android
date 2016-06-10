@@ -1,20 +1,12 @@
 package org.open311.android;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,82 +14,72 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.Toast;
 
-import org.codeforamerica.open311.facade.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
-import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
-import org.open311.android.dummy.DummyContent;
-import org.open311.android.fragments.IntroFragment;
-import org.open311.android.fragments.ItemFragment;
+import org.open311.android.fragments.PolicyFragment;
+import org.open311.android.fragments.ProfileFragment;
+import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.RequestsFragment;
-import org.open311.android.fragments.SettingsFragment;
-import org.open311.android.receivers.ServiceRequestsReceiver;
-import org.open311.android.services.GetServiceRequestsService;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.open311.android.helpers.Installation;
 
 import static org.open311.android.helpers.Utils.*;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
+        implements
+        NavigationView.OnNavigationItemSelectedListener,
         SwipeRefreshLayout.OnRefreshListener,
-        IntroFragment.OnFragmentInteractionListener,
         RequestsFragment.OnListFragmentInteractionListener,
-        SettingsFragment.OnFragmentInteractionListener,
-        ItemFragment.OnListFragmentInteractionListener, SearchView.OnQueryTextListener, FragmentManager.OnBackStackChangedListener {
+        SearchView.OnQueryTextListener,
+        FragmentManager.OnBackStackChangedListener {
     private ActionBarDrawerToggle toggle;
-    private Toolbar toolbar;
     private TabLayout tabLayout;
     private ViewPager viewPager;
+    private String installationId;
+    private ReportFragment reportFragment;
 
-    public SharedPreferences getSettings() {
-        return settings;
-    }
-
-    public void setSettings(SharedPreferences settings) {
-        this.settings = settings;
-    }
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     protected SharedPreferences settings;
+
+    public String getInstallationId() {
+        return installationId;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        settings = openSettings(this);
+        settings = getSettings(this);
+        installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle.setDrawerIndicatorEnabled(false); // Hide the hamburger icon
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        //NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        //navigationView.setNavigationItemSelectedListener(this);
+
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        if (savedInstanceState != null) {
+            // Restore the fragment's instance
+            reportFragment = (ReportFragment) getSupportFragmentManager().getFragment(
+                    savedInstanceState, "reportFragment");
+        }
     }
 
     @Override
@@ -115,9 +97,23 @@ public class MainActivity extends AppCompatActivity
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem item = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) item.getActionView();
-        searchView.setOnQueryTextListener(this);
-        //((MenuItem)findViewById(R.id.list_recent_messages)).setChecked(true);
+
+        // Hide the search feature for now ...
+        item.setVisible(false);
+        // SearchView searchView = (SearchView) item.getActionView();
+        // searchView.setOnQueryTextListener(this);
+
+        // Add click listener to action item -> not yet implemented
+        // See: res/menu/main.xml
+        MenuItem actionItem = menu.findItem(R.id.action_settings);
+        actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                String msg = getString(R.string.notImplemented);
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
         return true;
     }
 
@@ -148,15 +144,23 @@ public class MainActivity extends AppCompatActivity
 
         Fragment fragment = null;
         Class fragmentClass = null;
+
         int id = item.getItemId();
-        if (id == R.id.nav_reports_my) {
-            fragmentClass = ItemFragment.class;
-        } else if (id == R.id.nav_reports_recent) {
-            fragmentClass = RequestsFragment.class;
-        } else if (id == R.id.nav_settings) {
-            fragmentClass = SettingsFragment.class;
-        } else if (id == R.id.nav_about) {
-            fragmentClass = IntroFragment.class;
+
+        switch (id) {
+            case R.id.nav_reports_my:
+                fragmentClass = PolicyFragment.class;
+                break;
+            case R.id.nav_reports_recent:
+                fragmentClass = RequestsFragment.class;
+                break;
+            case R.id.nav_settings:
+                fragmentClass = ProfileFragment.class;
+                break;
+            case R.id.nav_about:
+                fragmentClass = ReportFragment.class;
+                break;
+            default: // fragmentClass = null
         }
 
         try {
@@ -185,16 +189,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
-
-    }
-
-    @Override
     public void onListFragmentInteraction(ServiceRequest item) {
 
     }
@@ -220,6 +214,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        if (reportFragment != null) {
+            // Save the fragment's instance
+            getSupportFragmentManager().putFragment(
+                    savedInstanceState, "reportFragment", reportFragment);
+        }
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
@@ -232,47 +236,12 @@ public class MainActivity extends AppCompatActivity
         saveSettings(this);
     }
 
-    public void setupGetRequestsServiceReceiver(final RequestsAdapter adapter) {
-        // Initialize
-        ServiceRequestsReceiver receiver;
-
-        // Service Interfacing
-        receiver = new ServiceRequestsReceiver(new Handler());
-        receiver.setReceiver(new ServiceRequestsReceiver.Receiver() {
-            @Override
-            public List<ServiceRequest> onReceiveResult(int resultCode, Bundle resultData) {
-                if (resultCode == Activity.RESULT_OK) {
-                    ArrayList<ServiceRequest> result = resultData.getParcelableArrayList("Requests");
-                    if (result != null) {
-                        Log.d("open311", result.toString());
-                        //Update the adapter with the result.
-                        adapter.appendRequests(result);
-                        return result;
-                    } else {
-                        Log.w("open311", "No data received!");
-                        return null;
-                    }
-                } else {
-                    Log.e("open311", resultData.toString());
-                    return null;
-                }
-            }
-        });
-
-        // Activate
-        Intent i = new Intent(getApplicationContext(), GetServiceRequestsService.class);
-        i.putExtra("receiver", receiver);
-        i.putExtra("endpointUrl", settings.getString("endpointUrl", "http://311.baltimorecity.gov/open311/v2"));
-        i.putExtra("jurisdictionId", settings.getString("jurisdictionId", "baltimorecity.gov"));
-        startService(i);
-    }
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(), MainActivity.this);
-        adapter.addFragment(new RequestsFragment(), "ONE");
-        adapter.addFragment(new ItemFragment(), "TWO");
-        adapter.addFragment(new IntroFragment(), "THREE");
-        adapter.addFragment(new SettingsFragment(), "FOUR");
+        adapter.addFragment(new RequestsFragment(), "Requests");
+        adapter.addFragment(new ReportFragment(), "Report");
+        adapter.addFragment(new ProfileFragment(), "Profile");
+        adapter.addFragment(new PolicyFragment(), "Policy");
         viewPager.setAdapter(adapter);
     }
 }

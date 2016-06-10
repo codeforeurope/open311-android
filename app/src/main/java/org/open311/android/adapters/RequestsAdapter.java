@@ -21,7 +21,6 @@ import org.open311.android.filters.RequestsFilter;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -62,7 +61,8 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         for (final ServiceRequest sr : filteredRequests) {
             this.filteredRequests.add(sr);
         }
-        Collections.reverse(this.filteredRequests);
+        // The latest version of the API returns a descending list, ordered by input date
+        // Collections.reverse(this.filteredRequests);
         // TODO filter?
         this.notifyDataSetChanged();
     }
@@ -122,23 +122,17 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         String notice = filteredRequests.get(position).getServiceNotice();
         String agency = filteredRequests.get(position).getAgencyResponsible();
 
-
         holder.requestName.setText(name);
         holder.requestAddress.setText(address);
+
         if (status != null) {
-            holder.requestStatus.setText(status.toString());
+            holder.requestStatus.setText(context.getText(getResId(status)));
             holder.requestDescription.setVisibility(View.VISIBLE);
         } else {
             holder.requestStatus.setVisibility(View.GONE);
         }
-        if (updated != null && requested != null) {
-            holder.requestUpdated.setText(DateUtils.getRelativeTimeSpanString(updated.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS));
-
-            //holder.requestRequested.setText(DateUtils.getRelativeTimeSpanString(requested.getTime(), (new Date()).getTime(), DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE));
-
-            if (updated.equals(requested)) {
-                holder.requestUpdated.setVisibility(View.GONE);
-            }
+        if (updated != null) {
+            holder.requestUpdated.setText(getElapsedTime(updated));
         }
         if (description != null && description.length() > 0) {
             holder.requestDescription.setText(description);
@@ -161,6 +155,28 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     @Override
     public Filter getFilter() {
         return new RequestsFilter(this, requests);
+    }
+
+    private CharSequence getElapsedTime(Date updated) {
+        return DateUtils.getRelativeTimeSpanString(
+                updated.getTime(),
+                (new Date()).getTime(),
+                DateUtils.SECOND_IN_MILLIS);
+    }
+
+    private int getResId(ServiceRequest.Status status) {
+        int resId;
+        switch (status) {
+            case OPEN:
+                resId = R.string.status_open;
+                break;
+            case CLOSED:
+                resId = R.string.status_closed;
+                break;
+            default:
+                resId = R.string.status_unknown;
+        }
+        return resId;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -192,6 +208,5 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         public String toString() {
             return super.toString() + " '" + requestDescription.getText() + "'";
         }
-
     }
 }

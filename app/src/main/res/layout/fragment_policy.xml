@@ -1,0 +1,67 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@android:color/white"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.PolicyFragment">
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="@string/privacyPolicy" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="@string/privacyPar1" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="@string/privacyPar2" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="@string/privacyPar3" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                 />
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="@string/questionsAndFeedback" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="@string/questionsPar1" />
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                />
+
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="@string/contactTitle" />
+
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactAuthority" />
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactPhone" />
+            <TextView
+                style="@style/AppTheme.ContactText"
+                android:text="@string/contactEmail" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

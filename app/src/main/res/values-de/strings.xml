@@ -46,4 +46,7 @@
     <string name="app_name">Open311</string>
     <string name="list_latest_messages">Aktuelle berichte</string>
     <string name="list_user_messages">Meine berichte</string>
+    <string name="storageNotWritable"></string>
+    <string name="questionsAndFeedback"></string>
+    <string name="ApplicationTitle">311</string>
 </resources>
