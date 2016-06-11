@@ -10,7 +10,7 @@
     <string name="Share">Share</string>
     <string name="Send">Send</string>
     <string name="ApplicationTitle">311</string>
-    <string name="ApplicationEmail">Contact your City</string>
+    <string name="ApplicationEmail">Contact the authorities</string>
     <string name="ApplicationIcon">Application Icon</string>
     <string name="setting_general">Settings</string>
     <string name="setting_user">User</string>
@@ -41,7 +41,7 @@
     <string name="supports_media">Supports Media</string>
     <string name="dialog_loading_services">Loading service information</string>
     <string name="dialog_posting_service">Posting service request</string>
-    <string name="choose_media_source">Choose source of picture</string>
+    <string name="choose_media_source">Select Source</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="location">Location</string>
@@ -81,7 +81,9 @@
     <string name="failure_loading_services">Failed to load service information</string>
     <string name="failure_posting_service">Posting report failed</string>
     <string name="error_403">This app does not have permission</string>
+    <string name="invalid_name">Name is invalid</string>
     <string name="invalid_email">Invalid email address</string>
+    <string name="invalid_phone">Phone number is invalid</string>
     <string name="settings_saved">Settings are saved</string>
     <string name="error_occurred">An error occurred</string>
     <string name="status_open">open</string>

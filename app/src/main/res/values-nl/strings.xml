@@ -78,7 +78,7 @@
     <string name="error_403">Onvoldoende rechten</string>
     <string name="dialog_posting_service">Melding wordt verzonden</string>
     <string name="dialog_loading_services">Informatie wordt opgehaald</string>
-    <string name="choose_media_source">Afbeeldingbron</string>
+    <string name="choose_media_source">Selecteer de bron</string>
     <string name="button_accept_error">Annuleren</string>
     <string name="btn_sign_up">Aanmelden</string>
     <string name="api_key">Sleutel</string>
