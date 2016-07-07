@@ -541,7 +541,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void handleLocation() {
-        progress = new ProgressDialog(getContext(), R.style.CustomDialogTheme);
+        progress = new ProgressDialog(getContext());
         progress.show();
         PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
