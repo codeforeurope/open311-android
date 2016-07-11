@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
     defaultConfig {
@@ -14,9 +15,16 @@ android {
     buildTypes {
         debug {
             resValue "string", "google_places_api_key", getApiKey()
+            resValue "string", "mapbox_api_key", getMapboxKey()
+            resValue "string", "open311_endpoint", getOpen311Endpoint()
+            resValue "string", "open311_apikey", getOpen311Key()
         }
         release {
             resValue "string", "google_places_api_key", "xxxxxxxxxxxxx"
+            resValue "string", "mapbox_api_key",  "xxxxxxxxxxxxx"
+            resValue "string", "open311_endpoint",  "https://www.open311.io/api/v2"
+            resValue "string", "open311_apikey", "xxxxxxxxxxxxx"
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -58,4 +66,22 @@ def getApiKey() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
     return properties.getProperty('apiKey')
+}
+
+def getMapboxKey() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('mapboxKey')
+}
+
+def getOpen311Endpoint() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('open311Endpoint')
+}
+
+def getOpen311Key() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty('open311Key')
 }

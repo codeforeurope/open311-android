@@ -22,7 +22,6 @@ import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
-import org.open311.android.Constants;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.helpers.MyReportsFile;
@@ -121,7 +120,7 @@ public class RequestsFragment extends Fragment {
 
     private void updateServiceRequests() {
         RetrieveServiceRequestsTask bgTask = new RetrieveServiceRequestsTask();
-        bgTask.setEndpointUrl(Constants.ENDPOINT);
+        bgTask.setEndpointUrl(getContext().getResources().getString(R.string.open311_endpoint));
         bgTask.execute();
     }
 

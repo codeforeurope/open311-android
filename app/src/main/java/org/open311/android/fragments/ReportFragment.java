@@ -604,7 +604,7 @@ public class ReportFragment extends Fragment {
                 .setAddress(address.getText().toString())
                 .setDescription(description.getText().toString());
 
-        bgTask = new PostServiceRequestTask(Constants.ENDPOINT, data, imageUri);
+        bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, imageUri);
         bgTask.execute();
     }
 
@@ -686,7 +686,7 @@ public class ReportFragment extends Fragment {
                     MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(imageUri);
                     wrapperFactory.setNetworkManager(networkManager);
                 }
-                wrapperFactory.setApiKey(Constants.API_KEY);
+                wrapperFactory.setApiKey(getContext().getResources().getString(R.string.open311_apikey));
 
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
@@ -762,7 +762,7 @@ public class ReportFragment extends Fragment {
          */
         @Override
         protected Integer doInBackground(Void... ignore) {
-            String url = Constants.ENDPOINT + "/services/" + this.serviceCode + ".xml";
+            String url = getContext().getResources().getString(R.string.open311_endpoint) + "/services/" + this.serviceCode + ".xml";
             APIWrapper wrapper;
             ServiceDefinition definition;
             Integer count = 0;
@@ -806,7 +806,7 @@ public class ReportFragment extends Fragment {
             if (services != null) return null;
             APIWrapper wrapper;
             try {
-                wrapper = new APIWrapperFactory(Constants.ENDPOINT).build();
+                wrapper = new APIWrapperFactory(getContext().getResources().getString(R.string.open311_endpoint)).build();
                 services = wrapper.getServiceList();
 
             } catch (APIWrapperException e) {
