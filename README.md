@@ -4,6 +4,8 @@ This repository is compatible with Android Studio.
 open311-android is a reference client for the Open311 API.
 open311-android should work for any organizations with an Open311 GeoReport v2 compliant endpoint server.
 
+Tested on API 19, API 22 and API 23
+
 ## Open311 - http://open311.org
 Open311 GeoReport v2 is an open standard for sharing non-emergency issues in public spaces.  Common issues include potholes, broken streetlights, garbage, vandalism, and other problems that compromise public spaces and infrastructure.
 
