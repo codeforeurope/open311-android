@@ -12,7 +12,8 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.R;
@@ -28,7 +29,6 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
 
     private List<ServiceRequest> requests;
     private ArrayList<ServiceRequest> filteredRequests;
-    private final RequestsFragment.OnListFragmentInteractionListener mListener;
     private Context context;
 
     public ArrayList<ServiceRequest> getFilteredRequests() {
@@ -69,7 +69,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
 
     public RequestsAdapter(List<ServiceRequest> requests, RequestsFragment.OnListFragmentInteractionListener mListener) {
         this.requests = requests;
-        this.mListener = mListener;
+        RequestsFragment.OnListFragmentInteractionListener mListener1 = mListener;
         if (requests != null) {
             filteredRequests = new ArrayList<ServiceRequest>(requests);
         } else {
@@ -110,7 +110,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         //Media
         URL url = filteredRequests.get(position).getMediaUrl();
         if (url != null) {
-            Picasso.with(context).load(url.toString()).fit().centerCrop().into(holder.requestImage);
+            Glide.with(context).load(url.toString()).fitCenter().centerCrop().diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.requestImage);
             holder.requestImage.setVisibility(View.VISIBLE);
         } else {
             holder.requestImage.setImageDrawable(null);

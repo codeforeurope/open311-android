@@ -17,20 +17,15 @@ import java.util.List;
 
 public class ViewPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragmentList = new ArrayList<Fragment>();
-    private final List<String> mFragmentTitleList = new ArrayList<String>();
     private Context context;
-    private FragmentManager manager;
     private int[] imageResId = {
-            R.drawable.ic_home_white_24dp,
-            R.drawable.ic_chat_bubble_white_24dp,
+            R.drawable.ic_add_alert_white_24dp,
+            R.drawable.ic_notifications_active,
             R.drawable.ic_person_white_24dp,
             R.drawable.ic_info_white_24dp
-            //R.drawable.ic_search_white_24dp,
-            //R.drawable.ic_settings_white_24dp
     };
     public ViewPagerAdapter(FragmentManager manager, Context context) {
         super(manager);
-        this.manager = manager;
         this.context = context;
     }
 
@@ -44,12 +39,8 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         return mFragmentList.size();
     }
 
-    public void addFragment(Fragment fragment, String title) {
-        //if (fragment != null) {
-        //    manager.beginTransaction().replace(R.id.flContent, fragment).addToBackStack(null).commit();
-        //}
+    public void addFragment(Fragment fragment) {
         mFragmentList.add(fragment);
-        mFragmentTitleList.add(title);
     }
 
     @Override
@@ -61,6 +52,5 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         ImageSpan imageSpan = new ImageSpan(image, ImageSpan.ALIGN_BOTTOM);
         sb.setSpan(imageSpan, 0, 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         return sb;
-        //return mFragmentTitleList.get(position);
     }
 }
