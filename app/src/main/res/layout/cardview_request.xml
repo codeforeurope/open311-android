@@ -36,10 +36,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
-                    android:text="Updated"
+                    android:layout_alignParentEnd="true"
+                    android:text="@string/updated"
                     android:singleLine="true"
                     android:drawablePadding="4dp"
-                    android:drawableLeft="@drawable/ic_schedule_12dp"/>
+                    android:drawableLeft="@drawable/ic_schedule"
+                    android:drawableStart="@drawable/ic_schedule"/>
             </RelativeLayout>
 
             <LinearLayout
@@ -50,14 +52,14 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:contentDescription="location"
-                    android:src="@drawable/ic_place_12dp" />
+                    android:contentDescription="@string/location"
+                    android:src="@drawable/ic_place" />
 
                 <TextView
                     android:id="@+id/request_address"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mainstreet nr. 1" />
+                    android:text="@string/location" />
             </LinearLayout>
         </LinearLayout>
 
@@ -84,7 +86,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:paddingTop="12dp"
-                android:text="Lorem Ipsum is slechts een proeftekst uit het drukkerij- en zetterijwezen. Lorem Ipsum is de standaard proeftekst in deze bedrijfstak sinds de 16e eeuw, toen een onbekende drukker een zethaak met letters nam en ze door elkaar husselde om een font-catalogus te maken. Het heeft niet alleen vijf eeuwen overleefd maar is ook, vrijwel onveranderd, overgenomen in elektronische letterzetting. Het is in de jaren '60 populair geworden met de introductie van Letraset vellen met Lorem Ipsum passages en meer recentelijk door desktop publishing software zoals Aldus PageMaker die versies van Lorem Ipsum bevatten."
+                android:text="@string/report_hint_description"
                 android:textSize="14sp" />
         </LinearLayout>
 
@@ -102,7 +104,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical|start"
-                android:text="Status" />
+                android:text="@string/status_unknown" />
         </LinearLayout>
 
     </RelativeLayout>
