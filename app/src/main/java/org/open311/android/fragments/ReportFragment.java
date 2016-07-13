@@ -1,8 +1,10 @@
 package org.open311.android.fragments;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,10 +12,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -25,16 +27,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+
+import com.github.clans.fab.FloatingActionButton;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
@@ -45,18 +54,15 @@ import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
-import org.open311.android.Constants;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.CustomButton;
-import org.open311.android.helpers.Image;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.Normalizer;
@@ -70,25 +76,24 @@ import java.util.Map;
  */
 public class ReportFragment extends Fragment {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
     private List<Service> services;
-    private Uri imageUri;
-    private Uri thumbnailUri;
+    private String imageUri;
     private ProgressDialog progress;
-    private PostServiceRequestTask bgTask;
 
     private Float latitude;
     private Float longitude;
 
-    public static final int BORDER_SIZE = 20; // border size of photo thumbnail
-
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
+    public static final int GALLERY_REQUEST = 103;
+    public static final int READ_STORAGE_REQUEST = 104;
 
     private static final boolean ATTRIBUTES_ENABLED = false;
 
-    private CustomButton photoButton;
     private String location;
     private String serviceName;
     private String serviceCode;
@@ -98,83 +103,81 @@ public class ReportFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Find a view by id - convenience method
-     *
-     * @param viewId the id of the view to find
-     * @return View
-     */
-    private View findViewById(int viewId) {
-        return getActivity().findViewById(viewId);
-    }
-
-    private void updateServiceButton() {
+    private void updateService() {
         if (serviceName != null) {
-            CustomButton btn = (CustomButton) findViewById(R.id.report_service_button);
-            btn.setText(serviceName);
+            TextView serviceTextView = (TextView) getActivity().findViewById(R.id.service_text);
+            serviceTextView.setText(serviceName);
+            ImageView icon = (ImageView) getActivity().findViewById(R.id.serviceView);
+            icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
     }
 
-    private void updateLocationButton() {
+    private void updateLocation() {
         if (location != null) {
-            CustomButton btn = (CustomButton) findViewById(R.id.report_location_button);
-            btn.setText(location);
+            TextView text = (TextView) getActivity().findViewById(R.id.location_text);
+            text.setText(location);
+            ImageView icon = (ImageView) getActivity().findViewById(R.id.locationView);
+            icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
     }
 
-    public void updatePhotoButtonImage() {
-        if (thumbnailUri != null) {
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(
-                        getActivity().getContentResolver(), thumbnailUri);
-                updatePhotoButtonImage(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    /**
+     * When we get a Return from the Camera, the image is in a temp file, transform it to string with getPath()
+     *
+     * @param imageFromTemp temporary image, this gets created when using the camera
+     */
+    public void updatePhoto(Uri imageFromTemp) {
+        imageUri = imageFromTemp.getPath();
+        updatePhoto();
+    }
+
+    public void updatePhoto() {
+        if (imageUri != null) {
+            Log.d(TAG, "Trying image from " + imageUri);
+
+            RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
+            ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
+            Glide.with(getContext()).load(imageUri).asBitmap().into(image);
+            layout.setVisibility(View.VISIBLE);
+        } else {
+            resetPhoto();
         }
     }
 
-    public void updatePhotoButtonImage(Bitmap photo) {
-        if (photoButton != null) {
-            photoButton.setHint("");
-            photoButton.setImageBitmap(addWhiteBorder(photo, BORDER_SIZE));
-        }
-    }
-
-    private void resetPhotoButton() {
-        if (photoButton != null) {
-            photoButton.clear();
-        }
+    private void resetPhoto() {
+        RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
+        layout.setVisibility(View.INVISIBLE);
         imageUri = null;
-        thumbnailUri = null;
+        TextView photoText = (TextView) getActivity().findViewById(R.id.photo_text);
+        photoText.setText(R.string.report_hint_photo);
     }
 
-    private void resetServiceButton() {
-        CustomButton btnService = (CustomButton) findViewById(R.id.report_service_button);
-        btnService.clear();
+    private void resetService() {
         serviceName = null;
         serviceCode = null;
+        TextView serviceText = (TextView) getActivity().findViewById(R.id.service_text);
+        serviceText.setText(R.string.report_hint_service);
     }
 
-    private void resetLocationButton() {
-        CustomButton btnLocation = (CustomButton) findViewById(R.id.report_location_button);
-        btnLocation.clear();
+    private void resetLocation() {
         latitude = null;
         longitude = null;
         location = null;
+        TextView locationText = (TextView) getActivity().findViewById(R.id.location_text);
+        locationText.setText(R.string.report_hint_location);
     }
 
-    private void resetDescriptionTextbox() {
-        EditText description = (EditText) findViewById(R.id.report_description_textbox);
+    private void resetDescription() {
+        EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
         description.setText(null);
-        description.setHintTextColor(Color.GRAY);
+
     }
 
-    private void cleanUpForm() {
-        resetPhotoButton();
-        resetServiceButton();
-        resetLocationButton();
-        resetDescriptionTextbox();
+    private void resetAll() {
+        resetPhoto();
+        resetService();
+        resetLocation();
+        resetDescription();
     }
 
     @Override
@@ -202,14 +205,12 @@ public class ReportFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_report, container, false);
 
-        CustomButton btnPhoto = (CustomButton) view.findViewById(R.id.report_photo_button);
-        CustomButton btnService = (CustomButton) view.findViewById(R.id.report_service_button);
-        CustomButton btnLocation = (CustomButton) view.findViewById(R.id.report_location_button);
+        RelativeLayout btnPhoto = (RelativeLayout) view.findViewById(R.id.photoButton);
+        RelativeLayout btnService = (RelativeLayout) view.findViewById(R.id.serviceButton);
+        RelativeLayout btnLocation = (RelativeLayout) view.findViewById(R.id.locationButton);
 
-        Button btnSubmit = (Button) view.findViewById(R.id.report_next_button);
+        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_next_button);
 
-        btnPhoto.setIcon(R.drawable.ic_photo_camera_black_24dp);
-        btnPhoto.setHint(getString(R.string.report_hint_photo));
         btnPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -217,8 +218,6 @@ public class ReportFragment extends Fragment {
             }
         });
 
-        btnLocation.setIcon(R.drawable.ic_location_on_black_24dp);
-        btnLocation.setHint(getString(R.string.report_hint_location));
         btnLocation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -226,8 +225,6 @@ public class ReportFragment extends Fragment {
             }
         });
 
-        btnService.setIcon(R.drawable.ic_subject_black_24dp);
-        btnService.setHint(R.string.report_hint_service);
         btnService.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -242,21 +239,15 @@ public class ReportFragment extends Fragment {
             }
         });
 
-        photoButton = btnPhoto;
-
         return view;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
             if (savedInstanceState.containsKey("imageUri")) {
-                imageUri = Uri.parse(savedInstanceState.getString("imageUri"));
-            }
-            if (savedInstanceState.containsKey("thumbnailUri")) {
-                thumbnailUri = Uri.parse(savedInstanceState.getString("thumbnailUri"));
+                imageUri = savedInstanceState.getString("imageUri");
             }
             if (savedInstanceState.containsKey("location")) {
                 location = savedInstanceState.getString("location");
@@ -296,10 +287,7 @@ public class ReportFragment extends Fragment {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
         if (imageUri != null) {
-            savedInstanceState.putString("imageUri", imageUri.toString());
-        }
-        if (thumbnailUri != null) {
-            savedInstanceState.putString("thumbnailUri", thumbnailUri.toString());
+            savedInstanceState.putString("imageUri", imageUri);
         }
         if (location != null) {
             savedInstanceState.putString("location", location);
@@ -327,10 +315,9 @@ public class ReportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updatePhotoButtonImage();
-        updateServiceButton();
-        updateLocationButton();
-        //updateAttributeButtons();
+        updatePhoto();
+        updateService();
+        updateLocation();
     }
 
     @Override
@@ -343,27 +330,6 @@ public class ReportFragment extends Fragment {
     }
 
     /**
-     * Create a temporary file
-     *
-     * @param name Filename
-     * @param ext  File Extension
-     * @return File
-     * @throws Exception
-     */
-    private File createTemporaryFile(String name, String ext) throws Exception {
-        File tempDir = Environment.getExternalStorageDirectory();
-        tempDir = new File(tempDir.getAbsolutePath() + "/.temp/");
-        if (!tempDir.exists()) {
-            tempDir.mkdir();
-        }
-        File file = new File(tempDir, name + ext);
-        if (file.exists() && file.isFile()) {
-            file.delete();
-        }
-        return File.createTempFile(name, ext, tempDir);
-    }
-
-    /**
      * Checks if form values are valid
      *
      * @return boolean
@@ -372,9 +338,7 @@ public class ReportFragment extends Fragment {
 
         boolean isValid = true;
 
-        CustomButton service = (CustomButton) findViewById(R.id.report_service_button);
-        CustomButton location = (CustomButton) findViewById(R.id.report_location_button);
-        EditText description = (EditText) findViewById(R.id.report_description_textbox);
+        EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
 
         String descText = description.getText().toString();
 
@@ -387,12 +351,12 @@ public class ReportFragment extends Fragment {
 
         if (serviceCode == null) {
             isValid = false;
-            service.setError();
+            resetLocation();
         }
 
         if (latitude == null || longitude == null) {
             isValid = false;
-            location.setError();
+            resetLocation();
         }
 
         if (description.getText().length() == 0) {
@@ -419,13 +383,14 @@ public class ReportFragment extends Fragment {
     }
 
     private void addAttributesToForm() {
+        // TODO process attributes
         Iterator<AttributeInfo> iterator = attrInfoList.iterator();
-        LinearLayout layout = (LinearLayout) findViewById(R.id.report_attributes);
+        LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.report_attributes);
         layout.removeAllViews(); // Make sure the ViewGroup is empty (i.e. has no child views)
         while (iterator.hasNext()) {
             final AttributeInfo attr = iterator.next();
             if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
-                System.out.println("ATTR-INFO: " + attr.getDatatype());
+                Log.d(TAG, "ATTR-INFO: " + attr.getDatatype());
                 // For now we'll accept attribute type SingleValueList.
                 // In a later version we'll also support the types:
                 // STRING, NUMBER, DATETIME, TEXT, MULTIVALUELIST
@@ -476,8 +441,8 @@ public class ReportFragment extends Fragment {
         }
         builder.setTitle(title).setItems(values, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int index) {
-                System.out.println("SELECTED ATTRIBUTE: " + values[index]);
-                updateLocationButton();
+                Log.d(TAG, "SELECTED ATTRIBUTE: " + values[index]);
+                updateLocation();
                 SingleValueAttributeWrapper sva = new SingleValueAttributeWrapper(code, keys[index]);
                 int aIndex = indexOfAttribute(sva);
                 if (aIndex == -1) {
@@ -509,29 +474,68 @@ public class ReportFragment extends Fragment {
             public void onClick(DialogInterface dialog, int index) {
                 serviceName = values[index];
                 serviceCode = codes[index];
-                System.out.println("SELECTED SERVICE: " + serviceName);
-                updateServiceButton();
+                Log.d(TAG, "SELECTED SERVICE: " + serviceName);
+                updateService();
                 if (ATTRIBUTES_ENABLED) {
                     new RetrieveAttributesTask(codes[index]).execute();
                 }
             }
         });
-        builder.create().show();
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+        builder.show();
     }
 
+
+    /**
+     * User clicked the Button to add a Picture to the request.
+     * We present the user with a dialog to select a picture from the
+     * gallery, or use the camera to pick one.
+     */
     private void onPhotoButtonClicked() {
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED) {
-            requestPermissions(new String[]{Manifest.permission.CAMERA},
-                    CAMERA_REQUEST);
-        } else {
-            handleCamera();
-        }
+        final CharSequence[] items = {getString(R.string.camera), getString(R.string.gallery)};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
+        builder.setTitle(getString(R.string.choose_media_source));
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.M)
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(getString(R.string.camera))) {
+                    String[] PERMISSIONS = {Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    if (!hasPermissions(getContext().getApplicationContext(), PERMISSIONS)) {
+                        requestPermissions(PERMISSIONS, CAMERA_REQUEST);
+                    } else {
+                        handleCamera();
+                    }
+                } else if (items[item].equals(getString(R.string.gallery))) {
+                    if (ContextCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                READ_STORAGE_REQUEST);
+                    } else {
+                        handleGallery();
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+
     }
 
     private void onLocationButtonClicked() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission_group.LOCATION) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION},
+                            Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_REQUEST);
         } else {
             handleLocation();
@@ -552,7 +556,32 @@ public class ReportFragment extends Fragment {
             e.printStackTrace();
         }
     }
+
+    /**
+     * User selected to use the Gallery as picture source
+     * Because we check permissions for Android 6+, this function is also used to propagate
+     * actions from the checker
+     */
+    private void handleGallery() {
+        Log.d(TAG, "HandleGallery");
+        if (!isExternalStorageWritable()) {
+            String msg = getString(R.string.storageNotWritable);
+            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
+        intent.setType("image/*");
+        intent.putExtra("return_data", true);
+        startActivityForResult(intent, GALLERY_REQUEST);
+    }
+
+    /**
+     * User selected to use the Camera as picture source.
+     * Because we check permissions for Android 6+, this function is also used to propagate
+     * actions from the checker
+     */
     private void handleCamera() {
+        Log.d(TAG, "HandleCamera");
         if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -563,9 +592,13 @@ public class ReportFragment extends Fragment {
         File photo;
         try {
             photo = createTemporaryFile("picture", ".bmp");
-            photo.delete();
-            imageUri = Uri.fromFile(photo);
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+            if(photo.delete()) {
+                imageUri = Uri.fromFile(photo).getPath();
+                cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
+            } else {
+                String msg = getString(R.string.storageNotWritable);
+                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -575,17 +608,17 @@ public class ReportFragment extends Fragment {
     }
 
     private void onSubmitButtonClicked() {
-        Log.d("open311", "Submit Button was clicked.");
+        Log.d(TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
         if (!isValidFormContent()) {
             return;
         }
 
-        CustomButton address = (CustomButton) findViewById(R.id.report_location_button);
-        EditText description = (EditText) findViewById(R.id.report_description_textbox);
+        TextView address = (TextView) getActivity().findViewById(R.id.location_text);
+        EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
 
-        POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
+        final POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
                 serviceCode,
                 latitude,
                 longitude,
@@ -604,8 +637,26 @@ public class ReportFragment extends Fragment {
                 .setAddress(address.getText().toString())
                 .setDescription(description.getText().toString());
 
-        bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, imageUri);
-        bgTask.execute();
+
+        // TODO Glide into correct size!
+        int myWidth = 512;
+        int myHeight = 384;
+
+        if(imageUri != null){
+        Glide.with(getActivity().getApplicationContext())
+        .load(imageUri)
+                .asBitmap()
+                .into(new SimpleTarget<Bitmap>(myWidth, myHeight) {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                        PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, bitmap);
+                        bgTask.execute();
+                    }
+                });
+        } else {
+            PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, null);
+            bgTask.execute();
+        }
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -615,27 +666,21 @@ public class ReportFragment extends Fragment {
             progress.dismiss();
         }
 
+        if (requestCode == GALLERY_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                imageUri = data.getData().toString();
+                updatePhoto();
+            } else {
+                resetPhoto();
+            }
+
+        }
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 if (imageUri == null) return;
-                try {
-                    // int width = getPhotoButtonWidth();
-                    // int height = Math.round((3 / (float) 4) * width); // 4:3 aspect ratio
-                    // Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), width, height);
-                    Bitmap bitmap = Image.decodeSampledBitmap(imageUri.getPath(), 320, 240);
-                    File file = createTemporaryFile("thumb", ".bmp");
-                    FileOutputStream out = new FileOutputStream(file);
-                    // PNG is a loss-less format, the compression factor (100) is ignored
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                    out.flush();
-                    out.close();
-                    thumbnailUri = Uri.fromFile(file);
-                    updatePhotoButtonImage(bitmap);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                updatePhoto();
             } else {
-                imageUri = null;
+                resetPhoto();
             }
         }
 
@@ -646,14 +691,12 @@ public class ReportFragment extends Fragment {
                 location = place.getName().toString();
                 latitude = (float) position.latitude;
                 longitude = (float) position.longitude;
-                CustomButton location = (CustomButton) getActivity()
-                        .findViewById(R.id.report_location_button);
-                location.setText(place.getName());
+                updateLocation();
             } else {
                 if (resultCode == 2) {
-                    System.out.println("Your API key is invalid, enter it in local.properties");
+                    Log.d(TAG, "Your API key is invalid, enter it in local.properties");
                 } else {
-                    System.out.println("LOCATION REQUEST RESULT CODE: " + resultCode);
+                    Log.d(TAG, "LOCATION REQUEST RESULT CODE: " + resultCode);
                 }
             }
         }
@@ -663,13 +706,13 @@ public class ReportFragment extends Fragment {
 
         private POSTServiceRequestData data;
         private String url;
-        private Uri imageUri;
+        private Bitmap bitmap;
         private boolean success = true;
 
-        public PostServiceRequestTask(String url, POSTServiceRequestData data, Uri imageUri) {
+        public PostServiceRequestTask(String url, POSTServiceRequestData data, Bitmap bitmap) {
             this.url = url;
             this.data = data;
-            this.imageUri = imageUri;
+            this.bitmap = bitmap;
         }
 
         /**
@@ -683,7 +726,7 @@ public class ReportFragment extends Fragment {
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(url);
                 if (imageUri != null) {
-                    MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(imageUri);
+                    MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(bitmap);
                     wrapperFactory.setNetworkManager(networkManager);
                 }
                 wrapperFactory.setApiKey(getContext().getResources().getString(R.string.open311_apikey));
@@ -695,7 +738,7 @@ public class ReportFragment extends Fragment {
                     success = true;
                     result = response.getServiceNotice();
                     saveServiceRequestId(response.getServiceRequestId());
-                    System.out.println("SERVICE REQUEST ID: " + response.getServiceRequestId());
+                    Log.d(TAG, "SERVICE REQUEST ID: " + response.getServiceRequestId());
                 } else {
                     success = false;
                     result = getString(R.string.report_failure_message);
@@ -731,9 +774,9 @@ public class ReportFragment extends Fragment {
             if (progress != null && progress.isShowing()) {
                 progress.dismiss();
             }
-            System.out.println("POST RESULT: " + result);
+            Log.d(TAG, "POST RESULT: " + result);
 
-            if (success) cleanUpForm();
+            if (success) resetAll();
 
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.report_dialog_title))
@@ -775,7 +818,7 @@ public class ReportFragment extends Fragment {
                     attrInfoList.add((AttributeInfo) iterator.next());
                 }
                 count = attrInfoList.size();
-                System.out.println("ATTRIBUTE COUNT: " + count);
+                Log.d(TAG, "ATTRIBUTE COUNT: " + count);
 
             } catch (APIWrapperException e) {
                 e.printStackTrace();
@@ -789,7 +832,7 @@ public class ReportFragment extends Fragment {
 
         protected void onPostExecute(Integer count) {
             if (count == 0) {
-                System.out.println("THE SELECTED SERVICE HAS NO ATTRIBUTES");
+                Log.d(TAG, "THE SELECTED SERVICE HAS NO ATTRIBUTES");
             }
             addAttributesToForm();
         }
@@ -820,27 +863,10 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    /**
-     * Add a white border to a bitmap image
-     *
-     * @param bmp        Bitmap
-     * @param borderSize int
-     * @return Bitmap
-     */
-    private Bitmap addWhiteBorder(Bitmap bmp, int borderSize) {
-        Bitmap bmpWithBorder = Bitmap.createBitmap(
-                bmp.getWidth() + borderSize * 2,
-                bmp.getHeight() + borderSize * 2,
-                bmp.getConfig());
-        Canvas canvas = new Canvas(bmpWithBorder);
-        canvas.drawColor(Color.WHITE);
-        canvas.drawBitmap(bmp, borderSize, borderSize, null);
-        return bmpWithBorder;
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        Log.d(TAG, "onRequestPermissionResult");
         if (requestCode == CAMERA_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleCamera();
@@ -849,5 +875,45 @@ public class ReportFragment extends Fragment {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleLocation();
         }
+    }
+
+    /**
+     * Create a temporary file
+     *
+     * @param name Filename
+     * @param ext  File Extension
+     * @return File
+     * @throws Exception
+     */
+    private File createTemporaryFile(String name, String ext) throws Exception {
+        File tempDir = Environment.getExternalStorageDirectory();
+        tempDir = new File(tempDir.getAbsolutePath() + "/.temp/");
+        if (!tempDir.exists()) {
+            tempDir.mkdir();
+        }
+        File file = new File(tempDir, name + ext);
+        if (file.exists() && file.isFile()) {
+            file.delete();
+        }
+        return File.createTempFile(name, ext, tempDir);
+    }
+
+    /**
+     * Helper function to check multiple permissions, even with multiple.
+     *
+     * @param context     the context from which to check permissions
+     * @param permissions the permissions to be checked
+     * @return if permissions are granted or not
+     */
+
+    public static boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

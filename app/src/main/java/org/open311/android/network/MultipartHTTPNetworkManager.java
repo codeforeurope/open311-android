@@ -1,8 +1,14 @@
 package org.open311.android.network;
 
+import android.content.ContextWrapper;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.util.Log;
+
+import com.bumptech.glide.Glide;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -11,6 +17,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import org.codeforamerica.open311.facade.Format;
 import org.codeforamerica.open311.internals.network.NetworkManager;
+import org.open311.android.MainActivity;
 import org.open311.android.helpers.Image;
 
 import java.io.BufferedReader;
@@ -30,12 +37,13 @@ import java.util.Map.Entry;
  * @author Bas Biezemans
  */
 public class MultipartHTTPNetworkManager implements NetworkManager {
+    private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TIMEOUT = 5000;
     private static final String FILENAME = "media.jpg";
-    private Uri imageUri;
+    private Bitmap bitmap;
 
-    public MultipartHTTPNetworkManager(Uri imageUri) {
-        this.imageUri = imageUri;
+    public MultipartHTTPNetworkManager(Bitmap bitmap) {
+        this.bitmap = bitmap;
     }
 
     /**
@@ -77,29 +85,17 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
             entity.addTextBody(entry.getKey(), entry.getValue());
         }
 
-        if (imageUri != null) {
-            Bitmap bitmap;
-            try {
-                bitmap = Image.decodeSampledBitmap(imageUri.getPath(), Image.WIDTH, Image.HEIGHT);
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                ContentType contentType = ContentType.create("image/jpg");
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream);
-                byte[] binaryData = stream.toByteArray();
-                entity.addBinaryBody("media", binaryData, contentType, FILENAME);
-
-                // Debug
-                // System.out.println("Parameter : media = " + contentType.getMimeType());
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        ContentType contentType = ContentType.create("image/jpg");
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, stream);
+        byte[] binaryData = stream.toByteArray();
+        entity.addBinaryBody("media", binaryData, contentType, FILENAME);
 
         HttpEntity httpEntity = entity.build();
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         // Debug
-        System.out.println("EndPoint URL: " + url.toString());
+        Log.d(TAG, "EndPoint URL: " + url.toString());
 
         conn.setDoOutput(true); // POST
         conn.setDoInput(true);
@@ -138,47 +134,6 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
      */
     @Override
     public void setFormat(Format format) { }
-
-    /**
-     * A SSLSocketFactory which allows non trusted SSL certificates.
-     *
-     * @author Santiago Munín <santimunin@gmail.com>
-     *
-     *
-    private class MySSLSocketFactory extends SSLSocketFactory {
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-
-        public MySSLSocketFactory(KeyStore truststore)
-                throws NoSuchAlgorithmException, KeyManagementException,
-                KeyStoreException, UnrecoverableKeyException {
-            super(truststore);
-
-            TrustManager tm = new X509TrustManager() {
-                public void checkClientTrusted(X509Certificate[] chain, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] chain, String authType)
-                        throws CertificateException {
-                }
-
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-
-            sslContext.init(null, new TrustManager[]{tm}, null);
-        }
-
-        @Override
-        public Socket createSocket(Socket socket, String host, int port, boolean autoClose) throws IOException {
-            return sslContext.getSocketFactory().createSocket(socket, host, port, autoClose);
-        }
-
-        @Override
-        public Socket createSocket() throws IOException {
-            return sslContext.getSocketFactory().createSocket();
-        }
-    } //*/
 
     private void disableConnectionReuseIfNecessary() {
         // HTTP connection reuse which was buggy pre-froyo

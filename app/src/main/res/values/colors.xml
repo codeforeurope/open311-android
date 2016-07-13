@@ -9,6 +9,7 @@
     <color name="textColor">#FFFFFF</color>
     <color name="iconColorPrimaryLight">#FFFFFF</color>
     <color name="iconColorPrimaryDark">#212121</color>
+    <color name="iconColorMutedDark">#40000000</color>
     <color name="transparent">#00000000</color>
     <color name="colorDivider">#B6B6B6</color>
 </resources>

@@ -3,14 +3,21 @@ package org.open311.android.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.github.clans.fab.FloatingActionButton;
 
 import org.open311.android.R;
 
@@ -23,19 +30,11 @@ import java.text.Normalizer;
 public class ProfileFragment extends Fragment {
 
     private SharedPreferences settings;
+    private EditText inputName, inputEmail, inputPhone;
+    private TextInputLayout inputLayoutName, inputLayoutEmail, inputLayoutPhone;
 
     public ProfileFragment() {
         // Required empty public constructor
-    }
-
-    /**
-     * Find a view by id - convenience method
-     *
-     * @param viewId
-     * @return View
-     */
-    private View findViewById(int viewId) {
-        return getActivity().findViewById(viewId);
     }
 
     @Override
@@ -49,15 +48,23 @@ public class ProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        EditText name  = (EditText) view.findViewById(R.id.input_name);
-        EditText email = (EditText) view.findViewById(R.id.input_email);
-        EditText phone = (EditText) view.findViewById(R.id.input_phone);
+        inputLayoutName = (TextInputLayout) view.findViewById(R.id.input_layout_name);
+        inputLayoutEmail = (TextInputLayout) view.findViewById(R.id.input_layout_email);
+        inputLayoutPhone = (TextInputLayout) view.findViewById(R.id.input_layout_phone);
 
-        name.setText(settings.getString("name", null));
-        email.setText(settings.getString("email", null));
-        phone.setText(settings.getString("phone", null));
+        inputName = (EditText) view.findViewById(R.id.input_name);
+        inputEmail = (EditText) view.findViewById(R.id.input_email);
+        inputPhone = (EditText) view.findViewById(R.id.input_phone);
 
-        Button submit = (Button) view.findViewById(R.id.btn_submit);
+        inputName.setText(settings.getString("name", null));
+        inputEmail.setText(settings.getString("email", null));
+        inputPhone.setText(settings.getString("phone", null));
+
+        inputName.addTextChangedListener(new MyTextWatcher(inputName));
+        inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        inputPhone.addTextChangedListener(new MyTextWatcher(inputPhone));
+
+        FloatingActionButton submit = (FloatingActionButton) view.findViewById(R.id.btn_submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,35 +78,23 @@ public class ProfileFragment extends Fragment {
     private void onSubmitButtonClicked() {
         SharedPreferences.Editor editor = settings.edit();
         String result;
-        EditText name = (EditText) findViewById(R.id.input_name);
-        EditText email = (EditText) findViewById(R.id.input_email);
-        EditText phone = (EditText) findViewById(R.id.input_phone);
 
-        String strName = name.getText().toString();
-        String strEmail = email.getText().toString();
-        String strPhone = phone.getText().toString();
-
-        // Filter name text. Replace everything that is not a letter or whitespace.
-        String pattern = "[^a-zA-Z\\s]";
-        strEmail = Normalizer.normalize(strName, Normalizer.Form.NFD).replaceAll(pattern, "");
-        name.setText(strEmail);
-
-        boolean isValid = true;
-
-        if (! strEmail.isEmpty()) {
-            if (! isValidEmail(strEmail)) {
-                isValid = false;
-                email.setError(getString(R.string.invalid_email));
-                email.requestFocus();
-            } else {
-                editor.putString("email", strEmail);
-            }
+        if (!validateName()) {
+            return;
         }
+        ;
+        if (!validateEmail()) {
+            return;
+        }
+        ;
+        if (!validatePhone()) {
+            return;
+        }
+        ;
 
-        if (! isValid) return;
-
-        editor.putString("name", strName);
-        editor.putString("phone", strPhone);
+        editor.putString("name", inputName.getText().toString());
+        editor.putString("phone", inputPhone.getText().toString());
+        editor.putString("email", inputEmail.getText().toString());
 
         if (editor.commit()) {
             result = getString(R.string.settings_saved);
@@ -109,11 +104,79 @@ public class ProfileFragment extends Fragment {
         Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
     }
 
-    private boolean isValidEmail(CharSequence target) {
-        if (target == null) {
+    private boolean validateName() {
+        if (inputName.getText().toString().trim().isEmpty()) {
+            inputLayoutName.setError(getString(R.string.invalid_name));
+            requestFocus(inputName);
             return false;
         } else {
-            return Patterns.EMAIL_ADDRESS.matcher(target).matches();
+            inputLayoutName.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validateEmail() {
+        String strEmail = inputEmail.getText().toString().trim();
+
+        if (strEmail.isEmpty() || !isValidEmail(strEmail)) {
+            inputLayoutEmail.setError(getString(R.string.invalid_email));
+            requestFocus(inputEmail);
+            return false;
+        } else {
+            inputLayoutEmail.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validatePhone() {
+        if (inputPhone.getText().toString().trim().isEmpty()) {
+            inputLayoutPhone.setError(getString(R.string.invalid_phone));
+            requestFocus(inputPhone);
+            return false;
+        } else {
+            inputLayoutPhone.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
+    }
+
+    private static boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.input_name:
+                    validateName();
+                    break;
+                case R.id.input_email:
+                    validateEmail();
+                    break;
+                case R.id.input_phone:
+                    validatePhone();
+                    break;
+            }
         }
     }
 }

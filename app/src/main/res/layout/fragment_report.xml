@@ -1,112 +1,221 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:focusableInTouchMode="true"
     tools:context=".fragments.ReportFragment">
 
     <ScrollView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:id="@+id/report_linear_layout"
-            android:orientation="vertical"
-            android:padding="16dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <TextView
-                style="@style/AppTheme.ReportFormTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/report_service" />
-
-            <org.open311.android.helpers.CustomButton
-                android:id="@+id/report_service_button"
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/input_layout_description"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="@style/AppTheme.ReportFormTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/report_location" />
-
-            <org.open311.android.helpers.CustomButton
-                android:id="@+id/report_location_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="@style/AppTheme.ReportFormTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/report_photo" />
-
-            <org.open311.android.helpers.CustomButton
-                android:id="@+id/report_photo_button"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <TextView
-                style="@style/AppTheme.ReportFormTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/description" />
-
-            <LinearLayout
-                android:id="@+id/report_desc_button"
-                android:orientation="horizontal"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:padding="5dp"
-                android:background="@drawable/button_shape">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="6dp"
-                    android:src="@drawable/ic_description_black_24dp" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <EditText
                     android:id="@+id/report_description_textbox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginRight="6dp"
-                    android:gravity="left|center_vertical"
-                    android:padding="10dp"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:ems="5"
-                    android:hint="@string/report_hint_description"
                     android:cursorVisible="true"
+                    android:ems="5"
+                    android:gravity="top"
+                    android:hint="@string/report_hint_description"
+                    android:inputType="textMultiLine|textCapSentences"
                     android:maxLength="500"
-                    android:background="@android:color/transparent" />
-
-            </LinearLayout>
+                    android:minHeight="200dp" />
+            </android.support.design.widget.TextInputLayout>
 
             <LinearLayout
                 android:id="@+id/report_attributes"
-                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
                 <!-- Attributes will be dynamically added -->
 
             </LinearLayout>
+            <!-- Button for selecting Service -->
 
-            <Button
-                android:id="@+id/report_next_button"
-                android:layout_width="fill_parent"
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/submit"
-                android:background="@color/colorPrimary"
-                android:layout_marginTop="40dp"
-                android:textColor="@android:color/white"
-                android:layout_weight="0" />
+                android:minHeight="72dp"
+                android:clickable="true"
+                android:id="@+id/serviceButton"
+                android:background="?attr/selectableItemBackground"
+                android:longClickable="true">
 
+                <ImageView
+                    android:scaleType="fitStart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/report_hint_description"
+                    android:id="@+id/serviceView"
+                    android:src="@drawable/ic_domain"
+                    android:tint="@color/iconColorMutedDark"/>
+                <LinearLayout
+                    android:id="@+id/service_text_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignWithParentIfMissing="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@+id/serviceView"
+                    android:layout_toEndOf="@+id/serviceView"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/report_hint_service"
+                    android:id="@+id/service_text" />
+                </LinearLayout>
+            </RelativeLayout>
+            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:id="@+id/locationButton"
+                android:background="?attr/selectableItemBackground"
+                android:minHeight="72dp">
+
+                <ImageView
+                    android:scaleType="fitStart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/report_hint_location"
+                    android:id="@+id/locationView"
+                    android:src="@drawable/ic_place"
+                    android:tint="@color/iconColorMutedDark"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignWithParentIfMissing="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@+id/locationView"
+                    android:layout_toEndOf="@+id/locationView"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/report_hint_location"
+                        android:id="@+id/location_text" />
+                </LinearLayout>
+            </RelativeLayout>
+            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/photoButton"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:minHeight="72dp">
+
+                <ImageView
+                    android:scaleType="fitStart"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:contentDescription="@string/report_hint_photo"
+                    android:id="@+id/photoView"
+                    android:src="@drawable/ic_image"
+                    android:tint="@color/iconColorMutedDark"/>
+                <LinearLayout
+                    android:id="@+id/photo_text_container"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignWithParentIfMissing="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@+id/photoView"
+                    android:layout_toEndOf="@+id/photoView"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp"
+                    android:paddingTop="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/report_hint_photo"
+                        android:id="@+id/photo_text" />
+                </LinearLayout>
+            </RelativeLayout>
+            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
+            <RelativeLayout
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/photoLayout"
+                android:clickable="true"
+                android:background="?attr/selectableItemBackground"
+                android:minHeight="72dp"
+                android:visibility="invisible"
+                >
+
+                <ImageView
+                    android:scaleType="fitXY"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:contentDescription="@string/report_hint_photo"
+                    android:id="@+id/photoPlaceholder"
+                    android:src="@drawable/ic_image"
+                    android:tint="@color/iconColorMutedDark"
+                    android:clickable="true"
+                    android:adjustViewBounds="true" />
+            </RelativeLayout>
         </LinearLayout>
-
     </ScrollView>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/report_next_button"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/ic_done"
+        fab:fab_label="@string/report_hint_photo" />
 
 </FrameLayout>
