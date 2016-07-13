@@ -56,7 +56,6 @@ import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
-import org.open311.android.helpers.CustomButton;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
@@ -397,17 +396,17 @@ public class ReportFragment extends Fragment {
                 continue;
             }
 
-            CustomButton button = new CustomButton(getActivity());
-            button.setId(attr.hashCode());
-            button.setText(attr.getDescription());
-            button.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onAttributeButtonClicked(attr);
-                }
-            });
+//            CustomButton button = new CustomButton(getActivity());
+//            button.setId(attr.hashCode());
+//            button.setText(attr.getDescription());
+//            button.setOnClickListener(new OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    onAttributeButtonClicked(attr);
+//                }
+//            });
 
-            layout.addView(button);
+//            layout.addView(button);
         }
     }
 
