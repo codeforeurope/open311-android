@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
@@ -49,7 +50,12 @@ import retrofit2.Response;
 public class MapActivity extends AppCompatActivity {
     private MapView mapView;
     private MapboxMap map;
+    private Float latitude = 0.0f;
+    private Float longitude = 0.0f;
+    private String addressString = "";
+    private String sourceType = "";
     FloatingActionButton gpsActionButton;
+    float gpsActionButtonOrigin = 999.999f;
     FloatingActionButton submitActionButton;
     LocationServices locationServices;
     private GeocoderView autocomplete;
@@ -86,16 +92,18 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         });
-        submitActionButton.setOnClickListener(new View.OnClickListener(){
-           @Override
-           public void onClick(View v){
-               Intent data = new Intent();
-               data.putExtra("myData1", "Data 1 value");
-               data.putExtra("myData2", "Data 2 value");
+        submitActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent data = new Intent();
+                data.putExtra("address_string", addressString);
+                data.putExtra("latitude", latitude);
+                data.putExtra("longitude", longitude);
+                data.putExtra("source", sourceType);
                 // Activity finished ok, return the data
-               setResult(RESULT_OK, data);
-               finish();
-           }
+                setResult(RESULT_OK, data);
+                finish();
+            }
         });
 
     }
@@ -125,6 +133,12 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void updateAddress(LatLng result) {
+
+        addressString = "";
+        sourceType = "GPS";
+        latitude = (float)result.getLatitude();
+        longitude = (float)result.getLongitude();
+
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
@@ -132,9 +146,14 @@ public class MapActivity extends AppCompatActivity {
         assert CoordsLine != null;
         String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.getLatitude(), result.getLongitude());
         CoordsLine.setText(coordText);
+        openBottomSheet();
     }
 
     private void updateAddress(CarmenFeature result) {
+        addressString = result.getPlaceName();
+        sourceType = "SEARCH";
+        latitude = (float)result.asPosition().getLatitude();
+        longitude = (float)result.asPosition().getLongitude();
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
@@ -142,31 +161,42 @@ public class MapActivity extends AppCompatActivity {
         assert CoordsLine != null;
         String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.asPosition().getLatitude(), result.asPosition().getLongitude());
         CoordsLine.setText(coordText);
+        openBottomSheet();
     }
 
     private void updateMap(double latitude, double longitude) {
-        // Marker
         MarkerViewOptions marker = new MarkerViewOptions()
                 .position(new LatLng(latitude, longitude));
 
         map.addMarker(marker);
-
-        // Animate map
         enableLocation(false);
         CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(new LatLng(latitude, longitude))
                 .zoom(13)
                 .build();
         map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
-        openBottomSheet();
+
     }
-    public void closeBottomSheet(){
+
+    public void closeBottomSheet() {
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        if (gpsActionButtonOrigin != 999.999f) {
+            gpsActionButton.setTranslationY(gpsActionButtonOrigin);
+        }
+        submitActionButton.setVisibility(View.INVISIBLE);
     }
-    public void openBottomSheet(){
-        //submitActionButton.setVisibility(View.VISIBLE);
+
+    public void openBottomSheet() {
+        Log.d(LOG_TAG, Float.toString(gpsActionButton.getTranslationY()));
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+        //The GPS action button can only move once.
+        if (gpsActionButtonOrigin == 999.999f) {
+            gpsActionButtonOrigin = gpsActionButton.getTranslationY();
+            gpsActionButton.animate().translationYBy(-200).setInterpolator(new AccelerateInterpolator(2)).start();
+        }
+        submitActionButton.setVisibility(View.VISIBLE);
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -228,10 +258,8 @@ public class MapActivity extends AppCompatActivity {
                         // the dropped marker snippet with the information. Lastly we open the info
                         // window.
                         updateAddress(feature);
-                        openBottomSheet();
                     } else {
                         updateAddress(point);
-                        openBottomSheet();
                     }
                 }
 
@@ -262,7 +290,6 @@ public class MapActivity extends AppCompatActivity {
                         gpsActionButton.setImageResource(R.drawable.ic_my_location);
                         // Start reverse geocoder
                         reverseGeocode(latlng);
-
                     }
                 }
             });
