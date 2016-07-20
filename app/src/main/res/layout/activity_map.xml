@@ -42,7 +42,7 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bottom_sheet"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="100dp"
         android:layout_gravity="end|bottom"
         android:background="@android:color/white"
         android:clipToPadding="true"
@@ -51,6 +51,11 @@
         <android.support.v7.widget.LinearLayoutCompat xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginEnd="70dp"
+            android:layout_marginRight="70dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:orientation="vertical">
 
             <TextView
@@ -79,9 +84,9 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_done"
-        app:backgroundTint="@color/colorPrimary"
         android:visibility="invisible"
-        />
+        app:backgroundTint="@color/colorPrimary" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/map_gps_button"
         android:layout_width="wrap_content"
@@ -92,6 +97,5 @@
         android:layout_marginRight="10dp"
         android:src="@drawable/ic_gps_not_fixed"
         app:backgroundTint="@color/colorPrimary"
-        app:layout_behavior="org.open311.android.behaviors.fabScroll"
-        />
+        app:layout_behavior="org.open311.android.behaviors.fabScroll" />
 </android.support.design.widget.CoordinatorLayout>
