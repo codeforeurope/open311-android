@@ -1,6 +1,7 @@
 package org.open311.android.fragments;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -37,14 +39,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.model.LatLng;
-
-import com.github.clans.fab.FloatingActionButton;
-
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.data.Attribute;
@@ -55,6 +49,7 @@ import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.open311.android.MainActivity;
+import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.MultipartHTTPNetworkManager;
@@ -75,7 +70,7 @@ import java.util.Map;
  */
 public class ReportFragment extends Fragment {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = "ReportFragment";
 
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
@@ -132,7 +127,7 @@ public class ReportFragment extends Fragment {
 
     public void updatePhoto() {
         if (imageUri != null) {
-            Log.d(TAG, "Trying image from " + imageUri);
+            Log.d(LOG_TAG, "updatePhoto " + imageUri);
 
             RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
             ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
@@ -389,7 +384,7 @@ public class ReportFragment extends Fragment {
         while (iterator.hasNext()) {
             final AttributeInfo attr = iterator.next();
             if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
-                Log.d(TAG, "ATTR-INFO: " + attr.getDatatype());
+                Log.d(LOG_TAG, "ATTR-INFO: " + attr.getDatatype());
                 // For now we'll accept attribute type SingleValueList.
                 // In a later version we'll also support the types:
                 // STRING, NUMBER, DATETIME, TEXT, MULTIVALUELIST
@@ -440,7 +435,7 @@ public class ReportFragment extends Fragment {
         }
         builder.setTitle(title).setItems(values, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int index) {
-                Log.d(TAG, "SELECTED ATTRIBUTE: " + values[index]);
+                Log.d(LOG_TAG, "SELECTED ATTRIBUTE: " + values[index]);
                 updateLocation();
                 SingleValueAttributeWrapper sva = new SingleValueAttributeWrapper(code, keys[index]);
                 int aIndex = indexOfAttribute(sva);
@@ -473,7 +468,7 @@ public class ReportFragment extends Fragment {
             public void onClick(DialogInterface dialog, int index) {
                 serviceName = values[index];
                 serviceCode = codes[index];
-                Log.d(TAG, "SELECTED SERVICE: " + serviceName);
+                Log.d(LOG_TAG, "SELECTED SERVICE: " + serviceName);
                 updateService();
                 if (ATTRIBUTES_ENABLED) {
                     new RetrieveAttributesTask(codes[index]).execute();
@@ -544,16 +539,11 @@ public class ReportFragment extends Fragment {
     }
 
     private void handleLocation() {
+        // todo, safe the backstack so that when we get back, we remain where we where.
         progress = new ProgressDialog(getContext());
         progress.show();
-        PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-        try {
-            startActivityForResult(builder.build(getActivity()), LOCATION_REQUEST);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
+        Intent intent = new Intent(getContext(), MapActivity.class);
+        startActivityForResult(intent, LOCATION_REQUEST);
     }
 
     /**
@@ -562,7 +552,7 @@ public class ReportFragment extends Fragment {
      * actions from the checker
      */
     private void handleGallery() {
-        Log.d(TAG, "HandleGallery");
+        Log.d(LOG_TAG, "HandleGallery");
         if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -580,7 +570,7 @@ public class ReportFragment extends Fragment {
      * actions from the checker
      */
     private void handleCamera() {
-        Log.d(TAG, "HandleCamera");
+        Log.d(LOG_TAG, "HandleCamera");
         if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
             Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
@@ -591,7 +581,7 @@ public class ReportFragment extends Fragment {
         File photo;
         try {
             photo = createTemporaryFile("picture", ".bmp");
-            if(photo.delete()) {
+            if (photo.delete()) {
                 imageUri = Uri.fromFile(photo).getPath();
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
             } else {
@@ -607,7 +597,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void onSubmitButtonClicked() {
-        Log.d(TAG, "Submit Button was clicked.");
+        Log.d(LOG_TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
         if (!isValidFormContent()) {
@@ -641,17 +631,17 @@ public class ReportFragment extends Fragment {
         int myWidth = 512;
         int myHeight = 384;
 
-        if(imageUri != null){
-        Glide.with(getActivity().getApplicationContext())
-        .load(imageUri)
-                .asBitmap()
-                .into(new SimpleTarget<Bitmap>(myWidth, myHeight) {
-                    @Override
-                    public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                        PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, bitmap);
-                        bgTask.execute();
-                    }
-                });
+        if (imageUri != null) {
+            Glide.with(getActivity().getApplicationContext())
+                    .load(imageUri)
+                    .asBitmap()
+                    .into(new SimpleTarget<Bitmap>(myWidth, myHeight) {
+                        @Override
+                        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                            PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, bitmap);
+                            bgTask.execute();
+                        }
+                    });
         } else {
             PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, null);
             bgTask.execute();
@@ -685,18 +675,8 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == LOCATION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Place place = PlacePicker.getPlace(getActivity(), data);
-                LatLng position = place.getLatLng();
-                location = place.getName().toString();
-                latitude = (float) position.latitude;
-                longitude = (float) position.longitude;
-                updateLocation();
-            } else {
-                if (resultCode == 2) {
-                    Log.d(TAG, "Your API key is invalid, enter it in local.properties");
-                } else {
-                    Log.d(TAG, "LOCATION REQUEST RESULT CODE: " + resultCode);
-                }
+                Log.d(LOG_TAG, data.getDataString());
+                //updateLocation();
             }
         }
     }
@@ -737,7 +717,7 @@ public class ReportFragment extends Fragment {
                     success = true;
                     result = response.getServiceNotice();
                     saveServiceRequestId(response.getServiceRequestId());
-                    Log.d(TAG, "SERVICE REQUEST ID: " + response.getServiceRequestId());
+                    Log.d(LOG_TAG, "SERVICE REQUEST ID: " + response.getServiceRequestId());
                 } else {
                     success = false;
                     result = getString(R.string.report_failure_message);
@@ -773,7 +753,7 @@ public class ReportFragment extends Fragment {
             if (progress != null && progress.isShowing()) {
                 progress.dismiss();
             }
-            Log.d(TAG, "POST RESULT: " + result);
+            Log.d(LOG_TAG, "POST RESULT: " + result);
 
             if (success) resetAll();
 
@@ -817,7 +797,7 @@ public class ReportFragment extends Fragment {
                     attrInfoList.add((AttributeInfo) iterator.next());
                 }
                 count = attrInfoList.size();
-                Log.d(TAG, "ATTRIBUTE COUNT: " + count);
+                Log.d(LOG_TAG, "ATTRIBUTE COUNT: " + count);
 
             } catch (APIWrapperException e) {
                 e.printStackTrace();
@@ -831,7 +811,7 @@ public class ReportFragment extends Fragment {
 
         protected void onPostExecute(Integer count) {
             if (count == 0) {
-                Log.d(TAG, "THE SELECTED SERVICE HAS NO ATTRIBUTES");
+                Log.d(LOG_TAG, "THE SELECTED SERVICE HAS NO ATTRIBUTES");
             }
             addAttributesToForm();
         }
@@ -865,7 +845,7 @@ public class ReportFragment extends Fragment {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        Log.d(TAG, "onRequestPermissionResult");
+        Log.d(LOG_TAG, "onRequestPermissionResult");
         if (requestCode == CAMERA_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleCamera();

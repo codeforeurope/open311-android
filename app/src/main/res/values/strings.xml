@@ -117,4 +117,6 @@
     <string name="introText1">Communicate Service Requests with your Government</string>
     <string name="introText2">Your previous request will be shown here after you have created your first request</string>
     <string name="updated">Updated</string>
+    <string name="map">Map</string>
+    <string name="map_hint_gps">Acquire GPS position</string>
 </resources>

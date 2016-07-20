@@ -7,13 +7,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
-import com.google.android.gms.security.ProviderInstaller;
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.ViewPagerAdapter;
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity
     private String installationId;
     private ReportFragment reportFragment;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = "open311.MainActivity";
 
     protected SharedPreferences settings;
 
@@ -43,16 +42,13 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            ProviderInstaller.installIfNeeded(this);
-        } catch (GooglePlayServicesRepairableException e) {
-            e.printStackTrace();
-        } catch (GooglePlayServicesNotAvailableException e) {
-            e.printStackTrace();
-        }
         settings = getSettings(this);
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
+
+        // Mapbox access token only needs to be configured once in your app
+        MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
@@ -64,6 +60,7 @@ public class MainActivity extends AppCompatActivity
         tabLayout.setupWithViewPager(viewPager);
 
         if (savedInstanceState != null) {
+            Log.d(LOG_TAG, "Restoring reportFragment");
             // Restore the fragment's instance
             reportFragment = (ReportFragment) getSupportFragmentManager().getFragment(
                     savedInstanceState, "reportFragment");
@@ -72,17 +69,8 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem item = menu.findItem(R.id.action_search);
 
-        // Hide the search feature for now ...
-        item.setVisible(false);
-        // SearchView searchView = (SearchView) item.getActionView();
-        // searchView.setOnQueryTextListener(this);
-
-        // Add click listener to action item -> not yet implemented
-        // See: res/menu/main.xml
         MenuItem actionItem = menu.findItem(R.id.action_settings);
         actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -129,6 +117,7 @@ public class MainActivity extends AppCompatActivity
         super.onSaveInstanceState(savedInstanceState);
         if (reportFragment != null) {
             // Save the fragment's instance
+            Log.d(LOG_TAG, "Saving reportFragment");
             getSupportFragmentManager().putFragment(
                     savedInstanceState, "reportFragment", reportFragment);
         }

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/white"
     tools:context=".fragments.ProfileFragment">
         <LinearLayout
@@ -17,7 +17,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/input_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/input_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1">
 
-                <EditText
+                <android.support.design.widget.TextInputEditText
                     android:id="@+id/input_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -59,13 +59,13 @@
 
         </LinearLayout>
 
-    <com.github.clans.fab.FloatingActionButton
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/btn_submit"
+        app:backgroundTint="@color/colorPrimary"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:src="@drawable/ic_done"
-        fab:fab_label="@string/save"
         android:layout_gravity="end|bottom" />
 </FrameLayout>

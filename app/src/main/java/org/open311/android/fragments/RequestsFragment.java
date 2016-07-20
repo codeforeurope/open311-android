@@ -36,6 +36,8 @@ import java.util.List;
  */
 public class RequestsFragment extends Fragment {
 
+    private static final String LOG_TAG = "RequestsFragment";
+
     private static final String ARG_COLUMN_COUNT = "column-count";
 
     private int mColumnCount = 1;
@@ -198,7 +200,7 @@ public class RequestsFragment extends Fragment {
             if (data != null) {
                 ArrayList<ServiceRequest> result = data.getParcelableArrayList("Requests");
                 if (result != null) {
-                    Log.d("open311", result.toString());
+                    Log.d(LOG_TAG, "Request results: " + result.toString());
                     // Update the adapter with the result.
                     recyclerViewAdapter.setRequests(result);
                     //
@@ -211,10 +213,10 @@ public class RequestsFragment extends Fragment {
                                         getActivity().findViewById(R.id.intro_container)));
                     }
                 } else {
-                    Log.w("open311", "No data received!");
+                    Log.w(LOG_TAG, "No data received!");
                 }
             } else {
-                Log.w("open311", "No data received!");
+                Log.w(LOG_TAG, "No data received!");
             }
             swipeRefreshLayout.setRefreshing(false);
         }

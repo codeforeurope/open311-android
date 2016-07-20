@@ -12,4 +12,5 @@
     <color name="iconColorMutedDark">#40000000</color>
     <color name="transparent">#00000000</color>
     <color name="colorDivider">#B6B6B6</color>
+    <color name="green">#008000</color>
 </resources>

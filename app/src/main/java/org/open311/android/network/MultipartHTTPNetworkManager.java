@@ -1,14 +1,8 @@
 package org.open311.android.network;
 
-import android.content.ContextWrapper;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.util.Log;
-
-import com.bumptech.glide.Glide;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -17,8 +11,6 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import org.codeforamerica.open311.facade.Format;
 import org.codeforamerica.open311.internals.network.NetworkManager;
-import org.open311.android.MainActivity;
-import org.open311.android.helpers.Image;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +29,7 @@ import java.util.Map.Entry;
  * @author Bas Biezemans
  */
 public class MultipartHTTPNetworkManager implements NetworkManager {
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LOG_TAG = "MultipartHTTPNetworkM..";
     private static final int TIMEOUT = 5000;
     private static final String FILENAME = "media.jpg";
     private Bitmap bitmap;
@@ -95,7 +87,7 @@ public class MultipartHTTPNetworkManager implements NetworkManager {
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         // Debug
-        Log.d(TAG, "EndPoint URL: " + url.toString());
+        Log.d(LOG_TAG, "EndPoint URL: " + url.toString());
 
         conn.setDoOutput(true); // POST
         conn.setDoInput(true);

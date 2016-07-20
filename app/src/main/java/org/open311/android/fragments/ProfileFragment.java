@@ -3,21 +3,18 @@ package org.open311.android.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
-import com.github.clans.fab.FloatingActionButton;
 
 import org.open311.android.R;
 
@@ -25,7 +22,6 @@ import java.text.Normalizer;
 
 /**
  * Profile {@link Fragment} subclass.
- *
  */
 public class ProfileFragment extends Fragment {
 
@@ -141,6 +137,7 @@ public class ProfileFragment extends Fragment {
 
         return true;
     }
+
     private void requestFocus(View view) {
         if (view.requestFocus()) {
             getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);

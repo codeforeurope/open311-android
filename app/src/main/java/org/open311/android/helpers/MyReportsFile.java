@@ -46,6 +46,7 @@ public class MyReportsFile {
                 identifiers += line;
             }
         } catch (FileNotFoundException e) {
+            // todo create the file
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
