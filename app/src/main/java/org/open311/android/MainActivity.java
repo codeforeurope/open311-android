@@ -1,8 +1,10 @@
 package org.open311.android;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -31,7 +33,7 @@ public class MainActivity extends AppCompatActivity
     private String installationId;
     private ReportFragment reportFragment;
 
-    private static final String LOG_TAG = "open311.MainActivity";
+    private static final String LOG_TAG = "MainActivity";
 
     protected SharedPreferences settings;
 
@@ -41,7 +43,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onCreate");
         super.onCreate(savedInstanceState);
+
         settings = getSettings(this);
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
+
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
@@ -109,11 +114,12 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackStackChanged() {
-
+        Log.d(LOG_TAG, "onBackStackChanged");
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onSaveInstance");
         super.onSaveInstanceState(savedInstanceState);
         if (reportFragment != null) {
             // Save the fragment's instance
@@ -125,6 +131,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onSupportNavigateUp() {
+        Log.d(LOG_TAG, "onSupportNavigateUp");
         //This method is called when the up button is pressed. Just the pop back stack.
         getSupportFragmentManager().popBackStack();
         return true;
@@ -143,5 +150,10 @@ public class MainActivity extends AppCompatActivity
         adapter.addFragment(new ProfileFragment());
         adapter.addFragment(new PolicyFragment());
         viewPager.setAdapter(adapter);
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(LOG_TAG, "onActivityResult");
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
