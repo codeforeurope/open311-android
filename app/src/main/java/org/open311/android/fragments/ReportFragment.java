@@ -39,6 +39,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.data.Attribute;
@@ -63,6 +64,7 @@ import java.text.Normalizer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -78,8 +80,13 @@ public class ReportFragment extends Fragment {
     private String imageUri;
     private ProgressDialog progress;
 
+    private String location;
+    private String serviceName;
+    private String serviceCode;
+    private String installationId;
     private Float latitude;
     private Float longitude;
+    private String source;
 
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
@@ -88,10 +95,6 @@ public class ReportFragment extends Fragment {
 
     private static final boolean ATTRIBUTES_ENABLED = false;
 
-    private String location;
-    private String serviceName;
-    private String serviceCode;
-    private String installationId;
 
     public ReportFragment() {
         // Required empty public constructor
@@ -107,12 +110,24 @@ public class ReportFragment extends Fragment {
     }
 
     private void updateLocation() {
-        if (location != null) {
+        try {
             TextView text = (TextView) getActivity().findViewById(R.id.location_text);
-            text.setText(location);
-            ImageView icon = (ImageView) getActivity().findViewById(R.id.locationView);
-            icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
+            if (location == null && source != null) {
+                String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
+                Log.d(LOG_TAG, "Coordinates: " + coordText);
+                text.setText(coordText);
+            }
+            if (location != null && source != null) {
+                Log.d(LOG_TAG, "Address: " + location);
+                text.setText(location);
+            } else {
+                text.setText(R.string.report_hint_location);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -196,6 +211,10 @@ public class ReportFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
+        Log.d(LOG_TAG, "onCreateView");
+        if (state != null)
+            Log.d(LOG_TAG, state.toString());
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_report, container, false);
 
@@ -279,6 +298,7 @@ public class ReportFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.d(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(savedInstanceState);
         if (imageUri != null) {
             savedInstanceState.putString("imageUri", imageUri);
@@ -385,23 +405,9 @@ public class ReportFragment extends Fragment {
             final AttributeInfo attr = iterator.next();
             if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
                 Log.d(LOG_TAG, "ATTR-INFO: " + attr.getDatatype());
-                // For now we'll accept attribute type SingleValueList.
-                // In a later version we'll also support the types:
-                // STRING, NUMBER, DATETIME, TEXT, MULTIVALUELIST
                 continue;
             }
 
-//            CustomButton button = new CustomButton(getActivity());
-//            button.setId(attr.hashCode());
-//            button.setText(attr.getDescription());
-//            button.setOnClickListener(new OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    onAttributeButtonClicked(attr);
-//                }
-//            });
-
-//            layout.addView(button);
         }
     }
 
@@ -539,10 +545,8 @@ public class ReportFragment extends Fragment {
     }
 
     private void handleLocation() {
-        // todo, safe the backstack so that when we get back, we remain where we where.
-        progress = new ProgressDialog(getContext());
-        progress.show();
-        Intent intent = new Intent(getContext(), MapActivity.class);
+        // todo, save to the backstack so that when we get back, we remain where we were.
+        Intent intent = new Intent(getActivity(), MapActivity.class);
         startActivityForResult(intent, LOCATION_REQUEST);
     }
 
@@ -649,6 +653,7 @@ public class ReportFragment extends Fragment {
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(LOG_TAG, "onActivityResult");
         super.onActivityResult(requestCode, resultCode, data);
 
         if (progress != null && progress.isShowing()) {
@@ -675,8 +680,12 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == LOCATION_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                Log.d(LOG_TAG, data.getDataString());
-                //updateLocation();
+                Bundle tempBundle = data.getExtras();
+                location = tempBundle.getString("address_string");
+                latitude = tempBundle.getFloat("latitude");
+                longitude = tempBundle.getFloat("longitude");
+                source = tempBundle.getString("source");
+                updateLocation();
             }
         }
     }
