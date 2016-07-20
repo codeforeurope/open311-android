@@ -46,10 +46,10 @@
     <string name="gallery">Gallery</string>
     <string name="location">Location</string>
     <string name="description">Description</string>
-    <string name="report_hint_service">Select the type of service request</string>
-    <string name="report_hint_photo">Take a photo</string>
+    <string name="report_hint_service">Select a category</string>
+    <string name="report_hint_photo">Attach a picture</string>
     <string name="report_hint_location">Select a location</string>
-    <string name="report_hint_description">Describe the problem</string>
+    <string name="report_hint_description">Enter a description</string>
     <string name="report_service">Service</string>
     <string name="report_status">Status</string>
     <string name="report_attributes">Attributes</string>
@@ -117,6 +117,6 @@
     <string name="introText1">Communicate Service Requests with your Government</string>
     <string name="introText2">Your previous request will be shown here after you have created your first request</string>
     <string name="updated">Updated</string>
-    <string name="map">Map</string>
+    <string name="map">Select a location</string>
     <string name="map_hint_gps">Acquire GPS position</string>
 </resources>
