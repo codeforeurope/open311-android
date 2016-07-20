@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ import java.text.Normalizer;
  * Profile {@link Fragment} subclass.
  */
 public class ProfileFragment extends Fragment {
-
+    private static final String LOG_TAG = "ProfileFragment";
     private SharedPreferences settings;
     private EditText inputName, inputEmail, inputPhone;
     private TextInputLayout inputLayoutName, inputLayoutEmail, inputLayoutPhone;
@@ -41,7 +42,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        Log.d(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         inputLayoutName = (TextInputLayout) view.findViewById(R.id.input_layout_name);
