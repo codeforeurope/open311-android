@@ -63,7 +63,7 @@ public class RequestsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        Log.d(LOG_TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_requests_list, container, false);
         final RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
