@@ -174,7 +174,8 @@ public class MapActivity extends AppCompatActivity {
                 .target(new LatLng(latitude, longitude))
                 .zoom(13)
                 .build();
-        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
+        map.setCameraPosition(cameraPosition);
+        //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
 
     }
 
@@ -286,7 +287,8 @@ public class MapActivity extends AppCompatActivity {
                                 .target(latlng)
                                 .zoom(16)
                                 .build();
-                        map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
+                        map.setCameraPosition(cameraPosition);
+                        //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
                         gpsActionButton.setImageResource(R.drawable.ic_my_location);
                         // Start reverse geocoder
                         reverseGeocode(latlng);
