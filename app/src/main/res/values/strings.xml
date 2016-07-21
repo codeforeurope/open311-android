@@ -102,7 +102,7 @@
     <string name="request_ago_icon">Last updated</string>
     <string name="action_settings">Settings</string>
     <string name="notImplemented">Not yet implemented</string>
-    <string name="serviceListUnavailable">Service list is unavailable</string>
+    <string name="serviceListUnavailable">Categories can not be fetched. Try again later.</string>
     <string name="storageNotWritable">External storage is not writable</string>
     <string name="privacyPolicy">Privacy Policy</string>
     <string name="questionsAndFeedback">Questions and feedback</string>

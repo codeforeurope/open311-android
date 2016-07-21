@@ -100,4 +100,5 @@
     <string name="introText1">Het meldloket is Eindhoven\'s meldpunt voor niet noodgevallen.</string>
     <string name="introText2">Als u iets meldt dan wordt het hier getoond. Swipe naar beneden om de lijst te verversen.</string>
     <string name="updated">bewerkt</string>
+    <string name="serviceListUnavailable">Lijst niet beschikbaar. Probeer het later nog eens.</string>
 </resources>
