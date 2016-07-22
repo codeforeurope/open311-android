@@ -1,7 +1,6 @@
 package org.open311.android.fragments;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
@@ -29,6 +28,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -49,11 +49,11 @@ import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
+import org.codeforamerica.open311.internals.network.HTTPNetworkManager;
 import org.open311.android.MainActivity;
 import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.helpers.MyReportsFile;
-import org.open311.android.network.MultipartHTTPNetworkManager;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
 
@@ -221,9 +221,19 @@ public class ReportFragment extends Fragment {
         RelativeLayout btnPhoto = (RelativeLayout) view.findViewById(R.id.photoButton);
         RelativeLayout btnService = (RelativeLayout) view.findViewById(R.id.serviceButton);
         RelativeLayout btnLocation = (RelativeLayout) view.findViewById(R.id.locationButton);
-
+        View descriptionView = (View) view.findViewById(R.id.report_description_textbox);
         FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_next_button);
 
+        //Hide the keyboard unless the descriptionView is selected
+        descriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    v.clearFocus();
+                    hideKeyBoard(v);
+                }
+            }
+        });
         btnPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -714,7 +724,7 @@ public class ReportFragment extends Fragment {
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(url);
                 if (imageUri != null) {
-                    MultipartHTTPNetworkManager networkManager = new MultipartHTTPNetworkManager(bitmap);
+                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
                     wrapperFactory.setNetworkManager(networkManager);
                 }
                 wrapperFactory.setApiKey(getContext().getResources().getString(R.string.open311_apikey));
@@ -859,6 +869,10 @@ public class ReportFragment extends Fragment {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleCamera();
         }
+        if (requestCode == GALLERY_REQUEST
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            handleGallery();
+        }
         if (requestCode == LOCATION_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleLocation();
@@ -903,5 +917,9 @@ public class ReportFragment extends Fragment {
             }
         }
         return true;
+    }
+    private void hideKeyBoard(View v) {
+        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 }
