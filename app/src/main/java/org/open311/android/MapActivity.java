@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -43,6 +44,7 @@ import java.util.Locale;
 public class MapActivity extends AppCompatActivity {
     private MapView mapView;
     private MapboxMap map;
+
     private Float latitude = 0.0f;
     private Float longitude = 0.0f;
     private String addressString = "";
@@ -63,6 +65,7 @@ public class MapActivity extends AppCompatActivity {
         setContentView(R.layout.activity_map);
 
         locationServices = LocationServices.getLocationServices(MapActivity.this);
+
         View bottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
         // Create a mapView
@@ -75,11 +78,13 @@ public class MapActivity extends AppCompatActivity {
                 map = mapboxMap;
             }
         });
+
         gpsActionButton = (FloatingActionButton) findViewById(R.id.map_gps_button);
         submitActionButton = (FloatingActionButton) findViewById(R.id.submit);
         gpsActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //todo implement GPS
                 if (map != null) {
                     toggleGps(!map.isMyLocationEnabled());
                 }
@@ -118,7 +123,7 @@ public class MapActivity extends AppCompatActivity {
                 autocomplete.setText(Utils.addressString(result));
                 updateAddress(result);
                 autocomplete.clearFocus();
-                updateMap(result.getLatitude(), result.getLongitude());
+                updateMap((float) result.getLatitude(), (float) result.getLongitude());
             }
         });
 
@@ -157,7 +162,10 @@ public class MapActivity extends AppCompatActivity {
         openBottomSheet();
     }
 
-    private void updateMap(double latitude, double longitude) {
+    private void updateMap(Float lat, Float lon) {
+        // todo updateMap
+        latitude = lat;
+        longitude = lon;
         MarkerViewOptions marker = new MarkerViewOptions()
                 .position(new LatLng(latitude, longitude));
 
@@ -263,7 +271,6 @@ public class MapActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
-
     }
 
     @Override
@@ -278,6 +285,7 @@ public class MapActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private class ReverseGeocodingTask extends AsyncTask<LatLng, Void, Address> {
         /**

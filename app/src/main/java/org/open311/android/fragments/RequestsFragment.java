@@ -68,7 +68,7 @@ public class RequestsFragment extends Fragment {
         final RecyclerView listView = (RecyclerView) view.findViewById(R.id.requests_list);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_container);
         switcher = (ViewSwitcher) view.findViewById(R.id.view_switcher);
-        if (listView instanceof RecyclerView) {
+        if (listView != null) {
             Context context = view.getContext();
             if (mColumnCount <= 1) {
                 listView.setLayoutManager(new LinearLayoutManager(context));

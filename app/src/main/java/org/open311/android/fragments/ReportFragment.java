@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -776,6 +777,17 @@ public class ReportFragment extends Fragment {
 
             if (success) resetAll();
 
+            MyReportsFile file = new MyReportsFile(getContext());
+            int reqs = file.getServiceRequestLength();
+            Log.d(LOG_TAG,"requests for user: " + reqs);
+            if (reqs >= 1) {
+                // todo Refresh the RequestsList
+//                RequestsFragment requestsFragment = (RequestsFragment)
+//                        getActivity().getSupportFragmentManager().findFragmentById(R.id.view_switcher);
+//                requestsFragment.updateServiceRequests();
+            }
+
+
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.report_dialog_title))
                     .setMessage(result)
@@ -918,8 +930,9 @@ public class ReportFragment extends Fragment {
         }
         return true;
     }
+
     private void hideKeyBoard(View v) {
-        InputMethodManager inputMethodManager =(InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 }

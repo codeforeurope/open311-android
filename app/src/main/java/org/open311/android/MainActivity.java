@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.MapboxAccountManager;
 
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.ViewPagerAdapter;
+
 import org.open311.android.fragments.PolicyFragment;
 import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
@@ -32,7 +33,6 @@ public class MainActivity extends AppCompatActivity
         FragmentManager.OnBackStackChangedListener {
     private String installationId;
     private ReportFragment reportFragment;
-
     private static final String LOG_TAG = "MainActivity";
 
     protected SharedPreferences settings;
@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
 
         // Mapbox access token only needs to be configured once in your app
         MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -127,6 +128,7 @@ public class MainActivity extends AppCompatActivity
             getSupportFragmentManager().putFragment(
                     savedInstanceState, "reportFragment", reportFragment);
         }
+
     }
 
     @Override
@@ -151,6 +153,7 @@ public class MainActivity extends AppCompatActivity
         adapter.addFragment(new PolicyFragment());
         viewPager.setAdapter(adapter);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(LOG_TAG, "onActivityResult");
