@@ -6,6 +6,7 @@ package org.open311.android.adapters;
 
 
 import android.content.Context;
+import android.location.Address;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,29 +16,19 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-import com.mapbox.services.commons.ServicesException;
-import com.mapbox.services.geocoding.v5.GeocodingCriteria;
-import com.mapbox.services.geocoding.v5.MapboxGeocoding;
-import com.mapbox.services.geocoding.v5.models.GeocodingResponse;
-import com.mapbox.services.geocoding.v5.models.CarmenFeature;
-
 import org.open311.android.R;
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
 import java.io.IOException;
 import java.util.List;
 
-import retrofit2.Response;
-
-/**
- * Created by miblon on 11/25/15.
- */
 public class GeocoderAdapter extends BaseAdapter implements Filterable {
 
     private final Context context;
 
     private GeocoderFilter geocoderFilter;
 
-    private List<CarmenFeature> features;
+    private List<Address> features;
 
     public GeocoderAdapter(Context context) {
         this.context = context;
@@ -53,7 +44,7 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
     }
 
     @Override
-    public CarmenFeature getItem(int position) {
+    public Address getItem(int position) {
         return features.get(position);
     }
 
@@ -81,8 +72,8 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
         TextView text = (TextView) view;
 
         // Set the place name
-        CarmenFeature feature = getItem(position);
-        text.setText(feature.getPlaceName());
+        Address feature = getItem(position);
+        text.setText(feature.getFeatureName());
 
         return view;
     }
@@ -101,7 +92,7 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
     }
 
     private class GeocoderFilter extends Filter {
-
+        static final String userAgent = "open311_geocode/1.0";
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();
@@ -111,37 +102,23 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
                 return results;
             }
 
-            // The geocoder client
-            MapboxGeocoding client = null;
+            // nominatim geocoder
+            GeocoderNominatim geocoder = new GeocoderNominatim(context, userAgent);
             try {
-                client = new MapboxGeocoding.Builder()
-                        .setAccessToken(context.getString(R.string.mapbox_api_key))
-                        .setLocation(constraint.toString())
-                        .setGeocodingType(GeocodingCriteria.TYPE_ADDRESS)
-                        .build();
-            } catch (ServicesException e) {
-                e.printStackTrace();
-            }
-
-            Response<GeocodingResponse> response;
-            try {
-                response = client.executeCall();
+                List<Address> features = geocoder.getFromLocationName(constraint.toString(), 10);
+                results.values = features;
+                results.count = features.size();
+                return results;
             } catch (IOException e) {
                 e.printStackTrace();
                 return results;
             }
-
-            features = response.body().getFeatures();
-
-            results.values = features;
-            results.count = features.size();
-            return results;
         }
 
         @Override
         protected void publishResults(CharSequence constraint, FilterResults results) {
             if (results != null && results.count > 0) {
-                features = (List<CarmenFeature>) results.values;
+                features = (List<Address>) results.values;
                 notifyDataSetChanged();
             } else {
                 notifyDataSetInvalidated();

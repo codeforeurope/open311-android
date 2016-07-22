@@ -3,7 +3,9 @@ package org.open311.android;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.BottomSheetBehavior;
@@ -20,32 +22,22 @@ import android.widget.TextView;
 
 import android.support.design.widget.FloatingActionButton;
 
-import com.mapbox.services.commons.ServicesException;
-import com.mapbox.services.commons.models.Position;
-import com.mapbox.services.geocoding.v5.GeocodingCriteria;
-import com.mapbox.services.geocoding.v5.models.CarmenFeature;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
-import com.mapbox.services.geocoding.v5.MapboxGeocoding;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.services.geocoding.v5.models.GeocodingResponse;
-
 
 import org.open311.android.adapters.GeocoderAdapter;
 import org.open311.android.widgets.GeocoderView;
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MapActivity extends AppCompatActivity {
     private MapView mapView;
@@ -121,11 +113,11 @@ public class MapActivity extends AppCompatActivity {
         autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                CarmenFeature result = adapter.getItem(position);
-                autocomplete.setText(result.getPlaceName());
+                Address result = adapter.getItem(position);
+                autocomplete.setText(result.getFeatureName());
                 updateAddress(result);
                 autocomplete.clearFocus();
-                updateMap(result.asPosition().getLatitude(), result.asPosition().getLongitude());
+                updateMap(result.getLatitude(), result.getLongitude());
             }
         });
 
@@ -136,8 +128,8 @@ public class MapActivity extends AppCompatActivity {
 
         addressString = "";
         sourceType = "GPS";
-        latitude = (float)result.getLatitude();
-        longitude = (float)result.getLongitude();
+        latitude = (float) result.getLatitude();
+        longitude = (float) result.getLongitude();
 
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
@@ -149,17 +141,21 @@ public class MapActivity extends AppCompatActivity {
         openBottomSheet();
     }
 
-    private void updateAddress(CarmenFeature result) {
-        addressString = result.getPlaceName();
+    private void updateAddress(Address result) {
+        if(result.getFeatureName() != null) {
+            addressString = result.getFeatureName();
+        } else {
+            addressString = "";
+        }
         sourceType = "SEARCH";
-        latitude = (float)result.asPosition().getLatitude();
-        longitude = (float)result.asPosition().getLongitude();
+        latitude = (float) result.getLatitude();
+        longitude = (float) result.getLongitude();
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
-        AddressLine.setText(result.getPlaceName());
+        AddressLine.setText(addressString);
         assert CoordsLine != null;
-        String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.asPosition().getLatitude(), result.asPosition().getLongitude());
+        String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.getLatitude(), result.getLongitude());
         CoordsLine.setText(coordText);
         openBottomSheet();
     }
@@ -238,43 +234,6 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-
-    private void reverseGeocode(final LatLng point) {
-        // This method is used to reverse geocode where the user has dropped the marker.
-        try {
-            MapboxGeocoding client = new MapboxGeocoding.Builder()
-                    .setAccessToken(this.getString(R.string.mapbox_api_key))
-                    .setCoordinates(Position.fromCoordinates(point.getLongitude(), point.getLatitude()))
-                    .setGeocodingType(GeocodingCriteria.TYPE_ADDRESS)
-                    .build();
-
-            client.enqueueCall(new Callback<GeocodingResponse>() {
-                @Override
-                public void onResponse(Call<GeocodingResponse> call, Response<GeocodingResponse> response) {
-
-                    List<CarmenFeature> results = response.body().getFeatures();
-                    if (results.size() > 0) {
-                        CarmenFeature feature = results.get(0);
-                        // If the geocoder returns a result, we take the first in the list and update
-                        // the dropped marker snippet with the information. Lastly we open the info
-                        // window.
-                        updateAddress(feature);
-                    } else {
-                        updateAddress(point);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<GeocodingResponse> call, Throwable t) {
-                    Log.e(LOG_TAG, "Geocoding Failure: " + t.getMessage());
-                }
-            });
-        } catch (ServicesException e) {
-            Log.e(LOG_TAG, "Error geocoding: " + e.toString());
-            e.printStackTrace();
-        }
-    }// reverseGeocode
-
     private void enableLocation(boolean enabled) {
         if (enabled) {
             locationServices.addLocationListener(new LocationListener() {
@@ -291,7 +250,7 @@ public class MapActivity extends AppCompatActivity {
                         //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
                         gpsActionButton.setImageResource(R.drawable.ic_my_location);
                         // Start reverse geocoder
-                        reverseGeocode(latlng);
+                        new ReverseGeocodingTask().execute(latlng);
                     }
                 }
             });
@@ -321,5 +280,38 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    private class ReverseGeocodingTask extends AsyncTask<LatLng, Void, Void> {
+        /**
+         * Get services in the background.
+         *
+         * @param points the LatLng
+         */
+        @Override
+        protected Void doInBackground(LatLng... points) {
+            // This method is used to reverse geocode where the user has dropped the marker.
+            final String userAgent = "open311_reverse/1.0";
+            LatLng point = points[0];
+            GeocoderNominatim geocoder = new GeocoderNominatim(getApplicationContext(), userAgent);
+            String theAddress;
+            try {
+                double dLatitude = point.getLatitude();
+                double dLongitude = point.getLongitude();
+                List<Address> addresses = geocoder.getFromLocation(dLatitude, dLongitude, 1);
+                StringBuilder sb = new StringBuilder();
+                if (addresses.size() > 0) {
+                    Address address = addresses.get(0);
+                    updateAddress(address);
+                } else {
+                    updateAddress(point);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                updateAddress(point);
+            }
+            return null;
+        }// reverseGeocode
+
     }
 }
