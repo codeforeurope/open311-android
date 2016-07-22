@@ -3,6 +3,7 @@ package org.open311.android.helpers;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Address;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -18,6 +19,17 @@ public class Utils {
     public static SharedPreferences getSettings(Activity activity) {
         return activity.getSharedPreferences(OPEN311_SETTINGS, 0);
 
+    }
+
+    public static String addressString(Address address) {
+        StringBuilder sb = new StringBuilder();
+        int n = address.getMaxAddressLineIndex();
+        for (int i = 0; i <= n; i++) {
+            if (i != 0)
+                sb.append(", ");
+            sb.append(address.getAddressLine(i));
+        }
+        return sb.toString();
     }
 
     public static boolean saveSettings(Activity activity) {
@@ -63,7 +75,8 @@ public class Utils {
     private static int randBetween(int start, int end) {
         return start + (int) Math.round(Math.random() * (end - start));
     }
-public static void deleteCache(Context context) {
+
+    public static void deleteCache(Context context) {
         try {
             File dir = context.getCacheDir();
             if (dir != null && dir.isDirectory()) {

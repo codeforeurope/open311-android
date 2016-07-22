@@ -32,8 +32,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
 import org.open311.android.adapters.GeocoderAdapter;
+import org.open311.android.helpers.Utils;
 import org.open311.android.widgets.GeocoderView;
-import org.osmdroid.bonuspack.location.GeocoderNominatim;
+import org.open311.android.helpers.GeocoderNominatim;
 
 import java.io.IOException;
 import java.util.List;
@@ -114,7 +115,7 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Address result = adapter.getItem(position);
-                autocomplete.setText(result.getFeatureName());
+                autocomplete.setText(Utils.addressString(result));
                 updateAddress(result);
                 autocomplete.clearFocus();
                 updateMap(result.getLatitude(), result.getLongitude());
@@ -142,11 +143,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void updateAddress(Address result) {
-        if(result.getFeatureName() != null) {
-            addressString = result.getFeatureName();
-        } else {
-            addressString = "";
-        }
+        addressString = Utils.addressString(result);
         sourceType = "SEARCH";
         latitude = (float) result.getLatitude();
         longitude = (float) result.getLongitude();
@@ -282,14 +279,14 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    private class ReverseGeocodingTask extends AsyncTask<LatLng, Void, Void> {
+    private class ReverseGeocodingTask extends AsyncTask<LatLng, Void, Address> {
         /**
          * Get services in the background.
          *
          * @param points the LatLng
          */
         @Override
-        protected Void doInBackground(LatLng... points) {
+        protected Address doInBackground(LatLng... points) {
             // This method is used to reverse geocode where the user has dropped the marker.
             final String userAgent = "open311_reverse/1.0";
             LatLng point = points[0];
@@ -299,12 +296,11 @@ public class MapActivity extends AppCompatActivity {
                 double dLatitude = point.getLatitude();
                 double dLongitude = point.getLongitude();
                 List<Address> addresses = geocoder.getFromLocation(dLatitude, dLongitude, 1);
-                StringBuilder sb = new StringBuilder();
                 if (addresses.size() > 0) {
-                    Address address = addresses.get(0);
-                    updateAddress(address);
+                    return addresses.get(0);
+
                 } else {
-                    updateAddress(point);
+                    return null;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -313,5 +309,9 @@ public class MapActivity extends AppCompatActivity {
             return null;
         }// reverseGeocode
 
+        @Override
+        protected void onPostExecute(Address result) {
+            updateAddress(result);
+        }
     }
 }

@@ -17,7 +17,8 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import org.open311.android.R;
-import org.osmdroid.bonuspack.location.GeocoderNominatim;
+import org.open311.android.helpers.Utils;
+import org.open311.android.helpers.GeocoderNominatim;
 
 import java.io.IOException;
 import java.util.List;
@@ -71,9 +72,9 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
         // It always is a textview
         TextView text = (TextView) view;
 
-        // Set the place name
+        // Set the address
         Address feature = getItem(position);
-        text.setText(feature.getFeatureName());
+        text.setText(Utils.addressString(feature));
 
         return view;
     }
@@ -93,6 +94,7 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
 
     private class GeocoderFilter extends Filter {
         static final String userAgent = "open311_geocode/1.0";
+
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
             FilterResults results = new FilterResults();

@@ -48,18 +48,17 @@
             </LinearLayout>
             <!-- Button for selecting Service -->
 
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/serviceButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:minHeight="72dp"
-                android:clickable="true"
-                android:id="@+id/serviceButton"
                 android:background="?attr/selectableItemBackground"
-                android:longClickable="true">
+                android:clickable="true"
+                android:longClickable="true"
+                android:minHeight="72dp">
 
                 <ImageView
-                    android:scaleType="fitStart"
+                    android:id="@+id/serviceView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentLeft="true"
@@ -69,9 +68,10 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:contentDescription="@string/report_hint_description"
-                    android:id="@+id/serviceView"
+                    android:scaleType="fitStart"
                     android:src="@drawable/ic_domain"
-                    android:tint="@color/iconColorMutedDark"/>
+                    android:tint="@color/iconColorMutedDark" />
+
                 <LinearLayout
                     android:id="@+id/service_text_container"
                     android:layout_width="wrap_content"
@@ -80,30 +80,35 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_toRightOf="@+id/serviceView"
                     android:layout_toEndOf="@+id/serviceView"
+                    android:layout_toRightOf="@+id/serviceView"
                     android:orientation="vertical"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/report_hint_service"
-                    android:id="@+id/service_text" />
+
+                    <TextView
+                        android:id="@+id/service_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/report_hint_service" />
                 </LinearLayout>
             </RelativeLayout>
-            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#000" />
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/locationButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:clickable="true"
-                android:id="@+id/locationButton"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
                 android:minHeight="72dp">
 
                 <ImageView
-                    android:scaleType="fitStart"
+                    android:id="@+id/locationView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentLeft="true"
@@ -113,9 +118,10 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:contentDescription="@string/report_hint_location"
-                    android:id="@+id/locationView"
+                    android:scaleType="fitStart"
                     android:src="@drawable/ic_place"
-                    android:tint="@color/iconColorMutedDark"/>
+                    android:tint="@color/iconColorMutedDark" />
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -123,30 +129,36 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_toRightOf="@+id/locationView"
                     android:layout_toEndOf="@+id/locationView"
+                    android:layout_toRightOf="@+id/locationView"
                     android:orientation="vertical"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp">
+
                     <TextView
+                        android:id="@+id/location_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/report_hint_location"
-                        android:id="@+id/location_text" />
+                        android:text="@string/report_hint_location" />
+
                 </LinearLayout>
             </RelativeLayout>
-            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#000" />
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/photoButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/photoButton"
-                android:clickable="true"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
                 android:minHeight="72dp">
 
                 <ImageView
-                    android:scaleType="fitStart"
+                    android:id="@+id/photoView"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_alignParentLeft="true"
@@ -156,9 +168,10 @@
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
                     android:contentDescription="@string/report_hint_photo"
-                    android:id="@+id/photoView"
+                    android:scaleType="fitStart"
                     android:src="@drawable/ic_image"
-                    android:tint="@color/iconColorMutedDark"/>
+                    android:tint="@color/iconColorMutedDark" />
+
                 <LinearLayout
                     android:id="@+id/photo_text_container"
                     android:layout_width="wrap_content"
@@ -167,55 +180,59 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginRight="16dp"
-                    android:layout_toRightOf="@+id/photoView"
                     android:layout_toEndOf="@+id/photoView"
+                    android:layout_toRightOf="@+id/photoView"
                     android:orientation="vertical"
                     android:paddingBottom="16dp"
                     android:paddingTop="16dp">
+
                     <TextView
+                        android:id="@+id/photo_text"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/report_hint_photo"
-                        android:id="@+id/photo_text" />
+                        android:text="@string/report_hint_photo" />
                 </LinearLayout>
             </RelativeLayout>
-            <View android:background="#000" android:layout_width="match_parent" android:layout_height="1px"/>
-            <RelativeLayout
-                xmlns:android="http://schemas.android.com/apk/res/android"
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="#000" />
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/photoLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/photoLayout"
-                android:clickable="true"
                 android:background="?attr/selectableItemBackground"
+                android:clickable="true"
                 android:minHeight="72dp"
-                android:visibility="invisible"
-                >
+                android:visibility="invisible">
 
                 <ImageView
-                    android:scaleType="fitXY"
+                    android:id="@+id/photoPlaceholder"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
-                    android:contentDescription="@string/report_hint_photo"
-                    android:id="@+id/photoPlaceholder"
-                    android:src="@drawable/ic_image"
-                    android:tint="@color/iconColorMutedDark"
+                    android:layout_centerVertical="true"
+                    android:adjustViewBounds="true"
                     android:clickable="true"
-                    android:adjustViewBounds="true" />
+                    android:contentDescription="@string/report_hint_photo"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_image"
+                    android:tint="@color/iconColorMutedDark" />
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/report_next_button"
-        app:backgroundTint="@color/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/ic_done"/>
+        android:src="@drawable/ic_done"
+        app:backgroundTint="@color/colorPrimary" />
 
 </FrameLayout>
