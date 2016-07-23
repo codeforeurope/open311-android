@@ -25,6 +25,7 @@ import android.support.design.widget.FloatingActionButton;
 
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
@@ -76,6 +77,13 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
+                // When user clicks the map, animate to new camera location
+                map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+                    @Override
+                    public void onMapClick(@NonNull LatLng point) {
+                        updateMap(point);
+                    }
+                });
             }
         });
 
@@ -162,20 +170,34 @@ public class MapActivity extends AppCompatActivity {
         openBottomSheet();
     }
 
+    private void updateMap(LatLng center) {
+        updateMap((float) center.getLatitude(), (float) center.getLongitude());
+    }
+
     private void updateMap(Float lat, Float lon) {
         // todo updateMap
+        map.clear();
+        Double zoom = map.getCameraPosition().zoom;
         latitude = lat;
         longitude = lon;
+        LatLng point = new LatLng(latitude, longitude);
         MarkerViewOptions marker = new MarkerViewOptions()
-                .position(new LatLng(latitude, longitude));
+                .position(point);
 
         map.addMarker(marker);
         enableLocation(false);
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(latitude, longitude))
+                .target(new LatLng(point))
                 .zoom(13)
                 .build();
+        if (zoom > 13) {
+            cameraPosition = new CameraPosition.Builder()
+                    .target(point)
+                    .build();
+        }
+
         map.setCameraPosition(cameraPosition);
+        new ReverseGeocodingTask().execute(point);
         //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
 
     }
@@ -189,8 +211,8 @@ public class MapActivity extends AppCompatActivity {
     }
 
     public void openBottomSheet() {
-        Log.d(LOG_TAG, Float.toString(gpsActionButton.getTranslationY()));
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
         //The GPS action button can only move once.
         if (gpsActionButtonOrigin == 999.999f) {
             gpsActionButtonOrigin = gpsActionButton.getTranslationY();
@@ -319,6 +341,7 @@ public class MapActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Address result) {
+            Log.d(LOG_TAG, "update address");
             updateAddress(result);
         }
     }
