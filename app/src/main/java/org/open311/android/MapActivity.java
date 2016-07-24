@@ -81,6 +81,7 @@ public class MapActivity extends AppCompatActivity {
                 map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                         updateMap(point);
                     }
                 });
@@ -127,11 +128,12 @@ public class MapActivity extends AppCompatActivity {
         autocomplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 Address result = adapter.getItem(position);
                 autocomplete.setText(Utils.addressString(result));
                 updateAddress(result);
                 autocomplete.clearFocus();
-                updateMap((float) result.getLatitude(), (float) result.getLongitude());
+                updateMap((float) result.getLatitude(), (float) result.getLongitude(), true);
             }
         });
 
@@ -171,10 +173,10 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void updateMap(LatLng center) {
-        updateMap((float) center.getLatitude(), (float) center.getLongitude());
+        updateMap((float) center.getLatitude(), (float) center.getLongitude(), false);
     }
 
-    private void updateMap(Float lat, Float lon) {
+    private void updateMap(Float lat, Float lon, Boolean recenter) {
         // todo updateMap
         map.clear();
         Double zoom = map.getCameraPosition().zoom;
@@ -186,24 +188,25 @@ public class MapActivity extends AppCompatActivity {
 
         map.addMarker(marker);
         enableLocation(false);
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(new LatLng(point))
-                .zoom(13)
-                .build();
-        if (zoom > 13) {
-            cameraPosition = new CameraPosition.Builder()
-                    .target(point)
+        if(recenter) {
+            CameraPosition cameraPosition = new CameraPosition.Builder()
+                    .target(new LatLng(point))
+                    .zoom(13)
                     .build();
+            if (zoom > 13) {
+                cameraPosition = new CameraPosition.Builder()
+                        .target(point)
+                        .build();
+            }
+            map.setCameraPosition(cameraPosition);
         }
 
-        map.setCameraPosition(cameraPosition);
         new ReverseGeocodingTask().execute(point);
         //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
 
     }
 
     public void closeBottomSheet() {
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         if (gpsActionButtonOrigin != 999.999f) {
             gpsActionButton.setTranslationY(gpsActionButtonOrigin);
         }
@@ -267,6 +270,7 @@ public class MapActivity extends AppCompatActivity {
                 @Override
                 public void onLocationChanged(Location location) {
                     if (location != null) {
+                        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                         LatLng latlng = new LatLng(location);
                         // Move the map camera to where the user location is
                         CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -278,6 +282,7 @@ public class MapActivity extends AppCompatActivity {
                         gpsActionButton.setImageResource(R.drawable.ic_my_location);
                         // Start reverse geocoder
                         new ReverseGeocodingTask().execute(latlng);
+                        enableLocation(false);
                     }
                 }
             });
