@@ -37,6 +37,7 @@ public class GeocoderNominatim {
 
     protected Locale mLocale;
     protected String mServiceUrl;
+    protected String mKey;
     protected String mUserAgent;
     protected boolean mPolygon;
 
@@ -62,6 +63,13 @@ public class GeocoderNominatim {
      */
     public void setService(String serviceUrl) {
         mServiceUrl = serviceUrl;
+    }
+
+    /**
+     * Specify the key to be used with the Nominatim service provider at mapQuest
+     */
+    public void setKey(String key) {
+        mKey = key;
     }
 
     /**
@@ -133,10 +141,10 @@ public class GeocoderNominatim {
 //        }
         if (jAddress.has("country_code"))
             gAddress.setAddressLine(addressIndex++, jAddress.get("country_code").getAsString().toUpperCase(mLocale));
-            gAddress.setCountryCode(jAddress.get("country_code").getAsString());
+        gAddress.setCountryCode(jAddress.get("country_code").getAsString());
 
 		/* Other possible OSM tags in Nominatim results not handled yet:
-		 * subway, golf_course, bus_stop, parking,...
+         * subway, golf_course, bus_stop, parking,...
 		 * house, house_number, building
 		 * city_district (13e Arrondissement)
 		 * road => or highway, ...
@@ -194,6 +202,9 @@ public class GeocoderNominatim {
                 //+ "&addressdetails=1"
                 + "&lat=" + latitude
                 + "&lon=" + longitude;
+        if (mKey != null) {
+            url += "&key=" + mKey;
+        }
         Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocation:" + url);
         String result = BonusPackHelper.requestStringFromUrl(url, mUserAgent);
         if (result == null)
@@ -229,7 +240,7 @@ public class GeocoderNominatim {
                 + "&accept-language=" + mLocale.getLanguage()
                 + "&addressdetails=1"
                 + "&limit=" + maxResults
-                + "&q=" + URLEncoder.encode(locationName);
+                + "&q=" + locationName;
         if (lowerLeftLatitude != 0.0 && upperRightLatitude != 0.0) {
             //viewbox = left, top, right, bottom:
             url += "&viewbox=" + lowerLeftLongitude
@@ -243,6 +254,9 @@ public class GeocoderNominatim {
             url += "&polygon=1";
             //TODO: polygon param is obsolete. Should be replaced by polygon_geojson.
             //Upgrade is on hold, waiting for MapQuest service to become compatible.
+        }
+        if (mKey != null) {
+            url += "&key=" + mKey;
         }
         Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocationName:" + url);
         String result = BonusPackHelper.requestStringFromUrl(url, mUserAgent);

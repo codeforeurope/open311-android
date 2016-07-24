@@ -19,9 +19,11 @@ import android.widget.TextView;
 import org.open311.android.R;
 import org.open311.android.helpers.Utils;
 import org.open311.android.helpers.GeocoderNominatim;
+import org.osmdroid.tileprovider.util.ManifestUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class GeocoderAdapter extends BaseAdapter implements Filterable {
 
@@ -93,7 +95,7 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
     }
 
     private class GeocoderFilter extends Filter {
-        static final String userAgent = "open311_geocode/1.0";
+        final String userAgent = "open311/1.0 (regular; info@open311.io)";
 
         @Override
         protected FilterResults performFiltering(CharSequence constraint) {
@@ -105,7 +107,10 @@ public class GeocoderAdapter extends BaseAdapter implements Filterable {
             }
 
             // nominatim geocoder
-            GeocoderNominatim geocoder = new GeocoderNominatim(context, userAgent);
+
+            GeocoderNominatim geocoder = new GeocoderNominatim(context, Locale.getDefault(), userAgent);
+            geocoder.setKey(ManifestUtil.retrieveKey(context, "MAPQUEST_API_KEY"));
+            geocoder.setService(GeocoderNominatim.MAPQUEST_SERVICE_URL);
             try {
                 List<Address> features = geocoder.getFromLocationName(constraint.toString(), 10);
                 results.values = features;

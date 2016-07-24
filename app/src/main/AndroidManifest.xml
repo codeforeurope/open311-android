@@ -22,7 +22,9 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
+        <meta-data
+            android:name="MAPQUEST_API_KEY"
+            android:value="M3vtPjjlzzs0w9woiu2jUik8hoaU9fAH"/>
         <meta-data
             android:name="org.open311.android.helpers.GlideConfiguration"
             android:value="GlideModule" />

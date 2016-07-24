@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,7 +24,6 @@ import android.support.design.widget.FloatingActionButton;
 
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationListener;
 import com.mapbox.mapboxsdk.location.LocationServices;
@@ -37,6 +35,7 @@ import org.open311.android.adapters.GeocoderAdapter;
 import org.open311.android.helpers.Utils;
 import org.open311.android.widgets.GeocoderView;
 import org.open311.android.helpers.GeocoderNominatim;
+import org.osmdroid.tileprovider.util.ManifestUtil;
 
 import java.io.IOException;
 import java.util.List;
@@ -59,12 +58,24 @@ public class MapActivity extends AppCompatActivity {
     private static final String LOG_TAG = "MapActivity";
     private static final int PERMISSIONS_LOCATION = 201;
 
+    private enum source {
+        GPS("GPS"),
+        SEARCH("SEARCH"),
+        CLICK("CLICK"),
+        REVERSE_GEOCODE("REVERSE_GECODE");
+
+        private final String value;
+
+        private source(String val) {
+            this.value = val;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
-
         locationServices = LocationServices.getLocationServices(MapActivity.this);
 
         View bottomSheet = findViewById(R.id.bottom_sheet);
@@ -77,12 +88,15 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
                 map = mapboxMap;
-                // When user clicks the map, animate to new camera location
                 map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
                     public void onMapClick(@NonNull LatLng point) {
                         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                        updateMap(point);
+                        sourceType = source.CLICK.value;
+                        latitude = (float) point.getLatitude();
+                        longitude = (float) point.getLongitude();
+                        //updateMap, but don't center it
+                        updateMap(false);
                     }
                 });
             }
@@ -107,7 +121,6 @@ public class MapActivity extends AppCompatActivity {
                 data.putExtra("latitude", latitude);
                 data.putExtra("longitude", longitude);
                 data.putExtra("source", sourceType);
-                // Activity finished ok, return the data
                 setResult(RESULT_OK, data);
                 finish();
             }
@@ -117,7 +130,6 @@ public class MapActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.map, menu);
         MenuItem item = menu.findItem(R.id.action_search);
 
@@ -129,66 +141,42 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                sourceType = source.SEARCH.value;
                 Address result = adapter.getItem(position);
                 autocomplete.setText(Utils.addressString(result));
                 updateAddress(result);
                 autocomplete.clearFocus();
-                updateMap((float) result.getLatitude(), (float) result.getLongitude(), true);
+                latitude = (float) result.getLatitude();
+                longitude = (float) result.getLongitude();
+                updateMap(true);
             }
         });
 
         return true;
     }
 
-    private void updateAddress(LatLng result) {
-
-        addressString = "";
-        sourceType = "GPS";
-        latitude = (float) result.getLatitude();
-        longitude = (float) result.getLongitude();
-
-        TextView AddressLine = (TextView) findViewById((R.id.address));
-        TextView CoordsLine = (TextView) findViewById((R.id.coords));
-        assert AddressLine != null;
-        AddressLine.setText("");
-        assert CoordsLine != null;
-        String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.getLatitude(), result.getLongitude());
-        CoordsLine.setText(coordText);
-        openBottomSheet();
-    }
-
     private void updateAddress(Address result) {
         addressString = Utils.addressString(result);
-        sourceType = "SEARCH";
-        latitude = (float) result.getLatitude();
-        longitude = (float) result.getLongitude();
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
         AddressLine.setText(addressString);
         assert CoordsLine != null;
-        String coordText = String.format(Locale.getDefault(), "(%f, %f)", result.getLatitude(), result.getLongitude());
+        String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
         CoordsLine.setText(coordText);
         openBottomSheet();
     }
 
-    private void updateMap(LatLng center) {
-        updateMap((float) center.getLatitude(), (float) center.getLongitude(), false);
-    }
-
-    private void updateMap(Float lat, Float lon, Boolean recenter) {
-        // todo updateMap
+    private void updateMap(Boolean recenter) {
         map.clear();
         Double zoom = map.getCameraPosition().zoom;
-        latitude = lat;
-        longitude = lon;
         LatLng point = new LatLng(latitude, longitude);
         MarkerViewOptions marker = new MarkerViewOptions()
                 .position(point);
 
         map.addMarker(marker);
         enableLocation(false);
-        if(recenter) {
+        if (recenter) {
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(point))
                     .zoom(13)
@@ -200,10 +188,8 @@ public class MapActivity extends AppCompatActivity {
             }
             map.setCameraPosition(cameraPosition);
         }
-
+        sourceType = source.GPS.value;
         new ReverseGeocodingTask().execute(point);
-        //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
-
     }
 
     public void closeBottomSheet() {
@@ -280,6 +266,7 @@ public class MapActivity extends AppCompatActivity {
                         map.setCameraPosition(cameraPosition);
                         //map.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 5000, null);
                         gpsActionButton.setImageResource(R.drawable.ic_my_location);
+                        sourceType = source.GPS.value;
                         // Start reverse geocoder
                         new ReverseGeocodingTask().execute(latlng);
                         enableLocation(false);
@@ -290,7 +277,6 @@ public class MapActivity extends AppCompatActivity {
         } else {
             gpsActionButton.setImageResource(R.drawable.ic_location_disabled);
         }
-        // Enable or disable the location layer on the map
         map.setMyLocationEnabled(enabled);
     }
 
@@ -323,15 +309,19 @@ public class MapActivity extends AppCompatActivity {
         @Override
         protected Address doInBackground(LatLng... points) {
             // This method is used to reverse geocode where the user has dropped the marker.
-            final String userAgent = "open311_reverse/1.0";
+            final String userAgent = "open311/1.0 (reverse; info@open311.io)";
             LatLng point = points[0];
-            GeocoderNominatim geocoder = new GeocoderNominatim(getApplicationContext(), userAgent);
+            GeocoderNominatim geocoder = new GeocoderNominatim(getBaseContext(), Locale.getDefault(), userAgent);
+            geocoder.setKey(ManifestUtil.retrieveKey(getBaseContext(), "MAPQUEST_API_KEY"));
+            geocoder.setService(GeocoderNominatim.MAPQUEST_SERVICE_URL);
             String theAddress;
             try {
-                double dLatitude = point.getLatitude();
-                double dLongitude = point.getLongitude();
-                List<Address> addresses = geocoder.getFromLocation(dLatitude, dLongitude, 1);
+                latitude = (float) point.getLatitude();
+                longitude = (float) point.getLongitude();
+
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                 if (addresses.size() > 0) {
+                    sourceType = source.REVERSE_GEOCODE.value;
                     return addresses.get(0);
 
                 } else {
@@ -339,10 +329,9 @@ public class MapActivity extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                updateAddress(point);
+                return null;
             }
-            return null;
-        }// reverseGeocode
+        }
 
         @Override
         protected void onPostExecute(Address result) {
