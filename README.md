@@ -20,13 +20,6 @@ git clone --recursive https://github.com/CodeForEindhoven/open311-android.git
 * Start Android Studio
 * Select __import project__ and point the dialog to the directory containing the created github repository
 
-Make sure you get a Google Places For Android Key at: https://console.developers.google.com/apis/credentials/wizard?api=placesandroid
-And enter it in your local.properties as
-```
-apiKey=YourGooglePlacesApiKeyHere
-```
-
-
 ## Contributing
 Online documentation is in the [Wiki](https://github.com/City-of-Bloomington/open311-android/wiki) here on GitHub.  Questions not addressed in the wiki should be sent to the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/open311-mobile).
 
