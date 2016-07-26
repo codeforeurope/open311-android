@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Open311</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="Import">Import</string>
     <string name="Gallery">Gallery</string>
     <string name="Slideshow">Slideshow</string>
@@ -19,7 +17,6 @@
     <string name="list_user_messages">My reports</string>
     <string name="menu_search">Search</string>
     <string name="menu_settings">Settings</string>
-    <string name="menu_reports_my">My Reports</string>
     <string name="menu_reports_recent">Recent Reports</string>
     <string name="menu_report">Report</string>
     <string name="menu_archive">My Reports</string>
@@ -58,14 +55,14 @@
     <string name="report_photo">Photo</string>
     <string name="report_location">Location</string>
     <string name="report_address">Enter an address</string>
-    <string name="report_visibility">Share request with public</string>
+    <string name="report_visibility">Share report with public</string>
     <string name="report_required_field">Required field</string>
     <string name="report_loading">Loading</string>
     <string name="report_dialog_title">Service Request</string>
     <string name="report_dialog_message">Wait while sending</string>
-    <string name="report_success_message">Your service request has been sent</string>
+    <string name="report_success_message">Your report has been sent</string>
     <string name="report_failure_message">Unsuccessful, please try again later</string>
-    <string name="next">Next step</string>
+    <string name="next">Next</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
