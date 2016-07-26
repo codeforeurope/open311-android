@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">Open311</string>
-    <string name="list_user_messages">Mis informes</string>
-    <string name="list_latest_messages">Informes recientes</string>
-    <string name="ApplicationTitle">311</string>
-</resources>
