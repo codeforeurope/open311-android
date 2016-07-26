@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GeoReporter</string>
+    <string name="app_name">Open311</string>
     <string name="menu_settings">Asetukset</string>
     <string name="menu_report">Palaute</string>
     <string name="menu_archive">Omat palautteet</string>
@@ -47,4 +47,32 @@
     <string name="list_latest_messages">Omat palautteet</string>
     <string name="list_user_messages">raporttini</string>
     <string name="ApplicationTitle">311</string>
+    <string name="ApplicationIcon">sovelluskuvake</string>
+    <string name="ApplicationEmail">Ota viranomaisten</string>
+    <string name="Communicate">tiedottaa</string>
+    <string name="Gallery">galleria</string>
+    <string name="Import">tuonti</string>
+    <string name="updated">päivitetty</string>
+    <string name="storageNotWritable">Ulkoinen tallennustila ei voi kirjoittaa</string>
+    <string name="status_unknown">tuntematon</string>
+    <string name="status_open">avoin</string>
+    <string name="settings_saved">Asetukset tallennettu</string>
+    <string name="status_closed">kiini</string>
+    <string name="setting_user">Käyttäjä</string>
+    <string name="setting_general">Asetukset</string>
+    <string name="Send">lähettää</string>
+    <string name="Share">jakaa</string>
+    <string name="Slideshow">Kuvaesitys</string>
+    <string name="Tools">Työkalut</string>
+    <string name="contactAuthority">open311.io</string>
+    <string name="contactEmail">info@open311.io</string>
+    <string name="contactPhone">555</string>
+    <string name="contactTitle">Yhteys</string>
+    <string name="description">Kuvaus</string>
+    <string name="add_to_report">Lisää tietoa</string>
+    <string name="btn_sign_up">Kirjaudu</string>
+    <string name="error_occurred">Tapahtui virhe</string>
+    <string name="hint_email">Sähköposti</string>
+    <string name="hint_name">Nimi</string>
+    <string name="hint_password">Salasana</string>
 </resources>

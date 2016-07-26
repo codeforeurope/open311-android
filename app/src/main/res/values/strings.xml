@@ -84,15 +84,12 @@
     <string name="invalid_name">Name is invalid</string>
     <string name="invalid_email">Invalid email address</string>
     <string name="invalid_phone">Phone number is invalid</string>
-    <string name="settings_saved">Settings are saved</string>
+    <string name="settings_saved">Settings saved</string>
     <string name="error_occurred">An error occurred</string>
     <string name="status_open">open</string>
     <string name="status_closed">closed</string>
     <string name="status_unknown">unknown</string>
     <string name="add_to_report">Add information</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="hint_email">Email</string>
     <string name="hint_name">Name</string>
     <string name="hint_phone">Phone</string>
@@ -100,15 +97,14 @@
     <string name="btn_sign_up">Sign Up</string>
     <string name="request_image">Image</string>
     <string name="request_ago_icon">Last updated</string>
-    <string name="action_settings">Settings</string>
     <string name="notImplemented">Not yet implemented</string>
     <string name="serviceListUnavailable">Categories can not be fetched. Try again later.</string>
     <string name="storageNotWritable">External storage is not writable</string>
     <string name="privacyPolicy">Privacy Policy</string>
     <string name="questionsAndFeedback">Questions and feedback</string>
     <string name="contactEmail">info@open311.io</string>
-    <string name="contactAuthority">Open311.io</string>
-    <string name="contactPhone">n/a</string>
+    <string name="contactAuthority">open311.io</string>
+    <string name="contactPhone">555</string>
     <string name="contactTitle">Contact</string>
     <string name="privacyPar1">We are aware of your trust in us. That is why we take it as our primary responsibility to protect your privacy. We will however collect information. We will explain why and what.</string>
     <string name="privacyPar2">Our privacy policy applies to the application and the services. By using our application, you accept our privacy policy.</string>

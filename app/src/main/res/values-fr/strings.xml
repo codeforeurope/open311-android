@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GeoReporter</string>
+    <string name="app_name">Open311</string>
     <string name="menu_settings">Paramètres</string>
     <string name="menu_report">Demande</string>
     <string name="menu_archive">Mes demandes</string>
@@ -15,7 +15,7 @@
     <string name="email">Courriel</string>
     <string name="phone">Téléphone</string>
     <string name="name">Nom</string>
-    <string name="url">Lien</string>
+    <string name="url">Url</string>
     <string name="jurisdiction_id">ID jurisdiction</string>
     <string name="api_key">Clée Api</string>
     <string name="format">Format</string>
@@ -47,4 +47,32 @@
     <string name="list_user_messages">Mes demandes</string>
     <string name="list_latest_messages">Demandes récent</string>
     <string name="ApplicationTitle">311</string>
+    <string name="ApplicationIcon">Icône d\'application</string>
+    <string name="ApplicationEmail">Contactez les autorités</string>
+    <string name="Communicate">Communiquer</string>
+    <string name="Gallery">Galerie</string>
+    <string name="Import">Importer</string>
+    <string name="updated">Actualisé</string>
+    <string name="storageNotWritable">Le stockage externe est pas inscriptible</string>
+    <string name="status_unknown">inconnu</string>
+    <string name="status_open">ouvert</string>
+    <string name="status_closed">fermé</string>
+    <string name="settings_saved">Paramètres sauvegardés</string>
+    <string name="setting_user">Utilisateur</string>
+    <string name="setting_general">Paramètres</string>
+    <string name="Send">Envoyer</string>
+    <string name="Share">Partager</string>
+    <string name="Slideshow">Slideshow</string>
+    <string name="Tools">Outils</string>
+    <string name="contactAuthority">open311.io</string>
+    <string name="contactEmail">info@open311.io</string>
+    <string name="contactPhone">555</string>
+    <string name="contactTitle">Contact</string>
+    <string name="description">Description</string>
+    <string name="add_to_report">Ajouter de l\'information</string>
+    <string name="btn_sign_up">Inscrire</string>
+    <string name="error_occurred">Une erreur est survenue</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_name">Nom</string>
+    <string name="hint_password">Mot de passe</string>
 </resources>
