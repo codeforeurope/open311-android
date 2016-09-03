@@ -17,11 +17,13 @@ import android.widget.ViewSwitcher;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
+import org.codeforamerica.open311.facade.EndpointType;
 import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.caching.NoCache;
+import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
 import org.open311.android.helpers.MyReportsFile;
@@ -32,7 +34,6 @@ import java.util.List;
 
 /**
  * Requests {@link Fragment} subclass.
- *
  */
 public class RequestsFragment extends Fragment {
 
@@ -156,12 +157,10 @@ public class RequestsFragment extends Fragment {
             Bundle bundle = null;
             APIWrapperFactory factory;
             try {
-                if (city != null) {
-                    factory = new APIWrapperFactory(city).setCache(new NoCache()).withLogs();
-                } else {
-                    factory = new APIWrapperFactory(endpointUrl, jurisdictionId)
-                            .setCache(new NoCache()).withLogs();
-                }
+                factory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
+                //.setCache(new NoCache())
+                //.withLogs();
+
 
                 APIWrapper wrapper;
                 wrapper = factory.build();

@@ -112,4 +112,7 @@
     <string name="updated">Updated</string>
     <string name="map">Select a location</string>
     <string name="map_hint_gps">Acquire GPS position</string>
+    <string name="contactingServer">Connecting to</string>
+    <string name="connectionEstablished">Connection established</string>
+    <string name="servicesDownloaded">services downloaded</string>
 </resources>

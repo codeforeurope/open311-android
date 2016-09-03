@@ -113,4 +113,7 @@
     <string name="setting_cloud"> Server</string>
     <string name="supports_media">Ondersteunt media</string>
     <string name="tab_servers">Servers</string>
+    <string name="contactingServer">Verbinden met</string>
+    <string name="connectionEstablished">Verbonden</string>
+    <string name="servicesDownloaded">categorieën gedownload</string>
 </resources>

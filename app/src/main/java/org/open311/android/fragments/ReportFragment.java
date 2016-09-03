@@ -42,9 +42,9 @@ import com.bumptech.glide.request.target.SimpleTarget;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
+import org.codeforamerica.open311.facade.EndpointType;
 import org.codeforamerica.open311.facade.data.Attribute;
 import org.codeforamerica.open311.facade.data.AttributeInfo;
-import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.POSTServiceRequestResponse;
 import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
@@ -67,7 +67,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 /**
  * Report {@link Fragment} subclass.
@@ -667,12 +666,12 @@ public class ReportFragment extends Fragment {
                     .into(new SimpleTarget<Bitmap>(myWidth, myHeight) {
                         @Override
                         public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                            PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, bitmap);
+                            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
                             bgTask.execute();
                         }
                     });
         } else {
-            PostServiceRequestTask bgTask = new PostServiceRequestTask(getContext().getResources().getString(R.string.open311_endpoint), data, null);
+            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
             bgTask.execute();
         }
     }
@@ -722,8 +721,7 @@ public class ReportFragment extends Fragment {
         private Bitmap bitmap;
         private boolean success = true;
 
-        public PostServiceRequestTask(String url, POSTServiceRequestData data, Bitmap bitmap) {
-            this.url = url;
+        public PostServiceRequestTask(POSTServiceRequestData data, Bitmap bitmap) {
             this.data = data;
             this.bitmap = bitmap;
         }
@@ -737,7 +735,7 @@ public class ReportFragment extends Fragment {
         protected String doInBackground(Void... ignore) {
             String result;
             try {
-                APIWrapperFactory wrapperFactory = new APIWrapperFactory(url);
+                APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
                 if (imageUri != null) {
                     HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
                     wrapperFactory.setNetworkManager(networkManager);
@@ -794,13 +792,6 @@ public class ReportFragment extends Fragment {
             MyReportsFile file = new MyReportsFile(getContext());
             int reqs = file.getServiceRequestLength();
             Log.d(LOG_TAG, "requests for user: " + reqs);
-            if (reqs >= 1) {
-                // todo Refresh the RequestsList
-//                RequestsFragment requestsFragment = (RequestsFragment)
-//                        getActivity().getSupportFragmentManager().findFragmentById(R.id.view_switcher);
-//                requestsFragment.updateServiceRequests();
-            }
-
 
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.report_dialog_title))
@@ -829,13 +820,13 @@ public class ReportFragment extends Fragment {
          */
         @Override
         protected Integer doInBackground(Void... ignore) {
-            String url = getContext().getResources().getString(R.string.open311_endpoint) + "/services/" + this.serviceCode + ".xml";
             APIWrapper wrapper;
             ServiceDefinition definition;
             Integer count = 0;
             attrInfoList.clear(); // Start with an empty list
             try {
-                wrapper = new APIWrapperFactory(url).build();
+
+                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION).build();
                 definition = wrapper.getServiceDefinition(this.serviceCode);
                 Iterator iterator = definition.getAttributes().iterator();
                 while (iterator.hasNext()) {
@@ -871,18 +862,7 @@ public class ReportFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... ignore) {
             if (services != null) return null;
-            APIWrapper wrapper;
-            try {
-                wrapper = new APIWrapperFactory(getContext().getResources().getString(R.string.open311_endpoint)).build();
-                services = wrapper.getServiceList();
-
-            } catch (APIWrapperException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            services = ((MainActivity) getActivity()).getServices();
             return null;
         }
     }

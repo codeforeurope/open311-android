@@ -1,7 +1,9 @@
 package org.open311.android;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -15,8 +17,13 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 
+import org.codeforamerica.open311.facade.APIWrapper;
+import org.codeforamerica.open311.facade.APIWrapperFactory;
+import org.codeforamerica.open311.facade.EndpointType;
 import org.codeforamerica.open311.facade.data.City;
+import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
+import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.open311.android.adapters.ViewPagerAdapter;
 
 import org.open311.android.fragments.CityFragment;
@@ -26,7 +33,11 @@ import org.open311.android.fragments.ReportFragment;
 import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
 
+import java.io.IOException;
+import java.util.List;
+
 import static org.open311.android.helpers.Utils.*;
+
 import io.tus.android.client.TusPreferencesURLStore;
 
 public class MainActivity extends AppCompatActivity
@@ -35,11 +46,29 @@ public class MainActivity extends AppCompatActivity
         CityFragment.OnListFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
     private String installationId;
+
+    private List<Service> services;
+
+    private City currentCity;
     private ReportFragment reportFragment;
     private CityFragment cityFragment;
     private static final String LOG_TAG = "MainActivity";
 
     protected SharedPreferences settings;
+
+
+    public List<Service> getServices() {
+        return services;
+    }
+
+    public City getCurrentCity() {
+        return currentCity;
+    }
+
+    public MainActivity setCurrentCity(City currentCity) {
+        this.currentCity = currentCity;
+        return this;
+    }
 
     public String getInstallationId() {
         return installationId;
@@ -51,6 +80,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         settings = getSettings(this);
+        setCurrentCity(City.EINDHOVEN);
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
 
@@ -75,6 +105,7 @@ public class MainActivity extends AppCompatActivity
             reportFragment = (ReportFragment) getSupportFragmentManager().getFragment(
                     savedInstanceState, "reportFragment");
         }
+        new DownloadPictures().execute();
     }
 
     @Override
@@ -171,6 +202,69 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onListFragmentInteraction(City item) {
+
+    }
+
+    private class DownloadPictures extends AsyncTask<String, Void, String> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            APIWrapper wrapper;
+            try {
+                wrapper = new APIWrapperFactory(getCurrentCity(), EndpointType.PRODUCTION).build();
+                publishProgress();
+                services = wrapper.getServiceList();
+                publishProgress();
+                Thread.sleep(2000);
+
+            } catch (APIWrapperException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            progressDialog.cancel();
+
+            //Call your method that checks if the pictures were downloaded
+
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog = new ProgressDialog(
+                    MainActivity.this);
+
+            progressDialog.setMessage(getString(R.string.contactingServer) + " " + City.EINDHOVEN.getCityName());
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            if (services == null) {
+                progressDialog.setMessage(getString(R.string.connectionEstablished));
+            } else {
+                if (services.size() > 0) {
+                    progressDialog.setMessage(services.size() + " " + getString(R.string.servicesDownloaded));
+                }
+            }
+        }
 
     }
 }

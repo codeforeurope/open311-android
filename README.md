@@ -17,8 +17,32 @@ The current version of the specification is documented at http://wiki.open311.or
 ```
 git clone --recursive https://github.com/CodeForEindhoven/open311-android.git
 ```
+
+Create a file called `local.properties` in the `open311-android/` folder with the following content:
+
+```
+#android sdk dir, will be set by android studio, make sure it is correct!
+sdk.dir=/home/someuser/android-sdk
+
+# The key for mapbox, needed to use mapbox map
+mapboxKey=pk.somelongtextofrandomcharacters
+
+# The default open311 endpoint you want to use
+open311Endpoint=https://yourserver.com/api/v2
+
+# Key needed to post to the default open311 endpoint
+open311Key=thisissecret
+```
 * Start Android Studio
 * Select __import project__ and point the dialog to the directory containing the created github repository
+
+When Android Studio is started, you should be good to go!
+
+# Running tests
+
+The org.codeforamerica.open311 subproject contains tests. 
+There is an issue with the `servers.json` resource, sometimes I cannot load or refresh it. I found that invalidating/restarting Android Studio most of the times clears this issue.
+
 
 ## Contributing
 Online documentation is in the [Wiki](https://github.com/City-of-Bloomington/open311-android/wiki) here on GitHub.  Questions not addressed in the wiki should be sent to the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/open311-mobile).
