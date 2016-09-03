@@ -17,7 +17,7 @@ import android.widget.ViewSwitcher;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
-import org.codeforamerica.open311.facade.City;
+import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
@@ -50,7 +50,8 @@ public class RequestsFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public RequestsFragment() { }
+    public RequestsFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

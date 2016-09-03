@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -60,7 +60,7 @@
         </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/btn_submit"
+        android:id="@+id/profile_submit"
         app:backgroundTint="@color/colorPrimary"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
@@ -68,4 +68,4 @@
         android:layout_height="match_parent"
         android:src="@drawable/ic_done"
         android:layout_gravity="end|bottom" />
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

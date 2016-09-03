@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
@@ -15,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import org.open311.android.R;
 
@@ -61,18 +61,18 @@ public class ProfileFragment extends Fragment {
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         inputPhone.addTextChangedListener(new MyTextWatcher(inputPhone));
 
-        FloatingActionButton submit = (FloatingActionButton) view.findViewById(R.id.btn_submit);
+        FloatingActionButton submit = (FloatingActionButton) view.findViewById(R.id.profile_submit);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onSubmitButtonClicked();
+                onSubmitButtonClicked(v);
             }
         });
 
         return view;
     }
 
-    private void onSubmitButtonClicked() {
+    private void onSubmitButtonClicked(View v) {
         SharedPreferences.Editor editor = settings.edit();
         String result;
 
@@ -98,7 +98,8 @@ public class ProfileFragment extends Fragment {
         } else {
             result = getString(R.string.error_occurred);
         }
-        Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+        Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     private boolean validateName() {

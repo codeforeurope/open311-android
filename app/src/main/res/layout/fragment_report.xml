@@ -1,4 +1,4 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -225,7 +225,7 @@
     </ScrollView>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/report_next_button"
+        android:id="@+id/report_submit"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end|bottom"
@@ -235,4 +235,4 @@
         android:src="@drawable/ic_done"
         app:backgroundTint="@color/colorPrimary" />
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

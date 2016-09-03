@@ -11,13 +11,15 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import com.mapbox.mapboxsdk.MapboxAccountManager;
 
+import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.open311.android.adapters.ViewPagerAdapter;
 
+import org.open311.android.fragments.CityFragment;
 import org.open311.android.fragments.PolicyFragment;
 import org.open311.android.fragments.ProfileFragment;
 import org.open311.android.fragments.ReportFragment;
@@ -25,13 +27,16 @@ import org.open311.android.fragments.RequestsFragment;
 import org.open311.android.helpers.Installation;
 
 import static org.open311.android.helpers.Utils.*;
+import io.tus.android.client.TusPreferencesURLStore;
 
 public class MainActivity extends AppCompatActivity
         implements
         RequestsFragment.OnListFragmentInteractionListener,
+        CityFragment.OnListFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
     private String installationId;
     private ReportFragment reportFragment;
+    private CityFragment cityFragment;
     private static final String LOG_TAG = "MainActivity";
 
     protected SharedPreferences settings;
@@ -80,8 +85,13 @@ public class MainActivity extends AppCompatActivity
         actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                String msg = getString(R.string.notImplemented);
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                cityFragment = new CityFragment();
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.cities_fragment, cityFragment)
+                        .commit();
+                View citiesView = findViewById(R.id.cities_fragment);
+                assert citiesView != null;
+                citiesView.bringToFront();
                 return true;
             }
         });
@@ -157,5 +167,10 @@ public class MainActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(LOG_TAG, "onActivityResult");
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onListFragmentInteraction(City item) {
+
     }
 }

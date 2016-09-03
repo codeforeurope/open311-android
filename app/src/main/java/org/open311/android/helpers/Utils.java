@@ -19,6 +19,7 @@ public class Utils {
     public static SharedPreferences getSettings(Activity activity) {
         return activity.getSharedPreferences(OPEN311_SETTINGS, 0);
 
+
     }
 
     public static String addressString(Address address) {

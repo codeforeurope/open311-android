@@ -4,7 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentTransaction;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -35,7 +35,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -45,9 +44,11 @@ import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.data.Attribute;
 import org.codeforamerica.open311.facade.data.AttributeInfo;
+import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.POSTServiceRequestResponse;
 import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
+import org.codeforamerica.open311.facade.data.Value;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.network.HTTPNetworkManager;
@@ -222,8 +223,8 @@ public class ReportFragment extends Fragment {
         RelativeLayout btnPhoto = (RelativeLayout) view.findViewById(R.id.photoButton);
         RelativeLayout btnService = (RelativeLayout) view.findViewById(R.id.serviceButton);
         RelativeLayout btnLocation = (RelativeLayout) view.findViewById(R.id.locationButton);
-        View descriptionView = (View) view.findViewById(R.id.report_description_textbox);
-        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_next_button);
+        View descriptionView = view.findViewById(R.id.report_description_textbox);
+        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
 
         //Hide the keyboard unless the descriptionView is selected
         descriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -259,7 +260,7 @@ public class ReportFragment extends Fragment {
         btnSubmit.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                onSubmitButtonClicked();
+                onSubmitButtonClicked(v);
             }
         });
 
@@ -359,7 +360,7 @@ public class ReportFragment extends Fragment {
      *
      * @return boolean
      */
-    private boolean isValidFormContent() {
+    private boolean isValidFormContent(View v) {
 
         boolean isValid = true;
 
@@ -391,8 +392,15 @@ public class ReportFragment extends Fragment {
 
         if (attrInfoList.size() != 0) {
             isValid = (attrInfoList.size() == attributes.size());
-            // TODO: set error for each missing attribute
+
         }
+        if (!isValid) {
+            // TODO: Construct a snackbar with text if invalid
+            String result = getString(R.string.failure_posting_service);
+            Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
+                    .show();
+        }
+
 
         return isValid;
     }
@@ -440,14 +448,13 @@ public class ReportFragment extends Fragment {
     private void onAttributeButtonClicked(AttributeInfo attribute) {
         String title = attribute.getDescription();
         final String code = attribute.getCode();
-        Map<String, String> map = attribute.getValues();
+        Value[] map = attribute.getValues();
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final String[] keys = new String[map.size()];
-        final String[] values = new String[map.size()];
-        int index = 0;
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            keys[index] = entry.getKey();
-            values[index] = entry.getValue();
+        final String[] keys = new String[map.length];
+        final String[] values = new String[map.length];
+        for (int index = 0; index < map.length; ++index) {
+            keys[index] = map[index].getKey();
+            values[index] = map[index].getName();
             index++;
         }
         builder.setTitle(title).setItems(values, new DialogInterface.OnClickListener() {
@@ -469,8 +476,10 @@ public class ReportFragment extends Fragment {
     private void onServiceButtonClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (services == null) {
+            View v = getActivity().findViewById(R.id.report_submit);
             String msg = getString(R.string.serviceListUnavailable);
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
         final String[] codes = new String[services.size()];
@@ -568,9 +577,11 @@ public class ReportFragment extends Fragment {
      */
     private void handleGallery() {
         Log.d(LOG_TAG, "HandleGallery");
+        View v = getActivity().findViewById(R.id.report_submit);
         if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
@@ -586,9 +597,11 @@ public class ReportFragment extends Fragment {
      */
     private void handleCamera() {
         Log.d(LOG_TAG, "HandleCamera");
+        View v = getActivity().findViewById(R.id.report_submit);
         if (!isExternalStorageWritable()) {
             String msg = getString(R.string.storageNotWritable);
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
 
@@ -601,7 +614,8 @@ public class ReportFragment extends Fragment {
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
             } else {
                 String msg = getString(R.string.storageNotWritable);
-                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+                Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                        .show();
             }
 
         } catch (Exception e) {
@@ -611,11 +625,11 @@ public class ReportFragment extends Fragment {
         startActivityForResult(cameraIntent, CAMERA_REQUEST);
     }
 
-    private void onSubmitButtonClicked() {
+    private void onSubmitButtonClicked(View v) {
         Log.d(LOG_TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
-        if (!isValidFormContent()) {
+        if (!isValidFormContent(v)) {
             return;
         }
 
@@ -779,7 +793,7 @@ public class ReportFragment extends Fragment {
 
             MyReportsFile file = new MyReportsFile(getContext());
             int reqs = file.getServiceRequestLength();
-            Log.d(LOG_TAG,"requests for user: " + reqs);
+            Log.d(LOG_TAG, "requests for user: " + reqs);
             if (reqs >= 1) {
                 // todo Refresh the RequestsList
 //                RequestsFragment requestsFragment = (RequestsFragment)
