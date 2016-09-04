@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         settings = getSettings(this);
-        setCurrentCity(City.EINDHOVEN);
+        setCurrentCity(City.fromString(getString(R.string.open311_endpoint)));
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
 
@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity
             progressDialog = new ProgressDialog(
                     MainActivity.this);
 
-            progressDialog.setMessage(getString(R.string.contactingServer) + " " + City.EINDHOVEN.getCityName());
+            progressDialog.setMessage(getString(R.string.contactingServer) + " " + getCurrentCity().getCityName());
             progressDialog.setCancelable(false);
             progressDialog.show();
 

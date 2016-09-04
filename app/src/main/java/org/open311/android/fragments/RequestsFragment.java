@@ -124,27 +124,10 @@ public class RequestsFragment extends Fragment {
 
     private void updateServiceRequests() {
         RetrieveServiceRequestsTask bgTask = new RetrieveServiceRequestsTask();
-        bgTask.setEndpointUrl(getContext().getResources().getString(R.string.open311_endpoint));
         bgTask.execute();
     }
 
     private class RetrieveServiceRequestsTask extends AsyncTask<Void, Void, Bundle> {
-
-        private City city = null;
-        private String endpointUrl = null;
-        private String jurisdictionId = null;
-
-        public void setCity(City city) {
-            this.city = city;
-        }
-
-        public void setEndpointUrl(String endpointUrl) {
-            this.endpointUrl = endpointUrl;
-        }
-
-        public void setJurisdictionId(String jurisdictionId) {
-            this.jurisdictionId = jurisdictionId;
-        }
 
         /**
          * Retrieve service requests in the background.

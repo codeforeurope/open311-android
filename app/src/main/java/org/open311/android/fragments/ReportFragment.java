@@ -740,7 +740,7 @@ public class ReportFragment extends Fragment {
                     HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
                     wrapperFactory.setNetworkManager(networkManager);
                 }
-                wrapperFactory.setApiKey(getContext().getResources().getString(R.string.open311_apikey));
+                wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentCity().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
