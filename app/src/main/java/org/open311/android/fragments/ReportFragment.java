@@ -62,11 +62,19 @@ import org.open311.android.helpers.SingleValueAttributeWrapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.text.Normalizer;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+
+import io.tus.android.client.TusAndroidUpload;
+import io.tus.android.client.TusPreferencesURLStore;
+import io.tus.java.client.TusClient;
+import io.tus.java.client.TusUpload;
+import io.tus.java.client.TusUploader;
+
 
 /**
  * Report {@link Fragment} subclass.
@@ -80,6 +88,7 @@ public class ReportFragment extends Fragment {
     private List<Service> services;
     private String imageUri;
     private ProgressDialog progress;
+    private TusClient client;
 
     private String location;
     private String serviceName;
@@ -717,7 +726,6 @@ public class ReportFragment extends Fragment {
     private class PostServiceRequestTask extends AsyncTask<Void, Void, String> {
 
         private POSTServiceRequestData data;
-        private String url;
         private Bitmap bitmap;
         private boolean success = true;
 
@@ -928,5 +936,77 @@ public class ReportFragment extends Fragment {
     private void hideKeyBoard(View v) {
         InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    private class UploadTask extends AsyncTask<Void, Long, URL> {
+        private TusClient client;
+        private TusUpload upload;
+        private Exception exception;
+
+        public UploadTask(TusClient client, TusUpload upload) {
+            this.client = client;
+            this.upload = upload;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress = new ProgressDialog(getContext());
+            progress.setTitle(getString(R.string.report_upload_title));
+            progress.setMessage(getString(R.string.report_upload_started) + "...");
+            progress.show();
+            //activity.setPauseButtonEnabled(true);
+        }
+
+        @Override
+        protected void onPostExecute(URL uploadURL) {
+            //activity.setStatus("Upload finished!\n" + uploadURL.toString());
+            //activity.setPauseButtonEnabled(false);
+        }
+
+        @Override
+        protected void onCancelled() {
+            //if(exception != null) {
+            //    activity.showError(exception);
+            //}
+
+            //activity.setPauseButtonEnabled(false);
+        }
+
+        @Override
+        protected void onProgressUpdate(Long... updates) {
+
+            long uploadedBytes = updates[0];
+            long totalBytes = updates[1];
+            progress.setMessage(String.format(
+                    getString(R.string.report_upload_progress), uploadedBytes, totalBytes)
+            );
+            //activity.setStatus(String.format("Uploaded %d/%d.", uploadedBytes, totalBytes));
+            //activity.setUploadProgress((int) ((double) uploadedBytes / totalBytes * 100));
+        }
+
+        @Override
+        protected URL doInBackground(Void... params) {
+            try {
+                TusUploader uploader = client.resumeOrCreateUpload(upload);
+                long totalBytes = upload.getSize();
+                long uploadedBytes;
+
+                // Upload file in 10KB chunks
+                uploader.setChunkSize(10 * 1024);
+
+                while(!isCancelled() && uploader.uploadChunk() > 0) {
+                    uploadedBytes = uploader.getOffset();
+                    publishProgress(uploadedBytes, totalBytes);
+                }
+
+                uploader.finish();
+                return uploader.getUploadURL();
+
+            } catch(Exception e) {
+                exception = e;
+                cancel(true);
+            }
+            return null;
+        }
     }
 }

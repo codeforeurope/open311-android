@@ -115,4 +115,7 @@
     <string name="contactingServer">Connecting to</string>
     <string name="connectionEstablished">Connection established</string>
     <string name="servicesDownloaded">services downloaded</string>
+    <string name="report_upload_started">Upload started</string>
+    <string name="report_upload_title">Upload</string>
+    <string name="report_upload_progress">Uploaded %d/%d.</string>
 </resources>

@@ -116,4 +116,7 @@
     <string name="contactingServer">Verbinden met</string>
     <string name="connectionEstablished">Verbonden</string>
     <string name="servicesDownloaded">categorieën gedownload</string>
+    <string name="report_upload_started">Upload gestart</string>
+    <string name="report_upload_title">Upload</string>
+    <string name="report_upload_progress">%d/%d geupload.</string>
 </resources>
