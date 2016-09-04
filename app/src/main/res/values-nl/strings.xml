@@ -118,5 +118,5 @@
     <string name="servicesDownloaded">categorieën gedownload</string>
     <string name="report_upload_started">Upload gestart</string>
     <string name="report_upload_title">Upload</string>
-    <string name="report_upload_progress">%d/%d geupload.</string>
+    <string name="report_upload_progress">%1$d/%2$d geupload.</string>
 </resources>
