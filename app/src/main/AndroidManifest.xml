@@ -11,7 +11,9 @@
     <!-- Get Device ID -->
     <!-- uses-permission android:name="android.permission.READ_PHONE_STATE" / -->
 
-    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
         android:required="false" />
@@ -24,11 +26,13 @@
         android:theme="@style/AppTheme">
         <meta-data
             android:name="MAPQUEST_API_KEY"
-            android:value="M3vtPjjlzzs0w9woiu2jUik8hoaU9fAH"/>
+            android:value="M3vtPjjlzzs0w9woiu2jUik8hoaU9fAH" />
         <meta-data
             android:name="org.open311.android.helpers.GlideConfiguration"
             android:value="GlideModule" />
+
         <service android:name="com.mapbox.mapboxsdk.telemetry.TelemetryService" />
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -42,13 +46,12 @@
         </activity>
         <activity
             android:name=".MapActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/map">
+            android:label="@string/map"
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
     </application>
 
 </manifest>

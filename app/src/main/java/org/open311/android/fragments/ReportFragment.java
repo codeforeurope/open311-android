@@ -64,6 +64,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,6 +155,12 @@ public class ReportFragment extends Fragment {
     public void updatePhoto() {
         if (imageUri != null) {
             Log.d(LOG_TAG, "updatePhoto " + imageUri);
+            // Tell the media gallery the photo is created
+            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+            File f = new File(imageUri);
+            Uri contentUri = Uri.fromFile(f);
+            mediaScanIntent.setData(contentUri);
+            getContext().sendBroadcast(mediaScanIntent);
 
             RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
             ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
@@ -614,23 +622,22 @@ public class ReportFragment extends Fragment {
         }
 
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        File photo;
-        try {
-            photo = createTemporaryFile("picture", ".bmp");
-            if (photo.delete()) {
-                imageUri = Uri.fromFile(photo).getPath();
+        if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photo = null;
+            try {
+                photo = createImageFile();
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
-            } else {
+                startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
+            } catch (IOException ex) {
                 String msg = getString(R.string.storageNotWritable);
                 Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
                         .show();
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
     }
 
     private void onSubmitButtonClicked(View v) {
@@ -994,7 +1001,7 @@ public class ReportFragment extends Fragment {
                 // Upload file in 10KB chunks
                 uploader.setChunkSize(10 * 1024);
 
-                while(!isCancelled() && uploader.uploadChunk() > 0) {
+                while (!isCancelled() && uploader.uploadChunk() > 0) {
                     uploadedBytes = uploader.getOffset();
                     publishProgress(uploadedBytes, totalBytes);
                 }
@@ -1002,11 +1009,27 @@ public class ReportFragment extends Fragment {
                 uploader.finish();
                 return uploader.getUploadURL();
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 exception = e;
                 cancel(true);
             }
             return null;
         }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        imageUri = Uri.fromFile(image).getPath();
+        return image;
     }
 }
