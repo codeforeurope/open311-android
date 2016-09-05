@@ -37,6 +37,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
@@ -670,16 +671,12 @@ public class ReportFragment extends Fragment {
                 .setAddress(address.getText().toString())
                 .setDescription(description.getText().toString());
 
-
-        // TODO Glide into correct size!
-        int myWidth = 512;
-        int myHeight = 384;
-
         if (imageUri != null) {
             Glide.with(getActivity().getApplicationContext())
                     .load(imageUri)
                     .asBitmap()
-                    .into(new SimpleTarget<Bitmap>(myWidth, myHeight) {
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .into(new SimpleTarget<Bitmap>() {
                         @Override
                         public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
                             PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
