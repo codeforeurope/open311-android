@@ -113,4 +113,10 @@
     <string name="request_image">Image</string>
     <string name="serviceListUnavailable">Catégories ne peuvent être récupérées. Réessayez plus tard.</string>
     <string name="setting_cloud"> Les serveurs</string>
+    <string name="contactingServer">Connexion à</string>
+    <string name="report_upload_progress">Téléchargé %1$d/%2$d.</string>
+    <string name="report_upload_started">Télécharger a commencé</string>
+    <string name="report_upload_title">Télécharger</string>
+    <string name="servicesDownloaded">services téléchargés</string>
+    <string name="connectionEstablished"> Connection établie</string>
 </resources>

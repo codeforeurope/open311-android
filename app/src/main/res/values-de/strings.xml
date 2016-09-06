@@ -113,4 +113,11 @@
     <string name="report_visibility"> Teilen Bericht mit öffentlichen</string>
     <string name="request_ago_icon">Letzte Aktualisierung</string>
     <string name="request_image">Bild</string>
+    <string name="contactingServer">Verbinden mit</string>
+    <string name="open311_endpoint"></string>
+    <string name="report_upload_progress">Hochgeladen %1$d/%2$d.</string>
+    <string name="report_upload_started">Hochladen begonnen</string>
+    <string name="report_upload_title">Hochladen</string>
+    <string name="servicesDownloaded">dienste heruntergeladen</string>
+    <string name="connectionEstablished"> Verbindung hergestellt</string>
 </resources>

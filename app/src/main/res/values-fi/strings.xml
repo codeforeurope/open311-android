@@ -113,4 +113,10 @@
     <string name="request_image">Kuva</string>
     <string name="serviceListUnavailable">Luokat voi noutaa. Yritä myöhemmin uudelleen.</string>
     <string name="setting_cloud"> Palvelimet</string>
+    <string name="contactingServer">Yhteyden</string>
+    <string name="report_upload_progress">Ladattu %1$d/%2$d.</string>
+    <string name="report_upload_started"> Lataa alkoi</string>
+    <string name="report_upload_title">Lataa</string>
+    <string name="servicesDownloaded"> palvelut ladattu</string>
+    <string name="connectionEstablished">Yhteys muodostettu</string>
 </resources>
