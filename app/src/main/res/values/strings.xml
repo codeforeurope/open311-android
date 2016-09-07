@@ -43,7 +43,7 @@
     <string name="gallery">Gallery</string>
     <string name="location">Location</string>
     <string name="description">Description</string>
-    <string name="report_hint_service">Select a category</string>
+    <string name="report_hint_service">Select a service</string>
     <string name="report_hint_photo">Attach a picture</string>
     <string name="report_hint_location">Select a location</string>
     <string name="report_hint_description">Enter a description</string>
@@ -95,7 +95,7 @@
     <string name="request_image">Image</string>
     <string name="request_ago_icon">Last updated</string>
     <string name="notImplemented">Not yet implemented</string>
-    <string name="serviceListUnavailable">Categories can not be fetched. Try again later.</string>
+    <string name="serviceListUnavailable">Services can not be fetched. Try again later.</string>
     <string name="storageNotWritable">External storage is not writable</string>
     <string name="privacyPolicy">Privacy Policy</string>
     <string name="questionsAndFeedback">Questions and feedback</string>
@@ -118,4 +118,8 @@
     <string name="report_upload_started">Upload started</string>
     <string name="report_upload_title">Upload</string>
     <string name="report_upload_progress">Uploaded %1$d/%2$d.</string>
+    <string name="yes_anonymous">Yes</string>
+    <string name="no_anonymous">No, post anonymous</string>
+    <string name="post_anonymous">Anonymous</string>
+    <string name="post_anonymous_description">You haven\'t set any contact details. This means that responsible party will not be able to contact you. Do you want to add contact details now?</string>
 </resources>

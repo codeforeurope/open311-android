@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -23,6 +24,8 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -377,7 +380,7 @@ public class ReportFragment extends Fragment {
      *
      * @return boolean
      */
-    private boolean isValidFormContent(View v) {
+    private boolean validate(View v) {
 
         boolean isValid = true;
 
@@ -412,7 +415,6 @@ public class ReportFragment extends Fragment {
 
         }
         if (!isValid) {
-            // TODO: Construct a snackbar with text if invalid
             String result = getString(R.string.failure_posting_service);
             Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
                     .show();
@@ -420,6 +422,21 @@ public class ReportFragment extends Fragment {
 
 
         return isValid;
+    }
+
+    private Boolean checkAnonymous() {
+        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        String email = settings.getString("email", null);
+        String phone = settings.getString("phone", null);
+        Boolean anonymous = true;
+        if (email != null) {
+            anonymous = false;
+        }
+        ;
+        if (phone != null) {
+            anonymous = false;
+        }
+        return anonymous;
     }
 
     /**
@@ -645,12 +662,12 @@ public class ReportFragment extends Fragment {
         Log.d(LOG_TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
-        if (!isValidFormContent(v)) {
+        if (!validate(v)) {
             return;
         }
 
-        TextView address = (TextView) getActivity().findViewById(R.id.location_text);
-        EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
+        final TextView address = (TextView) getActivity().findViewById(R.id.location_text);
+        final EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
 
         final POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
                 serviceCode,
@@ -658,35 +675,75 @@ public class ReportFragment extends Fragment {
                 longitude,
                 attributes);
 
-        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String name = settings.getString("name", null);
-        String email = settings.getString("email", null);
-        String phone = settings.getString("phone", null);
+        if (!checkAnonymous()) {
+            SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+            String name = settings.getString("name", null);
+            String email = settings.getString("email", null);
+            String phone = settings.getString("phone", null);
 
-        if (name != null) data.setName(name);
-        if (email != null) data.setEmail(email);
-        if (phone != null) data.setPhone(phone);
+            if (name != null) data.setName(name);
+            if (email != null) data.setEmail(email);
+            if (phone != null) data.setPhone(phone);
+            data.setDeviceId(installationId)
+                    .setAddress(address.getText().toString())
+                    .setDescription(description.getText().toString());
 
-        data.setDeviceId(installationId)
-                .setAddress(address.getText().toString())
-                .setDescription(description.getText().toString());
-
-        if (imageUri != null) {
-            Glide.with(getActivity().getApplicationContext())
-                    .load(imageUri)
-                    .asBitmap()
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .into(new SimpleTarget<Bitmap>() {
-                        @Override
-                        public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-                            bgTask.execute();
-                        }
-                    });
+            if (imageUri != null) {
+                Glide.with(getActivity().getApplicationContext())
+                        .load(imageUri)
+                        .asBitmap()
+                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+                                bgTask.execute();
+                            }
+                        });
+            } else {
+                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+                bgTask.execute();
+            }
         } else {
-            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
-            bgTask.execute();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
+            builder.setTitle(getString(R.string.post_anonymous))
+                    .setMessage(getString(R.string.post_anonymous_description))
+                    .setPositiveButton(getString(R.string.yes_anonymous), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // TODO redirect to profile
+                            TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
+                            TabLayout.Tab tab = tabLayout.getTabAt(2);
+                            tab.select();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.no_anonymous), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            data.setDeviceId(installationId)
+                                    .setAddress(address.getText().toString())
+                                    .setDescription(description.getText().toString());
+
+                            if (imageUri != null) {
+                                Glide.with(getActivity().getApplicationContext())
+                                        .load(imageUri)
+                                        .asBitmap()
+                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                                        .into(new SimpleTarget<Bitmap>() {
+                                            @Override
+                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+                                                bgTask.execute();
+                                            }
+                                        });
+                            } else {
+                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+                                bgTask.execute();
+                            }
+                        }
+                    })
+                    .show();
         }
+
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -1028,5 +1085,24 @@ public class ReportFragment extends Fragment {
         // Save a file: path for use with ACTION_VIEW intents
         imageUri = Uri.fromFile(image).getPath();
         return image;
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            validate(view);
+        }
     }
 }
