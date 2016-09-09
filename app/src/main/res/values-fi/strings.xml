@@ -123,4 +123,7 @@
     <string name="no_anonymous">Ei</string>
     <string name="post_anonymous">Anonyymi</string>
     <string name="post_anonymous_description">Et ole asettanut mitään yhteystietoja. Tämä tarkoittaa sitä, että vastuullinen osapuoli ei voi ottaa sinuun yhteyttä. Haluatko lisätä yhteystiedot nyt?</string>
+    <string name="street">Katu</string>
+    <string name="house_number">Talonumero</string>
+    <string name="edit_address">Osoite</string>
 </resources>

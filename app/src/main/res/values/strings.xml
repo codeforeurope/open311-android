@@ -122,4 +122,7 @@
     <string name="no_anonymous">No, post anonymous</string>
     <string name="post_anonymous">Anonymous</string>
     <string name="post_anonymous_description">You haven\'t set any contact details. This means that responsible party will not be able to contact you. Do you want to add contact details now?</string>
+    <string name="street">Street</string>
+    <string name="house_number">Housenumber</string>
+    <string name="edit_address">Address</string>
 </resources>

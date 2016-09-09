@@ -123,4 +123,7 @@
     <string name="no_anonymous">Nein</string>
     <string name="post_anonymous">Anonym</string>
     <string name="post_anonymous_description">Sie haben keine Kontaktdaten gesetzt. Dies bedeutet, dass verantwortliche Partei nicht in der Lage sein wird, um Sie zu kontaktieren. Wollen Sie Kontaktdaten jetzt hinzufügen?</string>
+    <string name="street">Straße</string>
+    <string name="house_number">Hausnummer</string>
+    <string name="edit_address">Adresse</string>
 </resources>

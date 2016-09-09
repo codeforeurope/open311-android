@@ -22,7 +22,29 @@ public class Utils {
 
     }
 
+    private static String removeAllRedundantSpaces(String str) {
+        str = str.trim();
+        str = str.replaceAll(" +", " ");
+        return str;
+    }
+
+    public static String formatAddress(Address address) {
+        //get the Locale
+        String housenumber = address.getSubThoroughfare() == null ? "" : address.getSubThoroughfare();
+        String street = address.getThoroughfare() == null ? "" : address.getThoroughfare();
+        String city =  address.getLocality() == null ? "" : address.getLocality();
+        if(Locale.getDefault() == Locale.US){
+            //housenumber first
+            return removeAllRedundantSpaces(housenumber + " " + street + ", " + city);
+        } else {
+            return removeAllRedundantSpaces(street + " " + housenumber + ", " + city);
+        }
+
+    }
+
     public static String addressString(Address address) {
+
+
         StringBuilder sb = new StringBuilder();
         int n = address.getMaxAddressLineIndex();
         for (int i = 0; i <= n; i++) {

@@ -1,6 +1,8 @@
 package org.open311.android;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
@@ -10,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,6 +21,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import android.support.design.widget.FloatingActionButton;
@@ -47,7 +52,7 @@ public class MapActivity extends AppCompatActivity {
 
     private Float latitude = 0.0f;
     private Float longitude = 0.0f;
-    private String addressString = "";
+    private Address address;
     private String sourceType = "";
     FloatingActionButton gpsActionButton;
     float gpsActionButtonOrigin = 999.999f;
@@ -57,6 +62,7 @@ public class MapActivity extends AppCompatActivity {
     private BottomSheetBehavior mBottomSheetBehavior;
     private static final String LOG_TAG = "MapActivity";
     private static final int PERMISSIONS_LOCATION = 201;
+    private Context context;
 
     private enum source {
         GPS("GPS"),
@@ -66,7 +72,7 @@ public class MapActivity extends AppCompatActivity {
 
         private final String value;
 
-        private source(String val) {
+        source(String val) {
             this.value = val;
         }
     }
@@ -77,9 +83,10 @@ public class MapActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         locationServices = LocationServices.getLocationServices(MapActivity.this);
-
+        context = this;
         View bottomSheet = findViewById(R.id.bottom_sheet);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+
         // Create a mapView
         mapView = (MapView) findViewById(R.id.mapview);
 
@@ -117,12 +124,51 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent data = new Intent();
-                data.putExtra("address_string", addressString);
+                data.putExtra("address_string", Utils.formatAddress(address));
                 data.putExtra("latitude", latitude);
                 data.putExtra("longitude", longitude);
                 data.putExtra("source", sourceType);
                 setResult(RESULT_OK, data);
                 finish();
+            }
+        });
+        // Click listener that last user manually change address
+        View addressDialog = findViewById(R.id.addressdialog);
+        addressDialog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.AppTheme_Dialog);
+                LinearLayout layout = new LinearLayout(context);
+                layout.setOrientation(LinearLayout.VERTICAL);
+
+                final EditText streetBox = new EditText(context);
+                streetBox.setHint(getString(R.string.street));
+                streetBox.setText(address.getThoroughfare());
+                layout.addView(streetBox);
+
+                final EditText housenumberBox = new EditText(mapView.getContext());
+                housenumberBox.setHint(getString(R.string.house_number));
+                housenumberBox.setText(address.getSubThoroughfare());
+                layout.addView(housenumberBox);
+                builder
+                        .setTitle(getString(R.string.edit_address))
+                        .setView(layout);
+                builder.setPositiveButton(R.string.okay, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //get the housenumber and the street; update the address.
+                        address.setSubThoroughfare(String.valueOf(housenumberBox.getText()));
+                        address.setThoroughfare(String.valueOf(streetBox.getText()));
+                        updateAddress(address);
+                        openBottomSheet();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
             }
         });
 
@@ -142,12 +188,12 @@ public class MapActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 sourceType = source.SEARCH.value;
-                Address result = adapter.getItem(position);
-                autocomplete.setText(Utils.addressString(result));
-                updateAddress(result);
+                address = adapter.getItem(position);
+                autocomplete.setText(Utils.addressString(address));
+                updateAddress(address);
                 autocomplete.clearFocus();
-                latitude = (float) result.getLatitude();
-                longitude = (float) result.getLongitude();
+                latitude = (float) address.getLatitude();
+                longitude = (float) address.getLongitude();
                 updateMap(true);
             }
         });
@@ -156,11 +202,12 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void updateAddress(Address result) {
-        addressString = Utils.addressString(result);
+        address = result;
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
-        AddressLine.setText(addressString);
+        //AddressLine.setText(Utils.addressString(address));
+        AddressLine.setText(Utils.formatAddress(address));
         assert CoordsLine != null;
         String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
         CoordsLine.setText(coordText);
@@ -190,13 +237,6 @@ public class MapActivity extends AppCompatActivity {
         }
         sourceType = source.GPS.value;
         new ReverseGeocodingTask().execute(point);
-    }
-
-    public void closeBottomSheet() {
-        if (gpsActionButtonOrigin != 999.999f) {
-            gpsActionButton.setTranslationY(gpsActionButtonOrigin);
-        }
-        submitActionButton.setVisibility(View.INVISIBLE);
     }
 
     public void openBottomSheet() {
@@ -314,7 +354,6 @@ public class MapActivity extends AppCompatActivity {
             GeocoderNominatim geocoder = new GeocoderNominatim(getBaseContext(), Locale.getDefault(), userAgent);
             geocoder.setKey(ManifestUtil.retrieveKey(getBaseContext(), "MAPQUEST_API_KEY"));
             geocoder.setService(GeocoderNominatim.MAPQUEST_SERVICE_URL);
-            String theAddress;
             try {
                 latitude = (float) point.getLatitude();
                 longitude = (float) point.getLongitude();

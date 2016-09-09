@@ -123,4 +123,7 @@
     <string name="no_anonymous">Nee, stuur anoniem</string>
     <string name="post_anonymous">Anoniem</string>
     <string name="post_anonymous_description">Contactgegevens zijn niet ingesteld. Dit betekent dat de verantwoordelijke partij geen contact kan opnemen. Wilt u contactgegevens instellen?</string>
+    <string name="house_number">Huisnummer</string>
+    <string name="street">Straat</string>
+    <string name="edit_address">Adres</string>
 </resources>

@@ -18,8 +18,12 @@ import org.osmdroid.util.GeoPoint;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implements an equivalent to Android Geocoder class, based on OpenStreetMap data and Nominatim API. <br>
@@ -106,44 +110,67 @@ public class GeocoderNominatim {
         }
         if (jAddress.has("house_number")) {
             gAddress.setAddressLine(addressIndex++, jAddress.get("house_number").getAsString());
-            gAddress.setThoroughfare(jAddress.get("house_number").getAsString());
+            gAddress.setSubThoroughfare(jAddress.get("house_number").getAsString());
         }
         if (jAddress.has("suburb")) {
             //gAddress.setAddressLine(addressIndex++, jAddress.getString("suburb"));
             //not kept => often introduce "noise" in the address.
             gAddress.setSubLocality(jAddress.get("suburb").getAsString());
         }
-//        if (jAddress.has("postcode")) {
+        if (jAddress.has("postcode")) {
 //            gAddress.setAddressLine(addressIndex++, jAddress.get("postcode").getAsString());
-//            gAddress.setPostalCode(jAddress.get("postcode").getAsString());
-//        }
+            gAddress.setPostalCode(jAddress.get("postcode").getAsString());
+        }
 
         if (jAddress.has("city")) {
             gAddress.setAddressLine(addressIndex++, jAddress.get("city").getAsString());
             gAddress.setLocality(jAddress.get("city").getAsString());
         } else if (jAddress.has("town")) {
-            gAddress.setAddressLine(addressIndex++, jAddress.get("town").getAsString());
+            //gAddress.setAddressLine(addressIndex++, jAddress.get("town").getAsString());
             gAddress.setLocality(jAddress.get("town").getAsString());
         } else if (jAddress.has("village")) {
-            gAddress.setAddressLine(addressIndex++, jAddress.get("village").getAsString());
+            //gAddress.setAddressLine(addressIndex++, jAddress.get("village").getAsString());
             gAddress.setLocality(jAddress.get("village").getAsString());
         }
 
-//        if (jAddress.has("county")) { //France: departement
-//            gAddress.setSubAdminArea(jAddress.get("county").getAsString());
-//        }
-//        if (jAddress.has("state")) { //France: region
-//            gAddress.setAdminArea(jAddress.get("state").getAsString());
-//        }
-//        if (jAddress.has("country")) {
-//            gAddress.setAddressLine(addressIndex++, jAddress.get("country").getAsString());
-//            gAddress.setCountryName(jAddress.get("country").getAsString());
-//        }
+        if (jAddress.has("county")) { //France: departement
+            gAddress.setSubAdminArea(jAddress.get("county").getAsString());
+        }
+        if (jAddress.has("state")) { //France: region
+            gAddress.setAdminArea(jAddress.get("state").getAsString());
+        }
+        if (jAddress.has("country")) {
+            gAddress.setAddressLine(addressIndex++, jAddress.get("country").getAsString());
+            gAddress.setCountryName(jAddress.get("country").getAsString());
+        }
         if (jAddress.has("country_code"))
             gAddress.setAddressLine(addressIndex++, jAddress.get("country_code").getAsString().toUpperCase(mLocale));
         gAddress.setCountryCode(jAddress.get("country_code").getAsString());
 
-		/* Other possible OSM tags in Nominatim results not handled yet:
+//        Set<String> knownAddressProperties = new HashSet<String>(
+//                Arrays.asList(new String[]{
+//                        "road",
+//                        "pedestrian",
+//                        "house_number",
+//                        "suburb",
+//                        "postcode",
+//                        "city",
+//                        "town",
+//                        "village",
+//                        "county",
+//                        "state",
+//                        "country",
+//                        "country_code"}
+//                )
+//        );
+//        for (Map.Entry<String, JsonElement> entry : jResult.entrySet()) {
+//            if (!knownAddressProperties.contains(entry.getKey())) {
+//                Log.d(BonusPackHelper.LOG_TAG, "GeocoderNominatim::getFromLocation:" + url);
+//
+//            }
+//        }
+
+        /* Other possible OSM tags in Nominatim results not handled yet:
          * subway, golf_course, bus_stop, parking,...
 		 * house, house_number, building
 		 * city_district (13e Arrondissement)
@@ -185,6 +212,7 @@ public class GeocoderNominatim {
             String display_name = jResult.get("display_name").getAsString();
             extras.putString("display_name", display_name);
         }
+
         gAddress.setExtras(extras);
 
         return gAddress;
