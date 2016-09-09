@@ -24,6 +24,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,9 +36,9 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+
 import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -103,7 +104,9 @@ public class ReportFragment extends Fragment {
     private Float latitude;
     private Float longitude;
     private String source;
-
+    private LinearLayoutCompat btnPhoto;
+    private LinearLayoutCompat layoutPhoto;
+    private ViewSwitcher photoviewSwitcher;
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
     public static final int GALLERY_REQUEST = 103;
@@ -114,6 +117,83 @@ public class ReportFragment extends Fragment {
 
     public ReportFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
+        Log.d(LOG_TAG, "onCreateView");
+        if (state != null)
+            Log.d(LOG_TAG, state.toString());
+
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_report, container, false);
+
+        btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
+        layoutPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoLayout);
+        LinearLayoutCompat btnService = (LinearLayoutCompat) view.findViewById(R.id.serviceButton);
+        LinearLayoutCompat btnLocation = (LinearLayoutCompat) view.findViewById(R.id.locationButton);
+        View descriptionView = view.findViewById(R.id.report_description_textbox);
+        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
+        photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
+        ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
+
+        //Hide the keyboard unless the descriptionView is selected
+        descriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    v.clearFocus();
+                    hideKeyBoard(v);
+                }
+            }
+        });
+        photoPlaceholder.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onPhotoButtonClicked();
+            }
+        });
+        btnPhoto.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onPhotoButtonClicked();
+            }
+        });
+        layoutPhoto.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onPhotoButtonClicked();
+            }
+        });
+
+        btnLocation.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onLocationButtonClicked();
+            }
+        });
+
+        btnService.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onServiceButtonClicked();
+            }
+        });
+
+        btnSubmit.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onSubmitButtonClicked(v);
+            }
+        });
+
+        return view;
     }
 
     private void updateService() {
@@ -146,38 +226,29 @@ public class ReportFragment extends Fragment {
 
     }
 
-    /**
-     * When we get a Return from the Camera, the image is in a temp file, transform it to string with getPath()
-     *
-     * @param imageFromTemp temporary image, this gets created when using the camera
-     */
-    public void updatePhoto(Uri imageFromTemp) {
-        imageUri = imageFromTemp.getPath();
-        updatePhoto();
-    }
-
-    public void updatePhoto() {
+    public void updatePhoto(Boolean broadcast) {
         if (imageUri != null) {
             Log.d(LOG_TAG, "updatePhoto " + imageUri);
-            // Tell the media gallery the photo is created
-            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            File f = new File(imageUri);
-            Uri contentUri = Uri.fromFile(f);
-            mediaScanIntent.setData(contentUri);
-            getContext().sendBroadcast(mediaScanIntent);
-
-            RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
+            if (broadcast) {
+                // Tell the media gallery the photo is created
+                Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+                File f = new File(imageUri);
+                Uri contentUri = Uri.fromFile(f);
+                mediaScanIntent.setData(contentUri);
+                getContext().sendBroadcast(mediaScanIntent);
+            }
             ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
+            Log.d(LOG_TAG, "imageView " + image.toString());
             Glide.with(getContext()).load(imageUri).asBitmap().into(image);
-            layout.setVisibility(View.VISIBLE);
+            Log.d(LOG_TAG, "gonna switch!");
+            photoviewSwitcher.setDisplayedChild(1);
         } else {
             resetPhoto();
         }
     }
 
     private void resetPhoto() {
-        RelativeLayout layout = (RelativeLayout) getActivity().findViewById(R.id.photoLayout);
-        layout.setVisibility(View.INVISIBLE);
+        photoviewSwitcher.setDisplayedChild(0);
         imageUri = null;
         TextView photoText = (TextView) getActivity().findViewById(R.id.photo_text);
         photoText.setText(R.string.report_hint_photo);
@@ -229,62 +300,6 @@ public class ReportFragment extends Fragment {
         // To always hide the keyboard when the activity starts: SOFT_INPUT_STATE_ALWAYS_HIDDEN
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
-        Log.d(LOG_TAG, "onCreateView");
-        if (state != null)
-            Log.d(LOG_TAG, state.toString());
-
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_report, container, false);
-
-        RelativeLayout btnPhoto = (RelativeLayout) view.findViewById(R.id.photoButton);
-        RelativeLayout btnService = (RelativeLayout) view.findViewById(R.id.serviceButton);
-        RelativeLayout btnLocation = (RelativeLayout) view.findViewById(R.id.locationButton);
-        View descriptionView = view.findViewById(R.id.report_description_textbox);
-        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
-
-        //Hide the keyboard unless the descriptionView is selected
-        descriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    v.clearFocus();
-                    hideKeyBoard(v);
-                }
-            }
-        });
-        btnPhoto.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPhotoButtonClicked();
-            }
-        });
-
-        btnLocation.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onLocationButtonClicked();
-            }
-        });
-
-        btnService.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onServiceButtonClicked();
-            }
-        });
-
-        btnSubmit.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onSubmitButtonClicked(v);
-            }
-        });
-
-        return view;
     }
 
     @Override
@@ -361,7 +376,7 @@ public class ReportFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        updatePhoto();
+        updatePhoto(true);
         updateService();
         updateLocation();
     }
@@ -452,7 +467,7 @@ public class ReportFragment extends Fragment {
     private void addAttributesToForm() {
         // TODO process attributes
         Iterator<AttributeInfo> iterator = attrInfoList.iterator();
-        LinearLayout layout = (LinearLayout) getActivity().findViewById(R.id.report_attributes);
+        LinearLayoutCompat layout = (LinearLayoutCompat) getActivity().findViewById(R.id.report_attributes);
         layout.removeAllViews(); // Make sure the ViewGroup is empty (i.e. has no child views)
         while (iterator.hasNext()) {
             final AttributeInfo attr = iterator.next();
@@ -757,7 +772,7 @@ public class ReportFragment extends Fragment {
         if (requestCode == GALLERY_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 imageUri = data.getData().toString();
-                updatePhoto();
+                updatePhoto(false);
             } else {
                 resetPhoto();
             }
@@ -766,7 +781,7 @@ public class ReportFragment extends Fragment {
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 if (imageUri == null) return;
-                updatePhoto();
+                updatePhoto(true);
             } else {
                 resetPhoto();
             }
@@ -897,9 +912,8 @@ public class ReportFragment extends Fragment {
 
                 wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION).build();
                 definition = wrapper.getServiceDefinition(this.serviceCode);
-                Iterator iterator = definition.getAttributes().iterator();
-                while (iterator.hasNext()) {
-                    attrInfoList.add((AttributeInfo) iterator.next());
+                for (AttributeInfo o : definition.getAttributes()) {
+                    attrInfoList.add(o);
                 }
                 count = attrInfoList.size();
                 Log.d(LOG_TAG, "ATTRIBUTE COUNT: " + count);
