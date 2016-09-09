@@ -159,7 +159,6 @@ public class MapActivity extends AppCompatActivity {
                         address.setSubThoroughfare(String.valueOf(housenumberBox.getText()));
                         address.setThoroughfare(String.valueOf(streetBox.getText()));
                         updateAddress(address);
-                        openBottomSheet();
                     }
                 });
                 builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -168,6 +167,7 @@ public class MapActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+                mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 builder.show();
             }
         });
