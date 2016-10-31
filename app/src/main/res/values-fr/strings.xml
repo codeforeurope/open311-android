@@ -100,7 +100,7 @@
     <string name="report_failure_message">Infructueuse, s\'il vous plaît réessayer plus tard</string>
     <string name="report_hint_description">Entrez une description</string>
     <string name="report_hint_location">Sélectionnez un emplacement</string>
-    <string name="report_hint_photo">Joindre une photo</string>
+    <string name="report_hint_photo">Ajouter une photo</string>
     <string name="report_hint_service">Choisir une catégorie</string>
     <string name="report_loading">Chargement...</string>
     <string name="report_location">Emplacement</string>
@@ -126,4 +126,5 @@
     <string name="street">Rue</string>
     <string name="house_number">Numéro</string>
     <string name="edit_address">Adresse</string>
+    <string name="report_hint_sound">Ajouter du son</string>
 </resources>

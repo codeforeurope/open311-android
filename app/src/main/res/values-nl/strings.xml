@@ -7,7 +7,7 @@
     <string name="location">Locatie</string>
     <string name="description">Omschrijving</string>
     <string name="report_hint_service">Selecteer een categorie</string>
-    <string name="report_hint_photo">Voeg een afbeelding toe</string>
+    <string name="report_hint_photo">Voeg foto toe</string>
     <string name="report_hint_location">Selecteer een locatie</string>
     <string name="report_hint_description">Geef een beschrijving</string>
     <string name="report_service">Service</string>
@@ -126,4 +126,5 @@
     <string name="house_number">Huisnummer</string>
     <string name="street">Straat</string>
     <string name="edit_address">Adres</string>
+    <string name="report_hint_sound">Voeg geluid toe</string>
 </resources>

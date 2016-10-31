@@ -15,8 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.MapboxAccountManager;
-
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.EndpointType;
@@ -83,10 +81,6 @@ public class MainActivity extends AppCompatActivity
         setCurrentCity(City.fromString(getString(R.string.open311_endpoint)));
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
-
-        // Mapbox access token only needs to be configured once in your app
-        MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);

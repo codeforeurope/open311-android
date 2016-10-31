@@ -102,7 +102,7 @@
     <string name="report_failure_message">Erfolglos, bitte versuchen Sie es später noch einmal</string>
     <string name="report_hint_description">Geben Sie eine Beschreibung</string>
     <string name="report_hint_location">Wählen Sie einen Ort</string>
-    <string name="report_hint_photo">Befestigen Bild</string>
+    <string name="report_hint_photo">Foto hinzufügen</string>
     <string name="report_hint_service">Wählen Sie eine Kategorie</string>
     <string name="report_loading">Laden...</string>
     <string name="report_location">Ort</string>
@@ -126,4 +126,5 @@
     <string name="street">Straße</string>
     <string name="house_number">Hausnummer</string>
     <string name="edit_address">Adresse</string>
+    <string name="report_hint_sound">Ton hinzufügen</string>
 </resources>

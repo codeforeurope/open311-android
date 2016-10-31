@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
@@ -28,6 +29,7 @@ import android.support.v7.widget.LinearLayoutCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -106,11 +108,14 @@ public class ReportFragment extends Fragment {
     private String source;
     private LinearLayoutCompat btnPhoto;
     private LinearLayoutCompat layoutPhoto;
+    private LinearLayoutCompat btnSound;
+    private LinearLayoutCompat layoutSound;
     private ViewSwitcher photoviewSwitcher;
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
     public static final int GALLERY_REQUEST = 103;
     public static final int READ_STORAGE_REQUEST = 104;
+    public static final int RECORDER_REQUEST = 104;
 
     private static final boolean ATTRIBUTES_ENABLED = false;
 
@@ -130,8 +135,11 @@ public class ReportFragment extends Fragment {
 
         btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
         layoutPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoLayout);
+        btnSound = (LinearLayoutCompat) view.findViewById(R.id.soundButton);
+        layoutSound = (LinearLayoutCompat) view.findViewById(R.id.soundLayout);
         LinearLayoutCompat btnService = (LinearLayoutCompat) view.findViewById(R.id.serviceButton);
         LinearLayoutCompat btnLocation = (LinearLayoutCompat) view.findViewById(R.id.locationButton);
+
         View descriptionView = view.findViewById(R.id.report_description_textbox);
         FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
         photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
@@ -168,7 +176,20 @@ public class ReportFragment extends Fragment {
                 onPhotoButtonClicked();
             }
         });
-
+        btnSound.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onSoundButtonClicked();
+            }
+        });
+        layoutSound.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                hideKeyBoard(v);
+                onSoundButtonClicked();
+            }
+        });
         btnLocation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -430,13 +451,29 @@ public class ReportFragment extends Fragment {
 
         }
         if (!isValid) {
-            String result = getString(R.string.failure_posting_service);
-            Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
-                    .show();
+            hideFab();
+//            String result = getString(R.string.failure_posting_service);
+//            Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
+//                    .show();
+        } else {
+            showFab();
         }
 
-
         return isValid;
+    }
+
+    private void showFab() {
+        CoordinatorLayout.LayoutParams p = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.WRAP_CONTENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
+        View fab = getActivity().findViewById(R.id.report_submit);
+        p.anchorGravity = Gravity.BOTTOM | Gravity.END;
+        p.setAnchorId(R.id.appbar);
+        fab.setLayoutParams(p);
+        fab.setVisibility(View.VISIBLE);
+    }
+
+    private void hideFab() {
+        View fab = getActivity().findViewById(R.id.report_submit);
+        fab.setVisibility(View.GONE);
     }
 
     private Boolean checkAnonymous() {
@@ -539,7 +576,7 @@ public class ReportFragment extends Fragment {
             values[index] = item.getServiceName();
             index++;
         }
-        builder.setTitle(R.string.report_service).setItems(values, new DialogInterface.OnClickListener() {
+        builder.setTitle(R.string.report_hint_service).setItems(values, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int index) {
                 serviceName = values[index];
                 serviceCode = codes[index];
@@ -600,7 +637,13 @@ public class ReportFragment extends Fragment {
         builder.show();
 
     }
+    /**
+     * User clicked the Button to add a sound to the request.
+     * We present the user with a dialog to select a sound from storage, or use the recorder.
+     */
+    private void onSoundButtonClicked() {
 
+    }
     private void onLocationButtonClicked() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission_group.LOCATION) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,

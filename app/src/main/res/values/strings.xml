@@ -44,7 +44,7 @@
     <string name="location">Location</string>
     <string name="description">Description</string>
     <string name="report_hint_service">Select a service</string>
-    <string name="report_hint_photo">Attach a picture</string>
+    <string name="report_hint_photo">Add photo</string>
     <string name="report_hint_location">Select a location</string>
     <string name="report_hint_description">Enter a description</string>
     <string name="report_service">Service</string>
@@ -125,4 +125,5 @@
     <string name="street">Street</string>
     <string name="house_number">Housenumber</string>
     <string name="edit_address">Address</string>
+    <string name="report_hint_sound">Add sound</string>
 </resources>

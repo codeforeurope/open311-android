@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import android.support.design.widget.FloatingActionButton;
 
+import com.mapbox.mapboxsdk.MapboxAccountManager;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -81,6 +82,8 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        // Mapbox access token only needs to be configured once in your app
+        MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
         setContentView(R.layout.activity_map);
         locationServices = LocationServices.getLocationServices(MapActivity.this);
         context = this;

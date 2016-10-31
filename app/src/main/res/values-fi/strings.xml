@@ -100,7 +100,7 @@
     <string name="report_failure_message">Epäonnistunut, yritä myöhemmin uudelleen</string>
     <string name="report_hint_description">Anna kuvaus</string>
     <string name="report_hint_location">Valitse sijainti</string>
-    <string name="report_hint_photo">Liittää kuvan</string>
+    <string name="report_hint_photo">Lisää kuva</string>
     <string name="report_hint_service">Valitse kategoria</string>
     <string name="report_loading">Ladataan...</string>
     <string name="report_location">Sijainti</string>
@@ -126,4 +126,5 @@
     <string name="street">Katu</string>
     <string name="house_number">Talonumero</string>
     <string name="edit_address">Osoite</string>
+    <string name="report_hint_sound">Lisää ääni</string>
 </resources>
