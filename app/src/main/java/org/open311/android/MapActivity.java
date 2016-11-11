@@ -37,6 +37,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
+import org.codeforamerica.open311.facade.data.City;
 import org.open311.android.adapters.GeocoderAdapter;
 import org.open311.android.helpers.Utils;
 import org.open311.android.widgets.GeocoderView;
@@ -82,6 +83,7 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         // Mapbox access token only needs to be configured once in your app
         MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
         setContentView(R.layout.activity_map);
@@ -97,6 +99,14 @@ public class MapActivity extends AppCompatActivity {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
+                City city = City.fromString(getString(R.string.open311_endpoint));
+                if (city.getMap() != null) {
+                    LatLng point = new LatLng(city.getMap().getLat(), city.getMap().getLon());
+                    mapboxMap.setCameraPosition(new CameraPosition.Builder()
+                            .target(point)
+                            .zoom(new Double(city.getMap().getZoom()))
+                            .build());
+                }
                 map = mapboxMap;
                 map.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
                     @Override
@@ -209,7 +219,6 @@ public class MapActivity extends AppCompatActivity {
         TextView AddressLine = (TextView) findViewById((R.id.address));
         TextView CoordsLine = (TextView) findViewById((R.id.coords));
         assert AddressLine != null;
-        //AddressLine.setText(Utils.addressString(address));
         AddressLine.setText(Utils.formatAddress(address));
         assert CoordsLine != null;
         String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
