@@ -65,6 +65,7 @@ import org.open311.android.R;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.helpers.SingleValueAttributeWrapper;
+import org.open311.android.adapters.ServicesAdapter;
 
 import java.io.File;
 import java.io.IOException;
@@ -576,17 +577,22 @@ public class ReportFragment extends Fragment {
             values[index] = item.getServiceName();
             index++;
         }
-        builder.setTitle(R.string.report_hint_service).setItems(values, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int index) {
-                serviceName = values[index];
-                serviceCode = codes[index];
-                Log.d(LOG_TAG, "SELECTED SERVICE: " + serviceName);
-                updateService();
-                if (ATTRIBUTES_ENABLED) {
-                    new RetrieveAttributesTask(codes[index]).execute();
-                }
-            }
-        });
+        builder.setTitle(R.string.report_hint_service)
+                .setCancelable(false)
+                .setAdapter(new ServicesAdapter(getActivity(), services),
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int index) {
+                                serviceName = values[index];
+                                serviceCode = codes[index];
+                                Log.d(LOG_TAG, "SELECTED SERVICE: " + serviceName);
+                                updateService();
+                                if (ATTRIBUTES_ENABLED) {
+                                    new RetrieveAttributesTask(codes[index]).execute();
+                                }
+                            }
+
+                        });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User cancelled the dialog
@@ -637,6 +643,7 @@ public class ReportFragment extends Fragment {
         builder.show();
 
     }
+
     /**
      * User clicked the Button to add a sound to the request.
      * We present the user with a dialog to select a sound from storage, or use the recorder.
@@ -644,6 +651,7 @@ public class ReportFragment extends Fragment {
     private void onSoundButtonClicked() {
 
     }
+
     private void onLocationButtonClicked() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission_group.LOCATION) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
