@@ -26,8 +26,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -97,6 +95,8 @@ public class ReportFragment extends Fragment {
     private LinkedList<Attribute> attributes;
     private List<Service> services;
     private String imageUri;
+    private String audioUri;
+    private String videoUri;
     private ProgressDialog progress;
     private TusClient client;
 
@@ -114,12 +114,33 @@ public class ReportFragment extends Fragment {
     private ViewSwitcher photoviewSwitcher;
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
-    public static final int GALLERY_REQUEST = 103;
+    public static final int GALLERY_IMAGE_REQUEST = 103;
+    public static final int RECORDER_REQUEST = 105;
+    public static final int GALLERY_VIDEO_REQUEST = 106;
+    public static final int GALLERY_AUDIO_REQUEST = 107;
     public static final int READ_STORAGE_REQUEST = 104;
-    public static final int RECORDER_REQUEST = 104;
+
 
     private static final boolean ATTRIBUTES_ENABLED = false;
 
+    enum GalleryType {
+        AUDIO("Audio", 0),
+        IMAGE("Image", 1),
+        VIDEO("Video", 2);
+
+        private String stringValue;
+        private int intValue;
+
+        GalleryType(String toString, int value) {
+            stringValue = toString;
+            intValue = value;
+        }
+
+        @Override
+        public String toString() {
+            return stringValue;
+        }
+    }
 
     public ReportFragment() {
         // Required empty public constructor
@@ -325,6 +346,7 @@ public class ReportFragment extends Fragment {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
@@ -417,7 +439,7 @@ public class ReportFragment extends Fragment {
      *
      * @return boolean
      */
-    private boolean validate(View v) {
+    private boolean validate() {
 
         boolean isValid = true;
 
@@ -464,11 +486,7 @@ public class ReportFragment extends Fragment {
     }
 
     private void showFab() {
-        CoordinatorLayout.LayoutParams p = new CoordinatorLayout.LayoutParams(CoordinatorLayout.LayoutParams.WRAP_CONTENT, CoordinatorLayout.LayoutParams.WRAP_CONTENT);
         View fab = getActivity().findViewById(R.id.report_submit);
-        p.anchorGravity = Gravity.BOTTOM | Gravity.END;
-        p.setAnchorId(R.id.appbar);
-        fab.setLayoutParams(p);
         fab.setVisibility(View.VISIBLE);
     }
 
@@ -485,7 +503,7 @@ public class ReportFragment extends Fragment {
         if (email != null) {
             anonymous = false;
         }
-        ;
+
         if (phone != null) {
             anonymous = false;
         }
@@ -511,9 +529,7 @@ public class ReportFragment extends Fragment {
             final AttributeInfo attr = iterator.next();
             if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
                 Log.d(LOG_TAG, "ATTR-INFO: " + attr.getDatatype());
-                continue;
             }
-
         }
     }
 
@@ -604,6 +620,46 @@ public class ReportFragment extends Fragment {
 
 
     /**
+     * User clicked the Button to add a sound to the request.
+     * We present the user with a dialog to select a sound from storage, or use the recorder.
+     */
+    private void onSoundButtonClicked() {
+        final CharSequence[] items = {getString(R.string.recorder), getString(R.string.gallery)};
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
+        builder.setTitle(getString(R.string.choose_audio_source));
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @TargetApi(Build.VERSION_CODES.M)
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                if (items[item].equals(getString(R.string.recorder))) {
+                    String[] PERMISSIONS = {Manifest.permission.CAPTURE_AUDIO_OUTPUT, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    if (!hasPermissions(getContext().getApplicationContext(), PERMISSIONS)) {
+                        requestPermissions(PERMISSIONS, RECORDER_REQUEST);
+                    } else {
+                        handleCamera();
+                    }
+                } else if (items[item].equals(getString(R.string.gallery))) {
+                    if (ContextCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+                        requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                READ_STORAGE_REQUEST);
+                    } else {
+                        handleGallery(GalleryType.AUDIO);
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+                dialog.dismiss();
+            }
+        });
+
+        builder.show();
+
+    }
+
+    /**
      * User clicked the Button to add a Picture to the request.
      * We present the user with a dialog to select a picture from the
      * gallery, or use the camera to pick one.
@@ -628,7 +684,7 @@ public class ReportFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                 READ_STORAGE_REQUEST);
                     } else {
-                        handleGallery();
+                        handleGallery(GalleryType.IMAGE);
                     }
                 }
             }
@@ -644,14 +700,6 @@ public class ReportFragment extends Fragment {
 
     }
 
-    /**
-     * User clicked the Button to add a sound to the request.
-     * We present the user with a dialog to select a sound from storage, or use the recorder.
-     */
-    private void onSoundButtonClicked() {
-
-    }
-
     private void onLocationButtonClicked() {
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission_group.LOCATION) == PackageManager.PERMISSION_DENIED) {
             requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -660,8 +708,6 @@ public class ReportFragment extends Fragment {
         } else {
             handleLocation();
         }
-
-
     }
 
     private void handleLocation() {
@@ -675,7 +721,7 @@ public class ReportFragment extends Fragment {
      * Because we check permissions for Android 6+, this function is also used to propagate
      * actions from the checker
      */
-    private void handleGallery() {
+    private void handleGallery(GalleryType type) {
         Log.d(LOG_TAG, "HandleGallery");
         View v = getActivity().findViewById(R.id.report_submit);
         if (!isExternalStorageWritable()) {
@@ -684,10 +730,28 @@ public class ReportFragment extends Fragment {
                     .show();
             return;
         }
+        // Pass the GalleryType to the intent
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-        intent.setType("image/*");
+        intent.putExtra("GalleryType", type.intValue);
         intent.putExtra("return_data", true);
-        startActivityForResult(intent, GALLERY_REQUEST);
+        // Initiate the correct type of Gallery
+        switch (type) {
+            case VIDEO:
+                intent.setType("video/*");
+                startActivityForResult(intent, GALLERY_VIDEO_REQUEST);
+                break;
+            case AUDIO:
+                intent.setType("audio/*");
+                startActivityForResult(intent, GALLERY_AUDIO_REQUEST);
+                break;
+            //Default to IMAGE
+            case IMAGE:
+            default:
+                intent.setType("image/*");
+                startActivityForResult(intent, GALLERY_IMAGE_REQUEST);
+        }
+
+
     }
 
     /**
@@ -708,9 +772,9 @@ public class ReportFragment extends Fragment {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photo = null;
+            File photo;
             try {
-                photo = createImageFile();
+                photo = createFile(GalleryType.IMAGE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
@@ -724,11 +788,15 @@ public class ReportFragment extends Fragment {
 
     }
 
+    private void handleRecorder() {
+        Log.d(LOG_TAG, "HandleRecorder");
+    }
+
     private void onSubmitButtonClicked(View v) {
         Log.d(LOG_TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
-        if (!validate(v)) {
+        if (!validate()) {
             return;
         }
 
@@ -780,7 +848,9 @@ public class ReportFragment extends Fragment {
                             // TODO redirect to profile
                             TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
                             TabLayout.Tab tab = tabLayout.getTabAt(2);
-                            tab.select();
+                            if (tab != null) {
+                                tab.select();
+                            }
                         }
                     })
                     .setNegativeButton(getString(R.string.no_anonymous), new DialogInterface.OnClickListener() {
@@ -820,15 +890,15 @@ public class ReportFragment extends Fragment {
             progress.dismiss();
         }
 
-        if (requestCode == GALLERY_REQUEST) {
+        if (requestCode == GALLERY_IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 imageUri = data.getData().toString();
                 updatePhoto(false);
             } else {
                 resetPhoto();
             }
-
         }
+
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 if (imageUri == null) return;
@@ -856,7 +926,7 @@ public class ReportFragment extends Fragment {
         private Bitmap bitmap;
         private boolean success = true;
 
-        public PostServiceRequestTask(POSTServiceRequestData data, Bitmap bitmap) {
+        PostServiceRequestTask(POSTServiceRequestData data, Bitmap bitmap) {
             this.data = data;
             this.bitmap = bitmap;
         }
@@ -944,7 +1014,7 @@ public class ReportFragment extends Fragment {
 
         private String serviceCode;
 
-        public RetrieveAttributesTask(String serviceCode) {
+        RetrieveAttributesTask(String serviceCode) {
             this.serviceCode = serviceCode;
         }
 
@@ -1009,35 +1079,22 @@ public class ReportFragment extends Fragment {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleCamera();
         }
-        if (requestCode == GALLERY_REQUEST
+        if (requestCode == GALLERY_IMAGE_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery();
+            handleGallery(GalleryType.IMAGE);
+        }
+        if (requestCode == GALLERY_AUDIO_REQUEST
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            handleGallery(GalleryType.AUDIO);
+        }
+        if (requestCode == GALLERY_VIDEO_REQUEST
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            handleGallery(GalleryType.VIDEO);
         }
         if (requestCode == LOCATION_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleLocation();
         }
-    }
-
-    /**
-     * Create a temporary file
-     *
-     * @param name Filename
-     * @param ext  File Extension
-     * @return File
-     * @throws Exception
-     */
-    private File createTemporaryFile(String name, String ext) throws Exception {
-        File tempDir = Environment.getExternalStorageDirectory();
-        tempDir = new File(tempDir.getAbsolutePath() + "/.temp/");
-        if (!tempDir.exists()) {
-            tempDir.mkdir();
-        }
-        File file = new File(tempDir, name + ext);
-        if (file.exists() && file.isFile()) {
-            file.delete();
-        }
-        return File.createTempFile(name, ext, tempDir);
     }
 
     /**
@@ -1136,38 +1193,51 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    private File createImageFile() throws IOException {
+    private File createFile(GalleryType type) throws IOException {
+        String prefix;
+        String extension;
+        File storageDir;
+        // Initiate the correct type of Gallery
+        switch (type) {
+            case VIDEO:
+                prefix = "VID311_";
+                extension = ".mp4";
+                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
+                break;
+            case AUDIO:
+                prefix = "REC311_";
+                extension = ".ogg";
+                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+                break;
+            //Default to IMAGE
+            case IMAGE:
+            default:
+                prefix = "IMG311_";
+                extension = ".jpg";
+                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        }
+
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
+        String fileName = prefix + timeStamp + "_";
+
+        File file = File.createTempFile(
+                fileName,  /* prefix */
+                extension,         /* suffix */
                 storageDir      /* directory */
         );
-
         // Save a file: path for use with ACTION_VIEW intents
-        imageUri = Uri.fromFile(image).getPath();
-        return image;
+        switch (type) {
+            case VIDEO:
+                videoUri = Uri.fromFile(file).getPath();
+                break;
+            case AUDIO:
+                audioUri = Uri.fromFile(file).getPath();
+                break;
+            default:
+                imageUri = Uri.fromFile(file).getPath();
+        }
+        return file;
     }
 
-    private class MyTextWatcher implements TextWatcher {
-
-        private View view;
-
-        private MyTextWatcher(View view) {
-            this.view = view;
-        }
-
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        }
-
-        public void afterTextChanged(Editable editable) {
-            validate(view);
-        }
-    }
 }

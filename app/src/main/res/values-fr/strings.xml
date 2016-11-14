@@ -22,7 +22,7 @@
     <string name="supports_media">Supports Média</string>
     <string name="dialog_loading_services">Chargement service information</string>
     <string name="dialog_posting_service">Transmission demande</string>
-    <string name="choose_media_source">Choisir source photo</string>
+    <string name="choose_media_source">Sélectionner une source d\'image</string>
     <string name="camera">Caméra</string>
     <string name="gallery">Gallery</string>
     <string name="location">Emplacement</string>
@@ -127,4 +127,6 @@
     <string name="house_number">Numéro</string>
     <string name="edit_address">Adresse</string>
     <string name="report_hint_sound">Ajouter du son</string>
+    <string name="choose_audio_source">Sélectionner une source audio</string>
+    <string name="recorder">Microphone</string>
 </resources>

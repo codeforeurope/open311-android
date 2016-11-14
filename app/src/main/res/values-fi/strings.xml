@@ -22,7 +22,7 @@
     <string name="supports_media">Tukee media</string>
     <string name="dialog_loading_services">Haetaan palvelun tietoja</string>
     <string name="dialog_posting_service">Lähetetään palautetta</string>
-    <string name="choose_media_source">Valitse kuva</string>
+    <string name="choose_media_source">Valitse kuvalähde</string>
     <string name="camera">Kamera</string>
     <string name="gallery">Galleria</string>
     <string name="location">Sijainti</string>
@@ -127,4 +127,6 @@
     <string name="house_number">Talonumero</string>
     <string name="edit_address">Osoite</string>
     <string name="report_hint_sound">Lisää ääni</string>
+    <string name="choose_audio_source">Valitse äänilähde</string>
+    <string name="recorder">Mikrofoni</string>
 </resources>

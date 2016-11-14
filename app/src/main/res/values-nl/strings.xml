@@ -76,7 +76,7 @@
     <string name="error_403">Onvoldoende rechten</string>
     <string name="dialog_posting_service">Melding wordt verzonden</string>
     <string name="dialog_loading_services">Informatie wordt opgehaald</string>
-    <string name="choose_media_source">Selecteer de bron</string>
+    <string name="choose_media_source">Selecteer afbeeldingbron</string>
     <string name="button_accept_error">Annuleren</string>
     <string name="btn_sign_up">Aanmelden</string>
     <string name="api_key">API Sleutel</string>
@@ -126,5 +126,7 @@
     <string name="house_number">Huisnummer</string>
     <string name="street">Straat</string>
     <string name="edit_address">Adres</string>
-    <string name="report_hint_sound">Voeg geluid toe</string>
+    <string name="report_hint_sound">Voeg audio toe</string>
+    <string name="choose_audio_source">Selecteer audiobron</string>
+    <string name="recorder">Microfoon</string>
 </resources>

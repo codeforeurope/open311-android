@@ -6,25 +6,24 @@
         <shape android:shape="rectangle">
             <solid android:color="#99000000" />
             <padding
+                android:bottom="4dp"
                 android:left="8dp"
-                android:top="4dp"
                 android:right="8dp"
-                android:bottom="4dp" />
+                android:top="4dp" />
             <corners android:radius="2dp" />
         </shape>
     </item>
 
     <item>
         <selector>
-
             <item android:state_pressed="true">
                 <shape>
                     <solid android:color="#A6000000" />
                     <padding
+                        android:bottom="4dp"
                         android:left="8dp"
-                        android:top="4dp"
                         android:right="8dp"
-                        android:bottom="4dp" />
+                        android:top="4dp" />
                     <corners android:radius="2dp" />
                 </shape>
             </item>
@@ -33,16 +32,14 @@
                 <shape android:shape="rectangle">
                     <solid android:color="#99000000" />
                     <padding
+                        android:bottom="4dp"
                         android:left="8dp"
-                        android:top="4dp"
                         android:right="8dp"
-                        android:bottom="4dp" />
+                        android:top="4dp" />
                     <corners android:radius="2dp" />
                 </shape>
             </item>
-
         </selector>
     </item>
-
 </ripple>
 

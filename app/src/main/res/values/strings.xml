@@ -38,7 +38,7 @@
     <string name="supports_media">Supports Media</string>
     <string name="dialog_loading_services">Loading service information</string>
     <string name="dialog_posting_service">Posting service request</string>
-    <string name="choose_media_source">Select Source</string>
+    <string name="choose_media_source">Select Image Source</string>
     <string name="camera">Camera</string>
     <string name="gallery">Gallery</string>
     <string name="location">Location</string>
@@ -126,4 +126,6 @@
     <string name="house_number">Housenumber</string>
     <string name="edit_address">Address</string>
     <string name="report_hint_sound">Add sound</string>
+    <string name="recorder">Microphone</string>
+    <string name="choose_audio_source">Select Audio Source</string>
 </resources>
