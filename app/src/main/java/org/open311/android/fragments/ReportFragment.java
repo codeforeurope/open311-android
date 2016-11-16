@@ -3,8 +3,10 @@ package org.open311.android.fragments;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.database.Cursor;
+import android.media.MediaPlayer;
+import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
@@ -27,7 +29,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -53,22 +54,20 @@ import org.codeforamerica.open311.facade.data.AttributeInfo;
 import org.codeforamerica.open311.facade.data.POSTServiceRequestResponse;
 import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
-import org.codeforamerica.open311.facade.data.Value;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
 import org.codeforamerica.open311.internals.network.HTTPNetworkManager;
 import org.open311.android.MainActivity;
 import org.open311.android.MapActivity;
 import org.open311.android.R;
+import org.open311.android.SoundRecorderActivity;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
-import org.open311.android.helpers.SingleValueAttributeWrapper;
 import org.open311.android.adapters.ServicesAdapter;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URL;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -77,12 +76,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import io.tus.android.client.TusAndroidUpload;
-import io.tus.android.client.TusPreferencesURLStore;
-import io.tus.java.client.TusClient;
-import io.tus.java.client.TusUpload;
-import io.tus.java.client.TusUploader;
-
+import static android.content.Intent.ACTION_EDIT;
 
 /**
  * Report {@link Fragment} subclass.
@@ -95,10 +89,8 @@ public class ReportFragment extends Fragment {
     private LinkedList<Attribute> attributes;
     private List<Service> services;
     private String imageUri;
-    private String audioUri;
-    private String videoUri;
+    private Uri audioUri;
     private ProgressDialog progress;
-    private TusClient client;
 
     private String location;
     private String serviceName;
@@ -107,26 +99,43 @@ public class ReportFragment extends Fragment {
     private Float latitude;
     private Float longitude;
     private String source;
-    private LinearLayoutCompat btnPhoto;
-    private LinearLayoutCompat layoutPhoto;
-    private LinearLayoutCompat btnSound;
-    private LinearLayoutCompat layoutSound;
+    private ImageView playBtn;
+    private MediaPlayer mMediaPlayer;
     private ViewSwitcher photoviewSwitcher;
+    private ViewSwitcher audioviewSwitcher;
+    private AudioStatus mAudioStatus;
+    private int mPlayTime = 0;
+
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
     public static final int GALLERY_IMAGE_REQUEST = 103;
-    public static final int RECORDER_REQUEST = 105;
-    public static final int GALLERY_VIDEO_REQUEST = 106;
-    public static final int GALLERY_AUDIO_REQUEST = 107;
     public static final int READ_STORAGE_REQUEST = 104;
-
+    public static final int RECORDER_REQUEST = 105;
+    public static final int GALLERY_AUDIO_REQUEST = 107;
 
     private static final boolean ATTRIBUTES_ENABLED = false;
 
+    enum AudioStatus {
+        PLAYING("Playing", 0),
+        STOPPED("Stopped", 2);
+
+        private String stringValue;
+        private int intValue;
+
+        AudioStatus(String toString, int value) {
+            stringValue = toString;
+            intValue = value;
+        }
+
+        @Override
+        public String toString() {
+            return stringValue;
+        }
+    }
+
     enum GalleryType {
-        AUDIO("Audio", 0),
-        IMAGE("Image", 1),
-        VIDEO("Video", 2);
+        IMAGE("Image", 0),
+        AUDIO("Audio", 1);
 
         private String stringValue;
         private int intValue;
@@ -155,16 +164,17 @@ public class ReportFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_report, container, false);
 
-        btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
-        layoutPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoLayout);
-        btnSound = (LinearLayoutCompat) view.findViewById(R.id.soundButton);
-        layoutSound = (LinearLayoutCompat) view.findViewById(R.id.soundLayout);
+        LinearLayoutCompat btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
+        LinearLayoutCompat layoutPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoLayout);
+        LinearLayoutCompat btnAudio = (LinearLayoutCompat) view.findViewById(R.id.audioButton);
+        LinearLayoutCompat layoutAudio = (LinearLayoutCompat) view.findViewById(R.id.audioLayout);
         LinearLayoutCompat btnService = (LinearLayoutCompat) view.findViewById(R.id.serviceButton);
         LinearLayoutCompat btnLocation = (LinearLayoutCompat) view.findViewById(R.id.locationButton);
-
+        playBtn = (ImageView) view.findViewById(R.id.audioView2);
         View descriptionView = view.findViewById(R.id.report_description_textbox);
         FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
         photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
+        audioviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
         //Hide the keyboard unless the descriptionView is selected
@@ -198,20 +208,22 @@ public class ReportFragment extends Fragment {
                 onPhotoButtonClicked();
             }
         });
-        btnSound.setOnClickListener(new OnClickListener() {
+        btnAudio.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideKeyBoard(v);
-                onSoundButtonClicked();
+                onAudioButtonClicked();
             }
         });
-        layoutSound.setOnClickListener(new OnClickListener() {
+        layoutAudio.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideKeyBoard(v);
-                onSoundButtonClicked();
+                onAudioButtonClicked();
             }
         });
+
+
         btnLocation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -232,7 +244,7 @@ public class ReportFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 hideKeyBoard(v);
-                onSubmitButtonClicked(v);
+                onSubmitButtonClicked();
             }
         });
 
@@ -269,6 +281,84 @@ public class ReportFragment extends Fragment {
 
     }
 
+    public void playAudio() {
+        try {
+
+            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer.setDataSource(getContext(), audioUri);
+            mMediaPlayer.prepare();
+            mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    if (mPlayTime > 0) {
+                        mMediaPlayer.seekTo(mPlayTime);
+                    }
+
+                    playBtn.setImageResource(R.drawable.ic_stop);
+                    mMediaPlayer.start();
+                    mAudioStatus = AudioStatus.PLAYING;
+                }
+            });
+
+            mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    playBtn.setImageResource(R.drawable.ic_play_arrow);
+                    mMediaPlayer.release();
+                    mPlayTime = 0;
+                    mAudioStatus = AudioStatus.STOPPED;
+                }
+            });
+
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Exception: " + e.getMessage());
+            mAudioStatus = AudioStatus.STOPPED;
+        }
+    }
+
+    public void updateAudio() {
+        if (audioUri != null) {
+            Log.d(LOG_TAG, "updateAudio " + audioUri);
+            TextView filename = (TextView) getActivity().findViewById(R.id.audio_text2);
+            OnClickListener playClicked = new OnClickListener() {
+                public void onClick(View v) {
+                    if (mAudioStatus == AudioStatus.PLAYING) {
+                        playBtn.setImageResource(R.drawable.ic_play_arrow);
+                        mMediaPlayer.release();
+                        mPlayTime = 0;
+                        mAudioStatus = AudioStatus.STOPPED;
+                    } else {
+                        playAudio();
+                    }
+                }
+            };
+            playBtn.setOnClickListener(playClicked);
+            filename.setText(niceName(audioUri));
+            audioviewSwitcher.setDisplayedChild(1);
+        } else {
+            resetPhoto();
+        }
+    }
+
+    private String niceName(Uri uri) {
+        String scheme = uri.getScheme();
+        if (scheme.equals("file")) {
+            return uri.getLastPathSegment();
+        } else if (scheme.equals("content")) {
+            Cursor returnCursor = getContext().getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = 0;
+            if (returnCursor != null) {
+                nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                returnCursor.moveToFirst();
+                return returnCursor.getString(nameIndex);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
     public void updatePhoto(Boolean broadcast) {
         if (imageUri != null) {
             Log.d(LOG_TAG, "updatePhoto " + imageUri);
@@ -288,6 +378,13 @@ public class ReportFragment extends Fragment {
         } else {
             resetPhoto();
         }
+    }
+
+    private void resetAudio() {
+        audioviewSwitcher.setDisplayedChild(0);
+        audioUri = null;
+        TextView audioText = (TextView) getActivity().findViewById(R.id.audio_text);
+        audioText.setText(R.string.report_hint_sound);
     }
 
     private void resetPhoto() {
@@ -320,6 +417,7 @@ public class ReportFragment extends Fragment {
 
     private void resetAll() {
         resetPhoto();
+        resetAudio();
         resetService();
         resetLocation();
         resetDescription();
@@ -419,14 +517,17 @@ public class ReportFragment extends Fragment {
 
     @Override
     public void onResume() {
+        Log.d(LOG_TAG, "onResume");
         super.onResume();
         updatePhoto(true);
+        updateAudio();
         updateService();
         updateLocation();
     }
 
     @Override
     public void onPause() {
+        Log.d(LOG_TAG, "onPause");
         super.onPause();
         if (progress != null && progress.isShowing()) {
             progress.dismiss();
@@ -533,49 +634,6 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    private int indexOfAttribute(SingleValueAttributeWrapper a) {
-        SingleValueAttributeWrapper attribute;
-        boolean found = false;
-        int n = attributes.size();
-        int k = 0;
-        int index = -1;
-        while (!found && k < n) {
-            attribute = (SingleValueAttributeWrapper) attributes.get(k);
-            found = attribute.hasCode(a.getCode());
-            if (found) index = k;
-            k++;
-        }
-        return index;
-    }
-
-    private void onAttributeButtonClicked(AttributeInfo attribute) {
-        String title = attribute.getDescription();
-        final String code = attribute.getCode();
-        Value[] map = attribute.getValues();
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        final String[] keys = new String[map.length];
-        final String[] values = new String[map.length];
-        for (int index = 0; index < map.length; ++index) {
-            keys[index] = map[index].getKey();
-            values[index] = map[index].getName();
-            index++;
-        }
-        builder.setTitle(title).setItems(values, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int index) {
-                Log.d(LOG_TAG, "SELECTED ATTRIBUTE: " + values[index]);
-                updateLocation();
-                SingleValueAttributeWrapper sva = new SingleValueAttributeWrapper(code, keys[index]);
-                int aIndex = indexOfAttribute(sva);
-                if (aIndex == -1) {
-                    attributes.add(sva);
-                } else {
-                    attributes.set(aIndex, sva);
-                }
-            }
-        });
-        builder.create().show();
-    }
-
     private void onServiceButtonClicked() {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         if (services == null) {
@@ -618,12 +676,11 @@ public class ReportFragment extends Fragment {
         builder.show();
     }
 
-
     /**
-     * User clicked the Button to add a sound to the request.
-     * We present the user with a dialog to select a sound from storage, or use the recorder.
+     * User clicked the Button to add audio to the request.
+     * We present the user with a dialog to select audio from storage, or use the recorder.
      */
-    private void onSoundButtonClicked() {
+    private void onAudioButtonClicked() {
         final CharSequence[] items = {getString(R.string.recorder), getString(R.string.gallery)};
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
         builder.setTitle(getString(R.string.choose_audio_source));
@@ -632,11 +689,11 @@ public class ReportFragment extends Fragment {
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals(getString(R.string.recorder))) {
-                    String[] PERMISSIONS = {Manifest.permission.CAPTURE_AUDIO_OUTPUT, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                    String[] PERMISSIONS = {Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE};
                     if (!hasPermissions(getContext().getApplicationContext(), PERMISSIONS)) {
                         requestPermissions(PERMISSIONS, RECORDER_REQUEST);
                     } else {
-                        handleCamera();
+                        handleRecorder();
                     }
                 } else if (items[item].equals(getString(R.string.gallery))) {
                     if (ContextCompat.checkSelfPermission(getContext().getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
@@ -736,15 +793,10 @@ public class ReportFragment extends Fragment {
         intent.putExtra("return_data", true);
         // Initiate the correct type of Gallery
         switch (type) {
-            case VIDEO:
-                intent.setType("video/*");
-                startActivityForResult(intent, GALLERY_VIDEO_REQUEST);
-                break;
             case AUDIO:
                 intent.setType("audio/*");
                 startActivityForResult(intent, GALLERY_AUDIO_REQUEST);
                 break;
-            //Default to IMAGE
             case IMAGE:
             default:
                 intent.setType("image/*");
@@ -752,6 +804,29 @@ public class ReportFragment extends Fragment {
         }
 
 
+    }
+
+    private void handleRecorder() {
+        Log.d(LOG_TAG, "HandleRecorder");
+        View v = getActivity().findViewById(R.id.report_submit);
+        if (!isExternalStorageWritable()) {
+            String msg = getString(R.string.storageNotWritable);
+            Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                    .show();
+            return;
+        }
+        Intent audioIntent = new Intent(getActivity(), SoundRecorderActivity.class);
+        try {
+            File audio = createFile(GalleryType.AUDIO);
+            audioIntent.setAction(ACTION_EDIT);
+            audioIntent.setData(Uri.fromFile(audio));
+            startActivityForResult(audioIntent, RECORDER_REQUEST);
+
+        } catch (IOException ex) {
+            String msg = getString(R.string.storageNotWritable);
+            Snackbar.make(v, msg, Snackbar.LENGTH_SHORT)
+                    .show();
+        }
     }
 
     /**
@@ -788,11 +863,7 @@ public class ReportFragment extends Fragment {
 
     }
 
-    private void handleRecorder() {
-        Log.d(LOG_TAG, "HandleRecorder");
-    }
-
-    private void onSubmitButtonClicked(View v) {
+    private void onSubmitButtonClicked() {
         Log.d(LOG_TAG, "Submit Button was clicked.");
 
         // Check the form result and post the service request
@@ -889,7 +960,22 @@ public class ReportFragment extends Fragment {
         if (progress != null && progress.isShowing()) {
             progress.dismiss();
         }
-
+        if (requestCode == GALLERY_AUDIO_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                audioUri = data.getData();
+                updateAudio();
+            } else {
+                resetAudio();
+            }
+        }
+        if (requestCode == RECORDER_REQUEST) {
+            if (resultCode == Activity.RESULT_OK) {
+                audioUri = data.getData();
+                updateAudio();
+            } else {
+                resetAudio();
+            }
+        }
         if (requestCode == GALLERY_IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 imageUri = data.getData().toString();
@@ -1053,7 +1139,6 @@ public class ReportFragment extends Fragment {
             if (count == 0) {
                 Log.d(LOG_TAG, "THE SELECTED SERVICE HAS NO ATTRIBUTES");
             }
-            addAttributesToForm();
         }
     }
 
@@ -1079,17 +1164,13 @@ public class ReportFragment extends Fragment {
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleCamera();
         }
-        if (requestCode == GALLERY_IMAGE_REQUEST
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.IMAGE);
-        }
         if (requestCode == GALLERY_AUDIO_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             handleGallery(GalleryType.AUDIO);
         }
-        if (requestCode == GALLERY_VIDEO_REQUEST
+        if (requestCode == GALLERY_IMAGE_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.VIDEO);
+            handleGallery(GalleryType.IMAGE);
         }
         if (requestCode == LOCATION_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1121,100 +1202,22 @@ public class ReportFragment extends Fragment {
         inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
-    private class UploadTask extends AsyncTask<Void, Long, URL> {
-        private TusClient client;
-        private TusUpload upload;
-        private Exception exception;
-
-        public UploadTask(TusClient client, TusUpload upload) {
-            this.client = client;
-            this.upload = upload;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            progress = new ProgressDialog(getContext());
-            progress.setTitle(getString(R.string.report_upload_title));
-            progress.setMessage(getString(R.string.report_upload_started) + "...");
-            progress.show();
-            //activity.setPauseButtonEnabled(true);
-        }
-
-        @Override
-        protected void onPostExecute(URL uploadURL) {
-            //activity.setStatus("Upload finished!\n" + uploadURL.toString());
-            //activity.setPauseButtonEnabled(false);
-        }
-
-        @Override
-        protected void onCancelled() {
-            //if(exception != null) {
-            //    activity.showError(exception);
-            //}
-
-            //activity.setPauseButtonEnabled(false);
-        }
-
-        @Override
-        protected void onProgressUpdate(Long... updates) {
-
-            long uploadedBytes = updates[0];
-            long totalBytes = updates[1];
-            progress.setMessage(String.format(
-                    getString(R.string.report_upload_progress), uploadedBytes, totalBytes)
-            );
-            //activity.setStatus(String.format("Uploaded %d/%d.", uploadedBytes, totalBytes));
-            //activity.setUploadProgress((int) ((double) uploadedBytes / totalBytes * 100));
-        }
-
-        @Override
-        protected URL doInBackground(Void... params) {
-            try {
-                TusUploader uploader = client.resumeOrCreateUpload(upload);
-                long totalBytes = upload.getSize();
-                long uploadedBytes;
-
-                // Upload file in 10KB chunks
-                uploader.setChunkSize(10 * 1024);
-
-                while (!isCancelled() && uploader.uploadChunk() > 0) {
-                    uploadedBytes = uploader.getOffset();
-                    publishProgress(uploadedBytes, totalBytes);
-                }
-
-                uploader.finish();
-                return uploader.getUploadURL();
-
-            } catch (Exception e) {
-                exception = e;
-                cancel(true);
-            }
-            return null;
-        }
-    }
-
     private File createFile(GalleryType type) throws IOException {
         String prefix;
         String extension;
         File storageDir;
         // Initiate the correct type of Gallery
         switch (type) {
-            case VIDEO:
-                prefix = "VID311_";
-                extension = ".mp4";
-                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES);
-                break;
             case AUDIO:
                 prefix = "REC311_";
-                extension = ".ogg";
-                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC);
+                extension = ".3gp";
+                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
                 break;
-            //Default to IMAGE
             case IMAGE:
             default:
                 prefix = "IMG311_";
                 extension = ".jpg";
-                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+                storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
         }
 
         // Create an image file name
@@ -1228,12 +1231,10 @@ public class ReportFragment extends Fragment {
         );
         // Save a file: path for use with ACTION_VIEW intents
         switch (type) {
-            case VIDEO:
-                videoUri = Uri.fromFile(file).getPath();
-                break;
             case AUDIO:
-                audioUri = Uri.fromFile(file).getPath();
+                audioUri = Uri.fromFile(file);
                 break;
+            case IMAGE:
             default:
                 imageUri = Uri.fromFile(file).getPath();
         }

@@ -129,4 +129,8 @@
     <string name="report_hint_sound">Voeg audio toe</string>
     <string name="choose_audio_source">Selecteer audiobron</string>
     <string name="recorder">Microfoon</string>
+    <string name="start_recording">Opname starten</string>
+    <string name="stop_recording">Opname stoppen</string>
+    <string name="stop_dialog">Stop</string>
+    <string name="record_dialog">Opnemen</string>
 </resources>

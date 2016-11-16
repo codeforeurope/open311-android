@@ -11,6 +11,7 @@
         <item name="autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>
         <item name="textAppearanceSearchResultTitle">@style/mySearchResult</item>
     </style>
+
     <style name="myAutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">
         <item name="android:popupBackground">#ffffff</item>
     </style>
@@ -18,6 +19,7 @@
     <style name="mySearchResult" parent="TextAppearance.AppCompat.SearchResult.Title">
         <item name="android:textColor">#000000</item>
     </style>
+
     <style name="buttonTransparent" parent="Base.TextAppearance.AppCompat.Button">
         <item name="android:background">#00000000</item>
         <item name="android:textColor">@color/textColorSecondary</item>
@@ -26,6 +28,23 @@
         <item name="android:minHeight">45dp</item>
     </style>
 
+    <style name="InCallButton">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+    <style name="Widget"/>
+
+    <style name="Widget.Silent">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textColorHint">?android:textColorSecondary</item>
+    </style>
+
+    <style name="Widget.Silent.TransparentButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@null</item>
+        <item name="android:gravity">start|center_vertical</item>
+    </style>
 
     <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/MyCustomTextAppearance</item>

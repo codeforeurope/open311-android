@@ -13,4 +13,288 @@
     <color name="transparent">#00000000</color>
     <color name="colorDivider">#B6B6B6</color>
     <color name="green">#008000</color>
+    <color name="solid_red">#f00</color>
+    <color name="solid_gray_light">#cccccc</color>
+
+    <!-- colors used for the security indicators - adopted to BP palette -->
+    <color name="indicator_amber">#ffffd21e</color>
+    <color name="indicator_gray">#ff787878</color>
+    <color name="indicator_green">#ff00e18c</color>
+    <color name="indicator_red">#ffff0000</color>
+
+    <color name="white_translucent">#80ffffff</color>
+    <color name="black_translucent">#80111111</color>
+
+    <!-- Colors for standard design, which is a "light"design mostly -->
+
+    <!-- Main background, an orange gradient -->
+    <color name="silent_back_start">#ffff7f00</color>
+    <color name="silent_back_end">#ffffdec3</color>
+
+    <!-- Basic colors for light designs
+     -->
+    <color name="button_stroke_color_dark_gray">#99333333</color>
+
+    <!-- Basic colors for dark designs
+     -->
+    <color name="button_stroke_color_white">#ccffffff</color>
+    <color name="dialpad_primary_text_color_dark">@color/sc_ng_text_dark</color>
+    <color name="dialpad_secondary_text_color_dark">#aaffffff</color>
+
+
+    <!-- Colors for Dusk theme -->
+    <color name="dusk_light_gray">#e5aaaaaa</color>
+    <color name="dusk_dark_gray">#e53f3f3f</color>
+
+    <!-- Colors for Black theme - adopted from BP color palette -->
+    <color name="black_background">#ff212121</color>  <!-- BP black -->
+    <color name="black_light_gray">#ff787878</color>  <!-- BP light grey -->
+    <color name="black_dark_gray">#ff545454</color>   <!-- BP Charcoal -->
+    <color name="black_yellow">#ffffd21e</color>      <!-- BP Yellow -->
+    <color name="black_green">@color/sc_ng_text_green</color>       <!-- BP Green (Pantone 3385) -->
+    <color name="black_green_dark">#ff00be8c</color>  <!-- BP Green (Pantone 339) -->
+    <color name="black_green_dark_1">#ff62ab42</color>
+    <color name="black_blue">#ff00a6dc</color>        <!-- BP Blue -->
+
+    <color name="black_background_transparent">#80212121</color>  <!-- BP black -->
+    <color name="black_light_gray_transparent">#1b787878</color>  <!-- BP light grey -->
+    <color name="black_dark_gray_transparent">#1b545454</color>   <!-- BP Charcoal -->
+
+    <!-- Colors for Q design -->
+    <color name="q_black">#272727</color>
+    <color name="q_orange">#ff9900</color>
+
+
+    <!-- ************* Colors for SCA part ******************* -->
+
+    <!-- Color of the theme of the People app -->
+    <color name="people_app_theme_color">#33B5E5</color>
+
+    <!-- Color of the text describing an unconsumed missed call. -->
+    <color name="call_log_missed_call_highlight_color">#FF0000</color>
+
+    <!-- Colors in the contact browser list -->
+    <color name="contact_count_text_color">#AAAAAA</color>
+
+    <color name="primary_text_color">@android:color/black</color>
+    <color name="secondary_text_color">#888888</color>
+
+    <!-- Color of image view placeholder. -->
+    <color name="image_placeholder">#DDDDDD</color>
+
+    <color name="textColorIconOverlay">#fff</color>
+    <color name="textColorIconOverlayShadow">#000</color>
+
+    <color name="shortcut_overlay_text_background">#7f000000</color>
+
+    <color name="quickcontact_tab_indicator">#ff33b5e6</color>
+
+
+    <!-- From Android Phone Common -->
+    <!-- Colors for the dialpad -->
+    <color name="dialer_theme_color">#0288d1</color>
+
+    <color name="incall_call_banner_subtext_color">#ccffffff</color>
+    <color name="incall_call_banner_text_color">#ffffff</color>
+    <color name="incall_accent_color">@color/sc_ng_text_grey_1</color>
+    <color name="incall_background_color">@color/sc_ng_background_3</color>
+    <color name="incall_call_banner_background_color">@color/incall_background_color</color>
+    <color name="button_background_color">@color/incall_background_color</color>
+
+    <!-- 70% opacity, black. -->
+    <color name="glowpad_background_color">#b3000000</color>
+    <!-- 15% opacity, white. -->
+    <color name="glowpad_outer_ring_color">#26ffffff</color>
+
+    <color name="glowpad_incoming_widget_tint">#a3a3a3</color>
+    <color name="glowpad_incoming_widget_background_tint">#ffffff</color>
+    <color name="floating_action_button_touch_tint">#80ffffff</color>
+
+    <color name="recent_call_log_item_phone_icon_tint">#000000</color>
+    <color name="call_log_extras_text_color">#0277bd</color>
+    <!-- Color of the 1dp divider that separates favorites -->
+    <color name="favorite_contacts_separator_color">#d0d0d0</color>
+
+    <!-- Background colors for LetterTileDrawables. This set of colors is a subset of
+    https://spec.googleplex.com/quantumpalette#extended which passes Google Accessibility
+    Requirements for the color in question on white with >= 3.0 contrast. We used
+    http://leaverou.github.io/contrast-ratio/#white-on-%23db4437 to double-check the contrast.
+    These colors are also used by MaterialColorMapUtils to generate primary activity colors.
+-->
+    <array name="letter_tile_colors">
+        <item>#DB4437</item>
+        <item>#E91E63</item>
+        <item>#9C27B0</item>
+        <item>#673AB7</item>
+        <item>#3F51B5</item>
+        <item>#4285F4</item>
+        <item>#039BE5</item>
+        <item>#0097A7</item>
+        <item>#009688</item>
+        <item>#0F9D58</item>
+        <item>#689F38</item>
+        <item>#EF6C00</item>
+        <item>#FF5722</item>
+        <item>#757575</item>
+    </array>
+
+    <!-- Darker versions of letter_tile_colors, two shades darker. These colors are used
+        for settings secondary activity colors. -->
+    <array name="letter_tile_colors_dark">
+        <item>#C53929</item>
+        <item>#C2185B</item>
+        <item>#7B1FA2</item>
+        <item>#512DA8</item>
+        <item>#303F9F</item>
+        <item>#3367D6</item>
+        <item>#0277BD</item>
+        <item>#006064</item>
+        <item>#00796B</item>
+        <item>#0B8043</item>
+        <item>#33691E</item>
+        <item>#E65100</item>
+        <item>#E64A19</item>
+        <item>#424242</item>
+    </array>
+
+    <!-- The default color used for tinting photos when no color can be extracted via Palette,
+        this is Blue Grey 500 -->
+    <color name="quickcontact_default_photo_tint_color">#607D8B</color>
+    <!-- The default secondary color when no color can be extracted via Palette,
+            this is Blue Grey 700 -->
+    <color name="quickcontact_default_photo_tint_color_dark">#455A64</color>
+
+    <color name="letter_tile_default_color">#cccccc</color>
+
+    <color name="letter_tile_font_color">#ffffff</color>
+
+    <!-- Background color of dialer list items (contacts, call log entries) -->
+    <color name="background_dialer_list_items">@color/sc_ng_background</color>
+
+    <color name="call_log_expanded_background_color">@color/black_light_gray</color>
+
+    <color name="empty_list_text_color">#b2b2b2</color>
+
+    <color name="remove_text_color">#ffffff</color>
+
+
+    <color name="searchbox_hint_text_color">#737373</color>
+
+    <color name="search_shortcut_background_color">#b6b6b6</color>
+    <color name="search_shortcut_icon_color">#f8f8f8</color>
+
+    <color name="contact_list_name_text_color">@android:color/primary_text_dark</color>
+
+    <!-- Text color for section header. -->
+    <color name="section_header_text_color">@android:color/primary_text_dark</color>
+
+    <!-- Color for icons in the actionbar -->
+    <color name="actionbar_icon_color">#ffffff</color>
+
+
+    <color name="dialer_green_highlight_color">@color/sc_ng_text_green</color>
+
+
+    <!-- Colors from Silent Text application -->
+    <color name="silent_black">#ff111111</color>
+    <color name="silent_darken">#22000000</color>
+    <color name="subtle_medium_grey">#30808080</color>
+    <color name="silent_orange">#ffe46226</color>
+    <color name="silent_yellow">#fff7c16d</color>
+    <color name="silent_white_disabled">#55ffffff</color>
+    <color name="silent_white">#ddffffff</color>
+    <color name="silent_grease">#ff222222</color>
+    <color name="silent_glass">#88ffffff</color>
+    <color name="silent_dark_orange">#ffa42206</color>
+    <color name="progress_color">#D23D44</color>
+    <color name="solid_white">#ffffffff</color>
+    <color name="theme_dark_text_primary">@color/solid_white</color>
+    <color name="translucent_white">#80ffffff</color>
+    <color name="theme_dark_text_secondary">@color/translucent_white</color>
+    <color name="silent_dark_grey">#ff505050</color>
+    <color name="silent_translucent_dark_grey">#80505050</color>
+
+    <color name="theme_light_text_primary">@color/silent_black</color>
+    <color name="theme_light_text_secondary">@color/silent_translucent_dark_grey</color>
+
+    <color name="sc_ng_text_grey">#f6f3eb</color>
+    <color name="sc_ng_text_grey_1">#fafafa</color>
+    <color name="sc_ng_text_grey_2">#888888</color>
+    <color name="sc_ng_text_grey_3">#a3a3a3</color>
+    <color name="sc_ng_text_grey_4">#bdbdbd</color>
+    <color name="sc_ng_text_grey_5">#D0D2D2</color>
+    <color name="sc_ng_text_dark">#4a4947</color>
+    <color name="sc_ng_background">#36373b</color>
+    <color name="sc_ng_background_1">#f6f3eb</color>
+    <color name="sc_ng_background_2">#28292c</color>
+    <color name="sc_ng_background_3">#727377</color>
+    <color name="sc_ng_background_outgoing">#f6f3eb</color>
+    <color name="sc_ng_background_incoming">#9e9d9d</color>
+    <color name="sc_ng_text_red">#e73a27</color>
+    <color name="sc_ng_text_green">#6fc34b</color>
+
+    <!-- Authenticator-specific colors (new "next-gen" style) -->
+    <color name="auth_active_headline_text_grey">#f6f3eb</color>
+    <color name="auth_active_body_text_grey">#bdbdbd</color>
+    <color name="auth_inactive_headline_text_grey">#bdbdbd</color>
+    <color name="auth_inactive_body_text_grey">#727377</color>
+    <color name="auth_background_grey">#36373b</color>
+    <!-- pressed and default colors for clickable textviews, buttons -->
+    <color name="auth_textview_default">#f5f3ee</color>
+    <color name="auth_textview_pressed">#727377</color>
+    <color name="auth_login_default">#e73a27</color>
+    <color name="auth_login_pressed">#727377</color>
+    <color name="auth_account_default">#454649</color>
+    <color name="auth_account_pressed">#727377</color>
+
+    <!-- colors in conversation (chat) view -->
+    <color name="chat_main_background">@color/sc_ng_background</color>
+    <color name="chat_toolbar_background">@color/sc_ng_background_1</color>
+    <color name="chat_compose_background">@color/sc_ng_background_1</color>
+    <color name="chat_compose_text">@color/sc_ng_text_dark</color>
+    <color name="chat_compose_hint">#ada9a3</color>
+
+    <color name="chat_attachment_grid_color">#43454b</color>
+    <color name="chat_attachment_grid_color_light">@color/sc_ng_text_grey</color>
+
+    <color name="chat_options_drawer_background">@color/sc_ng_background_2</color>
+    <color name="chat_options_text_color">@color/sc_ng_text_grey</color>
+    <color name="chat_options_description_text_color">@color/sc_ng_background_3</color>
+
+    <color name="chat_error_message_text_color">@color/sc_ng_text_grey</color>
+    <color name="chat_outgoing_message_text_color">#ede9e3</color>
+    <color name="chat_outgoing_message_disabled_text_color">#cdcac6</color>
+    <color name="chat_outgoing_message_disabled_text_color_light">#adaaa6</color>
+
+    <color name="chat_outgoing_message_disabled_color">#bb454545</color>
+    <color name="chat_outgoing_message_color">#5d5f66</color>
+    <color name="chat_outgoing_message_pressed_color">#7c2525</color>
+    <color name="chat_outgoing_message_checked_color">#7f0e0e</color>
+    <color name="chat_outgoing_message_color_light">#eee9de</color>
+
+    <color name="chat_incoming_message_disabled_color">#bb454545</color>
+    <color name="chat_incoming_message_color">#f6f3eb</color>
+    <color name="chat_incoming_message_received_color">#c4c2bc</color>
+    <color name="chat_incoming_message_pressed_color">#7c2525</color>
+    <color name="chat_incoming_message_checked_color">#7f0e0e</color>
+    <color name="chat_incoming_message_color_light">#bfbfbf</color>
+
+    <color name="chat_incoming_message_text_received_color">#8a4947</color>
+
+    <!-- for link colour in messages use the same colour as used by BP2 -->
+    <color name="chat_message_text_link_color">#80cbc4</color>
+
+    <!-- colour for unread message count indicator -->
+    <color name="chat_message_notification_color">@color/sc_ng_text_red</color>
+
+    <color name="chat_background_color_light">#fefdf9</color>
+    <color name="chat_background_color_dark">#fefdf9</color>
+
+    <array name="message_lights">
+        <item>#FF0000</item>
+        <item>#0000FF</item>
+        <item>#FFFFFF</item>
+        <item>#00FF00</item>
+        <item>#FF00FF</item>
+    </array>
 </resources>

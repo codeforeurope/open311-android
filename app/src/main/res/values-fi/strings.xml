@@ -129,4 +129,8 @@
     <string name="report_hint_sound">Lisää ääni</string>
     <string name="choose_audio_source">Valitse äänilähde</string>
     <string name="recorder">Mikrofoni</string>
+    <string name="stop_recording">Lopeta tallennus</string>
+    <string name="stop_dialog">Lopettaa</string>
+    <string name="start_recording">Aloita kuvaaminen</string>
+    <string name="record_dialog">Tallentaa</string>
 </resources>

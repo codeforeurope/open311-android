@@ -129,4 +129,8 @@
     <string name="report_hint_sound">Ajouter du son</string>
     <string name="choose_audio_source">Sélectionner une source audio</string>
     <string name="recorder">Microphone</string>
+    <string name="stop_recording">Arrêter l\'enregistrement</string>
+    <string name="stop_dialog">Arrêter</string>
+    <string name="start_recording">Commencer l\'enregistrement</string>
+    <string name="record_dialog">Enregistrement</string>
 </resources>

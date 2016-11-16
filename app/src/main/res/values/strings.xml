@@ -128,4 +128,8 @@
     <string name="report_hint_sound">Add sound</string>
     <string name="recorder">Microphone</string>
     <string name="choose_audio_source">Select Audio Source</string>
+    <string name="start_recording">Start Recording</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="stop_dialog">Stop</string>
+    <string name="record_dialog">Record</string>
 </resources>
