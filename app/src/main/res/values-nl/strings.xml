@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Meldapp</string>
+    <string name="app_name">Meld-app</string>
     <string name="first_name">Voornaam</string>
     <string name="format">Formaat</string>
     <string name="gallery">Gallerij</string>
@@ -61,9 +61,6 @@
     <string name="notImplemented">Nog niet geimplementeerd</string>
     <string name="okay">Ok</string>
     <string name="url">Url</string>
-    <string name="title_activity_main">Meldapp</string>
-    <string name="questionsAndFeedback">Vragen en feedback</string>
-    <string name="contactEmail">info@open311.io</string>
     <string name="storageNotWritable">Onvoldoende rechten om bestanden op te slaan</string>
     <string name="setting_general">Instellingen</string>
     <string name="request_image">Afbeelding</string>
@@ -83,20 +80,23 @@
     <string name="Slideshow">Voorstelling</string>
     <string name="Gallery">Gallerij</string>
     <string name="Communicate">Communiceren</string>
-    <string name="ApplicationTitle">Meldapp</string>
     <string name="ApplicationIcon">Applicatiesymbool</string>
     <string name="ApplicationEmail">Contact met de overheid</string>
     <string name="tab_personal_info">Persoonlijke informatie</string>
     <string name="uncategorized">Geen categorie</string>
-    <string name="privacyPar1">Wij zijn er van bewust dat u vertrouwen stelt in ons. Wij zien het dan ook als onze verantwoordelijkheid om uw privacy te beschermen. Op deze pagina laten we u weten welke gegevens we verzamelen als u onze app gebruikt en waarom we deze gegevens verzamelen. Zo snapt u precies hoe wij werken.</string>
-    <string name="privacyPar2">Dit privacybeleid is van toepassing op de diensten van Meldapp. Door gebruik te maken van deze app geeft u aan het privacy beleid te accepteren.</string>
-    <string name="privacyPar3">Meldapp respecteert de privacy van alle gebruikers van haar dienst en draagt er zorg voor dat de persoonlijke informatie die u ons verschaft vertrouwelijk wordt behandeld.</string>
-    <string name="questionsPar1">We controleren regelmatig of we aan dit privacybeleid voldoen. Als u vragen heeft over dit privacybeleid, kunt u contact met ons opnemen:</string>
-    <string name="contactPhone">040 - 2525 4646</string>
-    <string name="contactAuthority">Gemeente Eindhoven</string>
-    <string name="contactTitle">Contact</string>
-    <string name="introText1">Meldapp is Eindhoven\'s meldpunt voor niet noodgevallen.</string>
-    <string name="introText2">Als u iets meldt dan wordt het hier getoond. Swipe naar beneden om de lijst te verversen.</string>
+    <string name="policy_privacy_title">Privacy</string>
+    <string name="policy_privacy_text">
+        Wij zien het als onze verantwoordelijkheid om zorgvuldig om te gaan met privacy. Deze applicatie vraagt om een emailadres en/of telefoonnummer.
+        Deze gegevens dienen enkel om bij het verzenden van meldingen te zorgen dat instanties contact kunnen opnemen. Het is ook mogelijk anoniem meldingen
+        te versturen maar dit zal afhandeling wat ingewikkelder maken.
+    </string>
+    <string name= "policy_intro_title">Informatie</string>
+    <string name="policy_intro_text">
+        Met deze app kunt u woonoverlast in Eindhoven melden.\n\n
+            \t&#9679;	Is er ’s nachts geluidsoverlast?\n\t\t\tBel de politie via <b>0800-8844</b>\n
+            \t&#9679;	Heeft u spoedeisende hulp nodig?\n\t\t\tBel de politie via <b>112</b>\n</string>
+    <string name="policy_faq_title">Over</string>
+    <string name="policy_faq_text">Deze applicatie is Open Source en wordt o.a. ontwikkeld door de <b>Code fellows</b> van de Code For NL.\nWe controleren regelmatig of de applicatie correct werkt. Mocht er onverhoopt iets niet goed gaan, neem dan contact op via <b>info@open311.io</b></string>
     <string name="updated">bewerkt</string>
     <string name="serviceListUnavailable">Categorieën niet beschikbaar. Probeer het later nog eens.</string>
     <string name="setting_user">Gebruiker</string>
@@ -121,8 +121,8 @@
     <string name="report_upload_progress">%1$d/%2$d geupload.</string>
     <string name="yes_anonymous">Ja</string>
     <string name="no_anonymous">Nee, stuur anoniem</string>
-    <string name="post_anonymous">Anoniem</string>
-    <string name="post_anonymous_description">Contactgegevens zijn niet ingesteld. Dit betekent dat de verantwoordelijke partij geen contact kan opnemen. Wilt u contactgegevens instellen?</string>
+    <string name="post_anonymous">Contactgegevens</string>
+    <string name="post_anonymous_description">Stel je gegevens in, dan kunnen wij contact met je opnemen. Wil je je contactgegevens instellen?</string>
     <string name="house_number">Huisnummer</string>
     <string name="street">Straat</string>
     <string name="edit_address">Adres</string>
@@ -133,4 +133,11 @@
     <string name="stop_recording">Opname stoppen</string>
     <string name="stop_dialog">Stop</string>
     <string name="record_dialog">Opnemen</string>
+    <string name="cannot_send">Melding kan niet worden verstuurd.</string>
+    <string name="missing_fields">Vul alle verplichte informatie in.</string>
+    <string name="no_coordinates">locatie</string>
+    <string name="no_description">beschrijving</string>
+    <string name="no_servicecode">categorie</string>
+    <string name="no_reports_title">Geen meldingen</string>
+    <string name="no_reports_text">Je hebt nog geen meldingen gedaan. Zodra de eerste melding is verstuurd, zal op deze pagina het overzicht van je meldingen verschijnen.</string>
 </resources>

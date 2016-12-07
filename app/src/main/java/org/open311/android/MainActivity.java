@@ -244,6 +244,7 @@ public class MainActivity extends AppCompatActivity
                     MainActivity.this);
 
             progressDialog.setMessage(getString(R.string.contactingServer) + " " + getCurrentCity().getCityName());
+            MainActivity.this.setTitle(getString(R.string.app_name) + " " + getCurrentCity().getTitle());
             progressDialog.setCancelable(false);
             progressDialog.show();
 

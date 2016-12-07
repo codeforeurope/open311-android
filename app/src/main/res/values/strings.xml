@@ -7,7 +7,6 @@
     <string name="Communicate">Communicate</string>
     <string name="Share">Share</string>
     <string name="Send">Send</string>
-    <string name="ApplicationTitle">311</string>
     <string name="ApplicationEmail">Contact the authorities</string>
     <string name="ApplicationIcon">Application Icon</string>
     <string name="setting_general">Settings</string>
@@ -21,7 +20,6 @@
     <string name="menu_report">Report</string>
     <string name="menu_archive">My Reports</string>
     <string name="menu_about">About</string>
-    <string name="title_activity_main">GeoReporter</string>
     <string name="tab_personal_info">Personal Info</string>
     <string name="tab_servers">Servers</string>
     <string name="button_add_server">Add Server</string>
@@ -97,16 +95,16 @@
     <string name="notImplemented">Not yet implemented</string>
     <string name="serviceListUnavailable">Services can not be fetched. Try again later.</string>
     <string name="storageNotWritable">External storage is not writable</string>
-    <string name="privacyPolicy">Privacy Policy</string>
-    <string name="questionsAndFeedback">Questions and feedback</string>
-    <string name="contactEmail">info@open311.io</string>
-    <string name="contactAuthority">open311.io</string>
-    <string name="contactPhone">555</string>
-    <string name="contactTitle">Contact</string>
-    <string name="privacyPar1">We are aware of your trust in us. That is why we take it as our primary responsibility to protect your privacy. We will however collect information. We will explain why and what.</string>
-    <string name="privacyPar2">Our privacy policy applies to the application and the services. By using our application, you accept our privacy policy.</string>
-    <string name="privacyPar3">We respect the privacy of all users and make sure that personal information is used confidential.</string>
-    <string name="questionsPar1">We will monitor constantly if we comply to our privacy policy. For questions regarding privacy, please contact us.</string>
+    <string name="policy_privacy_title">Privacy</string>
+    <string name="policy_faq_title">Questions</string>
+    <string name="policy_privacy_text">
+        We are aware of your trust in us. That is why we take it as our primary responsibility to protect your privacy.
+        We will however collect information. We will explain why and what.\n\n
+
+        Our privacy policy applies to the application and the services. By using our application, you accept our privacy policy.\n\n
+
+        We respect the privacy of all users and make sure that personal information is used confidential.</string>
+    <string name="policy_faq_text">We will monitor constantly if we comply to our privacy policy. For questions regarding privacy, please contact us.</string>
     <string name="introText1">Communicate Service Requests with your Government</string>
     <string name="introText2">Your previous request will be shown here after you have created your first request</string>
     <string name="updated">Updated</string>
@@ -132,4 +130,16 @@
     <string name="stop_recording">Stop Recording</string>
     <string name="stop_dialog">Stop</string>
     <string name="record_dialog">Record</string>
+    <string name="pg_upload_audio_title">Upload (%1$d/%2$d)</string>
+    <string name="pg_upload_audio_message">Uploading Audio</string>
+    <string name="pg_upload_image_title">Upload (%1$d/%2$d)</string>
+    <string name="pg_upload_image_message">Uploading Image</string>
+    <string name="no_servicecode">service</string>
+    <string name="no_coordinates">location</string>
+    <string name="no_description">description</string>
+    <string name="cannot_send">Report can not be sent.</string>
+    <string name="missing_fields">Please complete all required fields.</string>
+    <string name="pause">Pause</string>
+    <string name="no_reports_title">No reports</string>
+    <string name="no_reports_text">You have not sent any reports yet. When you create your first report, this page will hold an overview of all your reports.</string>
 </resources>

@@ -14,52 +14,32 @@
             android:padding="16dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+            <TextView
+                style="@style/AppTheme.PolicyTitle"
+                android:text="@string/policy_intro_title" />
+
+            <TextView
+                style="@style/AppTheme.PolicyText"
+                android:text="@string/policy_intro_text" />
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"
-                android:text="@string/privacyPolicy" />
+                android:text="@string/policy_privacy_title" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="@string/privacyPar1" />
-
-            <TextView
-                style="@style/AppTheme.PolicyText"
-                android:text="@string/privacyPar2" />
-
-            <TextView
-                style="@style/AppTheme.PolicyText"
-                android:text="@string/privacyPar3" />
-
-            <TextView
-                style="@style/AppTheme.PolicyText"
-                 />
+                android:text="@string/policy_privacy_text" />
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"
-                android:text="@string/questionsAndFeedback" />
+                android:text="@string/policy_faq_title" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
-                android:text="@string/questionsPar1" />
+                android:text="@string/policy_faq_text" />
             <TextView
                 style="@style/AppTheme.PolicyText"
                 />
-
-            <TextView
-                style="@style/AppTheme.PolicyTitle"
-                android:text="@string/contactTitle" />
-
-            <TextView
-                style="@style/AppTheme.ContactText"
-                android:text="@string/contactAuthority" />
-            <TextView
-                style="@style/AppTheme.ContactText"
-                android:text="@string/contactPhone" />
-            <TextView
-                style="@style/AppTheme.ContactText"
-                android:text="@string/contactEmail" />
-
         </LinearLayout>
 
     </ScrollView>

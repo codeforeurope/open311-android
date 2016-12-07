@@ -5,7 +5,6 @@
     <string name="menu_report">Raportti</string>
     <string name="menu_archive">Raporttini</string>
     <string name="menu_about">Noin</string>
-    <string name="title_activity_main">GeoReporter</string>
     <string name="tab_personal_info">Omat tiedot</string>
     <string name="tab_servers">Palvelimet</string>
     <string name="button_add_server">Lisää palvelin</string>
@@ -64,10 +63,6 @@
     <string name="Share">jakaa</string>
     <string name="Slideshow">Kuvaesitys</string>
     <string name="Tools">Työkalut</string>
-    <string name="contactAuthority">open311.io</string>
-    <string name="contactEmail">info@open311.io</string>
-    <string name="contactPhone">555</string>
-    <string name="contactTitle">Yhteys</string>
     <string name="description">Kuvaus</string>
     <string name="add_to_report">Lisää tietoa</string>
     <string name="btn_sign_up">Kirjaudu</string>
@@ -91,8 +86,8 @@
     <string name="privacyPar1">Olemme tietoisia luottakaa meihin. Siksi me ota se meidän ensisijainen vastuu yksityisyyden suojaamiseksi. Tulemme kuitenkin kerätä tietoja. Me selittää, miksi ja mitä.</string>
     <string name="privacyPar2">Meidän tietosuojakäytäntö koskee sovelluksen ja palvelut. Käyttämällä meidän sovelluksen, hyväksyt tietosuojakäytäntömme.</string>
     <string name="privacyPar3">Kunnioitamme yksityisyyttä kaikille käyttäjille ja varmistaa, että henkilötietoja käytetään luottamuksellisina.</string>
-    <string name="privacyPolicy">Tietosuojakäytäntö</string>
-    <string name="questionsAndFeedback">Kysymykset ja palaute</string>
+    <string name="policy_privacy_title">Tietosuojakäytäntö</string>
+    <string name="policy_faq_title">Kysymykset</string>
     <string name="questionsPar1">Tulemme jatkuvasti tarkkailemaan jos noudattaa meidän tietosuojakäytännön. Kysyttävää yksityisyyden, ota yhteyttä.</string>
     <string name="report_address">Anna osoite</string>
     <string name="report_dialog_message">Odota lähetettäessä</string>

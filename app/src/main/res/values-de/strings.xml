@@ -4,7 +4,6 @@
     <string name="menu_report">Bericht</string>
     <string name="menu_archive">Meine berichte</string>
     <string name="menu_about">Über</string>
-    <string name="title_activity_main">GeoReporter</string>
     <string name="tab_personal_info">Persönliche Angaben</string>
     <string name="tab_servers">Server</string>
     <string name="button_add_server">Server hinzufügen</string>
@@ -47,8 +46,7 @@
     <string name="list_latest_messages">Aktuelle berichte</string>
     <string name="list_user_messages">Meine berichte</string>
     <string name="storageNotWritable">Externer Speicher ist nicht beschreibbar</string>
-    <string name="questionsAndFeedback">Fragen und Feedback</string>
-    <string name="ApplicationTitle">311</string>
+    <string name="policy_faq_title">Fragen</string>
     <string name="ApplicationEmail">Kontakt mit den Behörden</string>
     <string name="updated">Aktualisiert</string>
     <string name="status_unknown">unbekannt</string>
@@ -67,10 +65,6 @@
     <string name="Share">Aktie</string>
     <string name="Slideshow">Diashow</string>
     <string name="Tools">Werkzeuge</string>
-    <string name="contactAuthority">open311.io</string>
-    <string name="contactEmail">info@open311.io</string>
-    <string name="contactPhone">555</string>
-    <string name="contactTitle">Kontakt</string>
     <string name="description">Beschreibung</string>
     <string name="add_to_report">Information hinzufügen</string>
     <string name="btn_sign_up">Anmelden</string>

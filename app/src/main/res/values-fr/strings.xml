@@ -5,7 +5,6 @@
     <string name="menu_report">Rapport</string>
     <string name="menu_archive">Mes rapports</string>
     <string name="menu_about">À propos</string>
-    <string name="title_activity_main">GeoReporter</string>
     <string name="tab_personal_info">Info personnelle</string>
     <string name="tab_servers">Serveurs</string>
     <string name="button_add_server">Ajouter serveur</string>
@@ -64,10 +63,6 @@
     <string name="Share">Partager</string>
     <string name="Slideshow">Slideshow</string>
     <string name="Tools">Outils</string>
-    <string name="contactAuthority">open311.io</string>
-    <string name="contactEmail">info@open311.io</string>
-    <string name="contactPhone">555</string>
-    <string name="contactTitle">Contact</string>
     <string name="description">Description</string>
     <string name="add_to_report">Ajouter de l\'information</string>
     <string name="btn_sign_up">Inscrire</string>
@@ -91,8 +86,8 @@
     <string name="privacyPar1">Nous sommes conscients de votre confiance en nous. Voilà pourquoi nous considérons comme notre responsabilité première de protéger votre vie privée. Nous allons toutefois recueillir de l\'information. Nous allons expliquer pourquoi et quoi.</string>
     <string name="privacyPar2">Notre politique de confidentialité s\'applique à l\'application et les services. En utilisant notre application, vous acceptez notre politique de confidentialité.</string>
     <string name="privacyPar3">Nous respectons la vie privée de tous les utilisateurs et faire en sorte que les informations personnelles sont utilisées confidentielles.</string>
-    <string name="privacyPolicy">Politique de confidentialité</string>
-    <string name="questionsAndFeedback">Questions et commentaires</string>
+    <string name="policy_privacy_title">Politique de confidentialité</string>
+    <string name="policy_faq_title">Questions</string>
     <string name="questionsPar1">Nous allons surveiller constamment si nous nous conformons à notre politique de confidentialité. Pour toute question concernant la vie privée, s\'il vous plaît contactez-nous.</string>
     <string name="report_address">Entrer une adresse</string>
     <string name="report_dialog_message">Attendez que l\'envoi</string>
