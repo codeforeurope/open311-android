@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.open311.android.helpers.Utils.hideKeyBoard;
+
 /**
  * Requests {@link Fragment} subclass.
  */

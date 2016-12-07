@@ -105,8 +105,10 @@
 
         We respect the privacy of all users and make sure that personal information is used confidential.</string>
     <string name="policy_faq_text">We will monitor constantly if we comply to our privacy policy. For questions regarding privacy, please contact us.</string>
-    <string name="introText1">Communicate Service Requests with your Government</string>
-    <string name="introText2">Your previous request will be shown here after you have created your first request</string>
+    <string name="policy_intro_text">
+        Communicate Service Requests with your Government\n\n
+        Your previous request will be shown here after you have created your first request
+    </string>
     <string name="updated">Updated</string>
     <string name="map">Select a location</string>
     <string name="map_hint_gps">Acquire GPS position</string>
@@ -126,10 +128,9 @@
     <string name="report_hint_sound">Add sound</string>
     <string name="recorder">Microphone</string>
     <string name="choose_audio_source">Select Audio Source</string>
-    <string name="start_recording">Start Recording</string>
-    <string name="stop_recording">Stop Recording</string>
+    <string name="record_start">Start Recording</string>
+    <string name="record_stop">Stop Recording</string>
     <string name="stop_dialog">Stop</string>
-    <string name="record_dialog">Record</string>
     <string name="pg_upload_audio_title">Upload (%1$d/%2$d)</string>
     <string name="pg_upload_audio_message">Uploading Audio</string>
     <string name="pg_upload_image_title">Upload (%1$d/%2$d)</string>
@@ -137,9 +138,7 @@
     <string name="no_servicecode">service</string>
     <string name="no_coordinates">location</string>
     <string name="no_description">description</string>
-    <string name="cannot_send">Report can not be sent.</string>
     <string name="missing_fields">Please complete all required fields.</string>
-    <string name="pause">Pause</string>
     <string name="no_reports_title">No reports</string>
     <string name="no_reports_text">You have not sent any reports yet. When you create your first report, this page will hold an overview of all your reports.</string>
 </resources>

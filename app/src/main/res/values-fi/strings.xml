@@ -45,7 +45,6 @@
     <string name="error_403">Sovelluksella ei ole oikeuksia lähettää palautetta valitulle palvelimelle</string>
     <string name="list_latest_messages">Omat palautteet</string>
     <string name="list_user_messages">raporttini</string>
-    <string name="ApplicationTitle">311</string>
     <string name="ApplicationIcon">sovelluskuvake</string>
     <string name="ApplicationEmail">Ota viranomaisten</string>
     <string name="Communicate">tiedottaa</string>
@@ -71,8 +70,10 @@
     <string name="hint_name">Nimi</string>
     <string name="hint_password">Salasana</string>
     <string name="hint_phone">Puhelin</string>
-    <string name="introText1">Kommunikoida palvelupyyntöjä kanssa hallituksenne</string>
-    <string name="introText2">Aiemmat pyyntö näytetään tässä, kun olet luonut ensimmäinen pyyntö</string>
+    <string name="policy_intro_text">
+        Kommunikoida palvelupyyntöjä kanssa hallituksenne\n\n
+        Aiemmat pyyntö näytetään tässä, kun olet luonut ensimmäinen pyyntö
+    </string>
     <string name="invalid_email">Virheellinen sähköpostiosoite</string>
     <string name="invalid_name">Nimi on virheellinen</string>
     <string name="invalid_phone">Puhelinnumero on virheellinen</string>
@@ -83,12 +84,17 @@
     <string name="next">Seuraava</string>
     <string name="notImplemented">Ei ole vielä toteutettu</string>
     <string name="okay">Kunnossa</string>
-    <string name="privacyPar1">Olemme tietoisia luottakaa meihin. Siksi me ota se meidän ensisijainen vastuu yksityisyyden suojaamiseksi. Tulemme kuitenkin kerätä tietoja. Me selittää, miksi ja mitä.</string>
-    <string name="privacyPar2">Meidän tietosuojakäytäntö koskee sovelluksen ja palvelut. Käyttämällä meidän sovelluksen, hyväksyt tietosuojakäytäntömme.</string>
-    <string name="privacyPar3">Kunnioitamme yksityisyyttä kaikille käyttäjille ja varmistaa, että henkilötietoja käytetään luottamuksellisina.</string>
+    <string name="policy_privacy_text">
+        Olemme tietoisia luottakaa meihin. Siksi me ota se meidän ensisijainen vastuu yksityisyyden suojaamiseksi.
+        Tulemme kuitenkin kerätä tietoja. Me selittää, miksi ja mitä.\n\n
+
+        Meidän tietosuojakäytäntö koskee sovelluksen ja palvelut. Käyttämällä meidän sovelluksen, hyväksyt tietosuojakäytäntömme.\n\n
+
+        Kunnioitamme yksityisyyttä kaikille käyttäjille ja varmistaa, että henkilötietoja käytetään luottamuksellisina.
+    </string>
     <string name="policy_privacy_title">Tietosuojakäytäntö</string>
     <string name="policy_faq_title">Kysymykset</string>
-    <string name="questionsPar1">Tulemme jatkuvasti tarkkailemaan jos noudattaa meidän tietosuojakäytännön. Kysyttävää yksityisyyden, ota yhteyttä.</string>
+    <string name="policy_faq_text">Tulemme jatkuvasti tarkkailemaan jos noudattaa meidän tietosuojakäytännön. Kysyttävää yksityisyyden, ota yhteyttä.</string>
     <string name="report_address">Anna osoite</string>
     <string name="report_dialog_message">Odota lähetettäessä</string>
     <string name="report_dialog_title">Huolto pyyntö</string>
@@ -124,8 +130,7 @@
     <string name="report_hint_sound">Lisää ääni</string>
     <string name="choose_audio_source">Valitse äänilähde</string>
     <string name="recorder">Mikrofoni</string>
-    <string name="stop_recording">Lopeta tallennus</string>
+    <string name="record_stop">Lopeta tallennus</string>
     <string name="stop_dialog">Lopettaa</string>
-    <string name="start_recording">Aloita kuvaaminen</string>
-    <string name="record_dialog">Tallentaa</string>
+    <string name="record_start">Aloita kuvaaminen</string>
 </resources>

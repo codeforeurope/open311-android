@@ -77,6 +77,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.content.Intent.ACTION_EDIT;
+import static org.open311.android.helpers.Utils.hideKeyBoard;
 
 /**
  * Report {@link Fragment} subclass.
@@ -183,42 +184,42 @@ public class ReportFragment extends Fragment {
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     v.clearFocus();
-                    hideKeyBoard(v);
+                    hideKeyBoard(getActivity());
                 }
             }
         });
         photoPlaceholder.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onPhotoButtonClicked();
             }
         });
         btnPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onPhotoButtonClicked();
             }
         });
         layoutPhoto.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onPhotoButtonClicked();
             }
         });
         btnAudio.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onAudioButtonClicked();
             }
         });
         layoutAudio.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onAudioButtonClicked();
             }
         });
@@ -227,7 +228,7 @@ public class ReportFragment extends Fragment {
         btnLocation.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onLocationButtonClicked();
             }
         });
@@ -235,7 +236,7 @@ public class ReportFragment extends Fragment {
         btnService.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onServiceButtonClicked();
             }
         });
@@ -243,7 +244,7 @@ public class ReportFragment extends Fragment {
         btnSubmit.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                hideKeyBoard(v);
+                hideKeyBoard(getActivity());
                 onSubmitButtonClicked();
             }
         });
@@ -575,10 +576,9 @@ public class ReportFragment extends Fragment {
 
         }
         if (!isValid) {
-            hideFab();
-//            String result = getString(R.string.failure_posting_service);
-//            Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
-//                    .show();
+            String result = getString(R.string.failure_posting_service);
+            Snackbar.make(getView(), result, Snackbar.LENGTH_SHORT)
+                    .show();
         } else {
             showFab();
         }
@@ -589,11 +589,6 @@ public class ReportFragment extends Fragment {
     private void showFab() {
         View fab = getActivity().findViewById(R.id.report_submit);
         fab.setVisibility(View.VISIBLE);
-    }
-
-    private void hideFab() {
-        View fab = getActivity().findViewById(R.id.report_submit);
-        fab.setVisibility(View.GONE);
     }
 
     private Boolean checkAnonymous() {
@@ -1195,11 +1190,6 @@ public class ReportFragment extends Fragment {
             }
         }
         return true;
-    }
-
-    private void hideKeyBoard(View v) {
-        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
     private File createFile(GalleryType type) throws IOException {

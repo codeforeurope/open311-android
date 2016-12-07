@@ -186,6 +186,22 @@ public class MainActivity extends AppCompatActivity
         adapter.addFragment(new ProfileFragment());
         adapter.addFragment(new PolicyFragment());
         viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener(){
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                hideKeyBoard(MainActivity.this);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override

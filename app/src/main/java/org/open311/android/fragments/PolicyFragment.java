@@ -12,10 +12,10 @@ import org.open311.android.R;
 
 /**
  * Policy {@link Fragment} subclass.
- *
  */
 public class PolicyFragment extends Fragment {
     private static final String LOG_TAG = "PolicyFragment";
+
     public PolicyFragment() {
         // Required empty public constructor
     }

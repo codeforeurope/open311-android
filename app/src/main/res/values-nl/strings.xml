@@ -66,7 +66,6 @@
     <string name="request_image">Afbeelding</string>
     <string name="request_ago_icon">Bijgewerkt op</string>
     <string name="radio_button_normal">Standaard</string>
-    <string name="privacyPolicy">Privacybeleid</string>
     <string name="pending">Even geduld</string>
     <string name="failure_posting_service">Melding kon niet worden verzonden</string>
     <string name="failure_loading_services">Informatie kan niet worden geladen</string>
@@ -148,11 +147,11 @@
     <string name="report_hint_sound">Voeg audio toe</string>
     <string name="choose_audio_source">Selecteer audiobron</string>
     <string name="recorder">Microfoon</string>
-    <string name="start_recording">Opname starten</string>
-    <string name="stop_recording">Opname stoppen</string>
+    <string name="record_in_progress">Bezig met opnemen</string>
+    <string name="record_ready">Opname gereed</string>
+    <string name="record_stop">Stop opname</string>
     <string name="stop_dialog">Stop</string>
-    <string name="record_dialog">Opnemen</string>
-    <string name="cannot_send">Melding kan niet worden verstuurd.</string>
+    <string name="record_start">Druk op de knop om op te nemen</string>
     <string name="missing_fields">Vul alle verplichte informatie in.</string>
     <string name="no_coordinates">locatie</string>
     <string name="no_description">beschrijving</string>

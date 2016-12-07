@@ -73,8 +73,10 @@
     <string name="hint_name">Name</string>
     <string name="hint_password">Passwort</string>
     <string name="hint_phone">Telefon</string>
-    <string name="introText1">Kommunizieren Sie Service Requests mit Ihrer Regierung</string>
-    <string name="introText2">Ihre vorherige Anfrage werden hier angezeigt, nachdem Sie Ihre erste Anfrage erstellt haben</string>
+    <string name="policy_intro_text">
+        Kommunizieren Sie Service Requests mit Ihrer Regierung\n\n
+        Ihre vorherige Anfrage werden hier angezeigt, nachdem Sie Ihre erste Anfrage erstellt haben
+    </string>
     <string name="invalid_email">Ungültige E-Mail Adresse</string>
     <string name="invalid_name">Name ist ungültig</string>
     <string name="invalid_phone">Die Telefonnummer ist ungültig</string>
@@ -85,11 +87,16 @@
     <string name="next">Nächster</string>
     <string name="notImplemented">Noch nicht implementiert</string>
     <string name="okay">OK</string>
-    <string name="privacyPar1">Wir sind uns bewusst, Ihr Vertrauen in uns. Deshalb haben wir es als unsere primäre Verantwortung nehmen Ihre Privatsphäre zu schützen. Wir werden jedoch Informationen sammeln. Wir werden erklären, warum und was.</string>
-    <string name="privacyPar2">Unsere Datenschutzerklärung gilt für die Anwendung und den Service. Durch die Nutzung unserer Anwendung verwenden, können Sie unsere Datenschutzbestimmungen akzeptieren.</string>
-    <string name="privacyPar3">Wir respektieren die Privatsphäre aller Nutzer und stellen Sie sicher, dass persönliche Informationen vertraulich verwendet wird.</string>
-    <string name="privacyPolicy">Datenschutz-Bestimmungen</string>
-    <string name="questionsPar1">Wir überwachen ständig, wenn wir in unseren Datenschutzbestimmungen einhalten. Bei Fragen zum Datenschutz wenden Sie sich bitte an uns.</string>
+    <string name="policy_privacy_text">
+        Wir sind uns bewusst, Ihr Vertrauen in uns. Deshalb haben wir es als unsere primäre Verantwortung nehmen Ihre Privatsphäre zu schützen.
+        Wir werden jedoch Informationen sammeln. Wir werden erklären, warum und was.\n\n
+
+        Unsere Datenschutzerklärung gilt für die Anwendung und den Service. Durch die Nutzung unserer Anwendung verwenden, können Sie unsere Datenschutzbestimmungen akzeptieren.\n\n
+
+        Wir respektieren die Privatsphäre aller Nutzer und stellen Sie sicher, dass persönliche Informationen vertraulich verwendet wird.
+    </string>
+    <string name="policy_privacy_title">Datenschutz-Bestimmungen</string>
+    <string name="policy_faq_text">Wir überwachen ständig, wenn wir in unseren Datenschutzbestimmungen einhalten. Bei Fragen zum Datenschutz wenden Sie sich bitte an uns.</string>
     <string name="report_address">Gib eine Adresse ein</string>
     <string name="report_dialog_message">Warten Sie, während das Senden</string>
     <string name="report_dialog_title">Service-Anfrage</string>
@@ -124,7 +131,6 @@
     <string name="choose_audio_source">Audioquelle auswählen</string>
     <string name="recorder">Mikrofon</string>
     <string name="stop_dialog">Halt</string>
-    <string name="stop_recording">Höre auf, aufzunehmen</string>
-    <string name="start_recording">Starte die Aufnahme</string>
-    <string name="record_dialog">Aufname</string>
+    <string name="record_stop">Höre auf, aufzunehmen</string>
+    <string name="record_start">Starte die Aufnahme</string>
 </resources>

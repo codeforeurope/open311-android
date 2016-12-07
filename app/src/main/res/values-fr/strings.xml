@@ -45,7 +45,6 @@
     <string name="error_403">Cette application n\'est pas authorisée</string>
     <string name="list_user_messages">Mes demandes</string>
     <string name="list_latest_messages">Demandes récent</string>
-    <string name="ApplicationTitle">311</string>
     <string name="ApplicationIcon">Icône d\'application</string>
     <string name="ApplicationEmail">Contactez les autorités</string>
     <string name="Communicate">Communiquer</string>
@@ -71,8 +70,10 @@
     <string name="hint_name">Nom</string>
     <string name="hint_password">Mot de passe</string>
     <string name="hint_phone">Téléphone</string>
-    <string name="introText1">Communiquer les demandes de service avec votre gouvernement</string>
-    <string name="introText2">Votre demande précédente sera affichée ici après avoir créé votre première demande</string>
+    <string name="policy_intro_text">
+        Communiquer les demandes de service avec votre gouvernement\n\n
+        Votre demande précédente sera affichée ici après avoir créé votre première demande
+    </string>
     <string name="invalid_email">Adresse e-mail invalide</string>
     <string name="invalid_name">Nom est invalide</string>
     <string name="invalid_phone">N ° de téléphone est invalide</string>
@@ -83,12 +84,17 @@
     <string name="next">Prochain</string>
     <string name="notImplemented">Pas encore implémenté</string>
     <string name="okay">D\'accord</string>
-    <string name="privacyPar1">Nous sommes conscients de votre confiance en nous. Voilà pourquoi nous considérons comme notre responsabilité première de protéger votre vie privée. Nous allons toutefois recueillir de l\'information. Nous allons expliquer pourquoi et quoi.</string>
-    <string name="privacyPar2">Notre politique de confidentialité s\'applique à l\'application et les services. En utilisant notre application, vous acceptez notre politique de confidentialité.</string>
-    <string name="privacyPar3">Nous respectons la vie privée de tous les utilisateurs et faire en sorte que les informations personnelles sont utilisées confidentielles.</string>
+    <string name="policy_privacy_text">
+        Nous sommes conscients de votre confiance en nous. Voilà pourquoi nous considérons comme notre responsabilité première de protéger votre vie privée.
+        Nous allons toutefois recueillir de l\'information. Nous allons expliquer pourquoi et quoi.\n\n
+
+        Notre politique de confidentialité s\'applique à l\'application et les services. En utilisant notre application, vous acceptez notre politique de confidentialité.\n\n
+
+        Nous respectons la vie privée de tous les utilisateurs et faire en sorte que les informations personnelles sont utilisées confidentielles.
+    </string>
     <string name="policy_privacy_title">Politique de confidentialité</string>
     <string name="policy_faq_title">Questions</string>
-    <string name="questionsPar1">Nous allons surveiller constamment si nous nous conformons à notre politique de confidentialité. Pour toute question concernant la vie privée, s\'il vous plaît contactez-nous.</string>
+    <string name="policy_faq_text">Nous allons surveiller constamment si nous nous conformons à notre politique de confidentialité. Pour toute question concernant la vie privée, s\'il vous plaît contactez-nous.</string>
     <string name="report_address">Entrer une adresse</string>
     <string name="report_dialog_message">Attendez que l\'envoi</string>
     <string name="report_dialog_title">Demande de service</string>
@@ -124,8 +130,7 @@
     <string name="report_hint_sound">Ajouter du son</string>
     <string name="choose_audio_source">Sélectionner une source audio</string>
     <string name="recorder">Microphone</string>
-    <string name="stop_recording">Arrêter l\'enregistrement</string>
+    <string name="record_stop">Arrêter l\'enregistrement</string>
     <string name="stop_dialog">Arrêter</string>
-    <string name="start_recording">Commencer l\'enregistrement</string>
-    <string name="record_dialog">Enregistrement</string>
+    <string name="record_start">Commencer l\'enregistrement</string>
 </resources>

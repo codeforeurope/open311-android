@@ -42,13 +42,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
-            <TextView
-                style="@style/AppTheme.PolicyTitle"
-                android:text="@string/policy_intro_title" />
-
-            <TextView
-                style="@style/AppTheme.PolicyText"
-                android:text="@string/policy_intro_text" />
 
             <TextView
                 style="@style/AppTheme.PolicyTitle"

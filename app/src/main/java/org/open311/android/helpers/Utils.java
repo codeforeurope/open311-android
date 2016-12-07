@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Address;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -15,6 +17,16 @@ import java.util.Random;
 
 public class Utils {
     public static final String OPEN311_SETTINGS = "open311_settings";
+
+    public static void hideKeyBoard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
 
     public static SharedPreferences getSettings(Activity activity) {
         return activity.getSharedPreferences(OPEN311_SETTINGS, 0);
