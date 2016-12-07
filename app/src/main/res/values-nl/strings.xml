@@ -92,9 +92,28 @@
     </string>
     <string name= "policy_intro_title">Informatie</string>
     <string name="policy_intro_text">
-        Met deze app kunt u woonoverlast in Eindhoven melden.\n\n
+        Waar mensen dicht bij elkaar wonen, zal iedereen rekening met elkaar moeten houden.
+        Soms lukt dat niet, en ontstaan er irritaties of burenruzies. Bijvoorbeeld door lawaai, geluidsoverlast, fout parkeren of andere vormen van overlast.
+        Heb je daarmee te maken, doe er dan iets aan.\n\n
+        Een gesprek kan veel oplossen als je op een rustige manier de overlastgever aanspreekt.
+        Vertel van welk gedrag je last hebt en geef aan wat het met je doet.
+        Vertel bovendien hoe zij zich kunnen aanpassen zodat je geen last meer van hen hebt.
+        Luister ook naar het verhaal van de ander.\n\n
+        Helpt het gesprek niet? Misschien kan buurtbemiddeling helpen.
+        Buurtbemiddeling Eindhoven helpt alle buren die een conflict met elkaar hebben en daar uit
+        willen komen. Bij Buurtbemiddeling Eindhoven krijg je gratis tips en hulp van
+        getrainde vrijwillige bemiddelaars. De bemiddelaars zijn mensen afkomstig uit alle
+        buurten van Eindhoven. Zij hebben uiteenlopende (culturele)achtergronden en zijn van
+        verschillende leeftijden. Het team bestaat uit ruim 50 bemiddelaars.\n\n
+        Als een gesprek en buurtbemiddeling niet helpt, dan kun je een melding doen met deze app.
+        Huur je bij een corporatie? Geef dan je eigen adres op als locatie en de app zorgt dat de melding
+        bij de corporatie terecht komt.\n\n
+
+        Is er sprake van strafbare feiten (denk aan geweld of intimidatie) of wil je buiten kantooruren een melding doen?\n\n
+
             \t&#9679;	Is er ’s nachts geluidsoverlast?\n\t\t\tBel de politie via <b>0800-8844</b>\n
             \t&#9679;	Heeft u spoedeisende hulp nodig?\n\t\t\tBel de politie via <b>112</b>\n</string>
+
     <string name="policy_faq_title">Over</string>
     <string name="policy_faq_text">Deze applicatie is Open Source en wordt o.a. ontwikkeld door de <b>Code fellows</b> van de Code For NL.\nWe controleren regelmatig of de applicatie correct werkt. Mocht er onverhoopt iets niet goed gaan, neem dan contact op via <b>info@open311.io</b></string>
     <string name="updated">bewerkt</string>
