@@ -120,7 +120,6 @@
     <string name="report_upload_title">Hochladen</string>
     <string name="servicesDownloaded">dienste heruntergeladen</string>
     <string name="connectionEstablished">Verbindung hergestellt</string>
-    <string name="yes_anonymous">Ja</string>
     <string name="no_anonymous">Nein</string>
     <string name="post_anonymous">Anonym</string>
     <string name="post_anonymous_description">Sie haben keine Kontaktdaten gesetzt. Dies bedeutet, dass verantwortliche Partei nicht in der Lage sein wird, um Sie zu kontaktieren. Wollen Sie Kontaktdaten jetzt hinzufügen?</string>

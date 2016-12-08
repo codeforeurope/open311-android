@@ -39,6 +39,7 @@ public class SoundRecorderActivity extends Activity {
 
     // Views for both
     FloatingActionButton mRecordAudioControlButton;
+    FloatingActionButton mRecordSubmitButton;
     TextView mRecordingStatus;
     Timer mProgressTimer;
 
@@ -114,6 +115,7 @@ public class SoundRecorderActivity extends Activity {
         mRecordAudioProgressBar.setMax(MAX_DURATION_MS);
         mAudioSeekBar = (Chronometer) findViewById(R.id.record_audio_seekbar);
         mRecordAudioControlButton = (FloatingActionButton) findViewById(R.id.record_audio_control_button);
+        mRecordSubmitButton = (FloatingActionButton) findViewById(R.id.record_submit);
         mRecordingStatus = (TextView) findViewById((R.id.recording_status_text));
 
         mOnClickListener = new View.OnClickListener() {
@@ -140,7 +142,14 @@ public class SoundRecorderActivity extends Activity {
                 }
             }
         };
+        mRecordSubmitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                completeRecording();
+            }
+        });
 
+        mRecordingStatus.setText(getString(R.string.record_start));
         mRecordAudioControlButton.setOnClickListener(mOnClickListener);
 
         mAudioSeekBar.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
@@ -181,8 +190,10 @@ public class SoundRecorderActivity extends Activity {
         try {
             mMediaRecorder.start();
             mCurrentRecordingState = RecordingState.STARTED;
+            mRecordSubmitButton.setVisibility(View.INVISIBLE);
             mRecordAudioControlButton.setImageDrawable(ContextCompat.getDrawable(SoundRecorderActivity.this.getApplication().getBaseContext(), R.drawable.ic_stop));
             mAudioSeekBar.start();
+            mRecordingStatus.setText(getString(R.string.record_in_progress));
             mRecordAudioProgressBar.setVisibility(View.VISIBLE);
         } catch (IllegalStateException exception) {
             Log.e(LOG_TAG, "Bad state when starting recording", exception);
@@ -203,6 +214,7 @@ public class SoundRecorderActivity extends Activity {
         Log.i(LOG_TAG, "Recording stopped");
         mCurrentRecordingState = RecordingState.STOPPED;
         mRecordAudioControlButton.setImageDrawable(ContextCompat.getDrawable(SoundRecorderActivity.this.getApplication().getBaseContext(), R.drawable.ic_mic_white_24dp));
+        mRecordSubmitButton.setVisibility(View.VISIBLE);
     }
 
 

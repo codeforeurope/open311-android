@@ -137,7 +137,6 @@
     <string name="report_upload_started">Upload gestart</string>
     <string name="report_upload_title">Upload</string>
     <string name="report_upload_progress">%1$d/%2$d geupload.</string>
-    <string name="yes_anonymous">Ja</string>
     <string name="no_anonymous">Nee, stuur anoniem</string>
     <string name="post_anonymous">Contactgegevens</string>
     <string name="post_anonymous_description">Stel je gegevens in, dan kunnen wij contact met je opnemen. Wil je je contactgegevens instellen?</string>

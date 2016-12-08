@@ -909,7 +909,7 @@ public class ReportFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
             builder.setTitle(getString(R.string.post_anonymous))
                     .setMessage(getString(R.string.post_anonymous_description))
-                    .setPositiveButton(getString(R.string.yes_anonymous), new DialogInterface.OnClickListener() {
+                    .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // TODO redirect to profile
                             TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);

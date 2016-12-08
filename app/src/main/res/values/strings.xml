@@ -118,7 +118,6 @@
     <string name="report_upload_started">Upload started</string>
     <string name="report_upload_title">Upload</string>
     <string name="report_upload_progress">Uploaded %1$d/%2$d.</string>
-    <string name="yes_anonymous">Yes</string>
     <string name="no_anonymous">No, post anonymous</string>
     <string name="post_anonymous">Anonymous</string>
     <string name="post_anonymous_description">You haven\'t set any contact details. This means that responsible party will not be able to contact you. Do you want to add contact details now?</string>

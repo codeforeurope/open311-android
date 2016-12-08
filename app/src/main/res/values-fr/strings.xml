@@ -120,7 +120,6 @@
     <string name="report_upload_title">Télécharger</string>
     <string name="servicesDownloaded">services téléchargés</string>
     <string name="connectionEstablished">Connection établie</string>
-    <string name="yes_anonymous">Oui</string>
     <string name="no_anonymous">Non</string>
     <string name="post_anonymous">Anonyme</string>
     <string name="post_anonymous_description">Vous avez pas réglé détails de contact. Cela signifie que la partie responsable ne sera pas en mesure de vous contacter. Voulez-vous ajouter des détails de contact maintenant?</string>

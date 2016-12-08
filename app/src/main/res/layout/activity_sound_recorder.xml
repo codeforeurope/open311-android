@@ -7,16 +7,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/record_audio_control_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_mic_white_24dp"
-        app:backgroundTint="?attr/colorPrimary" />
-
     <Chronometer
         android:id="@+id/record_audio_seekbar"
         android:layout_width="wrap_content"
@@ -51,7 +41,31 @@
         android:layout_above="@+id/record_audio_control_button"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="60dp"
-        android:text="@string/record_dialog"
+        android:text="@string/record_start"
         android:textColor="#000000" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/record_audio_control_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_mic_white_24dp"
+        app:backgroundTint="?attr/colorPrimary" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/record_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="end|bottom"
+        android:layout_marginBottom="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:visibility="invisible"
+        android:src="@drawable/ic_done"
+        app:backgroundTint="@color/colorPrimary" />
 </RelativeLayout>
