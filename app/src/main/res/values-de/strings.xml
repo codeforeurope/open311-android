@@ -133,4 +133,5 @@
     <string name="stop_dialog">Halt</string>
     <string name="record_stop">Höre auf, aufzunehmen</string>
     <string name="record_start">Starte die Aufnahme</string>
+    <string name="missing_fields">Bitte füllen Sie alle Pflichtfelder aus.</string>
 </resources>
