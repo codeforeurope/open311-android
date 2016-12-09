@@ -133,4 +133,16 @@
     <string name="stop_dialog">Lopettaa</string>
     <string name="record_start">Aloita kuvaaminen</string>
     <string name="missing_fields">Täytä kaikki pakolliset kentät.</string>
+    <string name="policy_intro_title">Tiedot</string>
+    <string name="pg_upload_audio_message">Lataaminen audio</string>
+    <string name="pg_upload_audio_title">Lataa (%1$d/%2$d)</string>
+    <string name="pg_upload_image_message">Lataaminen kuva</string>
+    <string name="pg_upload_image_title">Lataa (%1$d/%2$d)</string>
+    <string name="no_coordinates">sijainti</string>
+    <string name="no_description">kuvaus</string>
+    <string name="no_reports_text">Et ole lähettänyt mitään raportteja vielä. Kun olet luonut ensimmäisen raportin, tämä sivu pitää yleiskatsauksen kaikista raporteista.</string>
+    <string name="no_reports_title">No raportit</string>
+    <string name="no_servicecode">tiedoksianto</string>
+    <string name="record_in_progress">Tallennus käynnissä</string>
+    <string name="record_ready">Tallennus päättynyt</string>
 </resources>

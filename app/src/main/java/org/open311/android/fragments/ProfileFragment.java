@@ -19,8 +19,6 @@ import android.widget.EditText;
 
 import org.open311.android.R;
 
-import java.text.Normalizer;
-
 /**
  * Profile {@link Fragment} subclass.
  */
@@ -29,6 +27,7 @@ public class ProfileFragment extends Fragment {
     private SharedPreferences settings;
     private EditText inputName, inputEmail, inputPhone;
     private TextInputLayout inputLayoutName, inputLayoutEmail, inputLayoutPhone;
+    private FloatingActionButton mSubmitBtn;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -61,8 +60,8 @@ public class ProfileFragment extends Fragment {
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         inputPhone.addTextChangedListener(new MyTextWatcher(inputPhone));
 
-        FloatingActionButton submit = (FloatingActionButton) view.findViewById(R.id.profile_submit);
-        submit.setOnClickListener(new View.OnClickListener() {
+        mSubmitBtn = (FloatingActionButton) view.findViewById(R.id.profile_submit);
+        mSubmitBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onSubmitButtonClicked(v);
@@ -75,19 +74,9 @@ public class ProfileFragment extends Fragment {
     private void onSubmitButtonClicked(View v) {
         SharedPreferences.Editor editor = settings.edit();
         String result;
-
-        if (!validateName()) {
+        if (!validate()) {
             return;
         }
-        ;
-        if (!validateEmail()) {
-            return;
-        }
-        ;
-        if (!validatePhone()) {
-            return;
-        }
-        ;
 
         editor.putString("name", inputName.getText().toString());
         editor.putString("phone", inputPhone.getText().toString());
@@ -102,41 +91,31 @@ public class ProfileFragment extends Fragment {
                 .show();
     }
 
-    private boolean validateName() {
+    private boolean validate() {
         if (inputName.getText().toString().trim().isEmpty()) {
             inputLayoutName.setError(getString(R.string.invalid_name));
-            requestFocus(inputName);
+            mSubmitBtn.setVisibility(View.INVISIBLE);
             return false;
         } else {
             inputLayoutName.setErrorEnabled(false);
         }
-
-        return true;
-    }
-
-    private boolean validateEmail() {
         String strEmail = inputEmail.getText().toString().trim();
 
         if (strEmail.isEmpty() || !isValidEmail(strEmail)) {
             inputLayoutEmail.setError(getString(R.string.invalid_email));
-            requestFocus(inputEmail);
+            mSubmitBtn.setVisibility(View.INVISIBLE);
             return false;
         } else {
             inputLayoutEmail.setErrorEnabled(false);
         }
-
-        return true;
-    }
-
-    private boolean validatePhone() {
         if (inputPhone.getText().toString().trim().isEmpty()) {
             inputLayoutPhone.setError(getString(R.string.invalid_phone));
-            requestFocus(inputPhone);
+            mSubmitBtn.setVisibility(View.INVISIBLE);
             return false;
         } else {
             inputLayoutPhone.setErrorEnabled(false);
         }
-
+        mSubmitBtn.setVisibility(View.VISIBLE);
         return true;
     }
 
@@ -158,24 +137,18 @@ public class ProfileFragment extends Fragment {
             this.view = view;
         }
 
+        @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
         }
 
+        @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
         }
 
         public void afterTextChanged(Editable editable) {
-            switch (view.getId()) {
-                case R.id.input_name:
-                    validateName();
-                    break;
-                case R.id.input_email:
-                    validateEmail();
-                    break;
-                case R.id.input_phone:
-                    validatePhone();
-                    break;
-            }
+            validate();
         }
     }
 }

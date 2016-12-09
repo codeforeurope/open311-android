@@ -140,4 +140,7 @@
     <string name="missing_fields">Please complete all required fields.</string>
     <string name="no_reports_title">No reports</string>
     <string name="no_reports_text">You have not sent any reports yet. When you create your first report, this page will hold an overview of all your reports.</string>
+    <string name="policy_intro_title">Information</string>
+    <string name="record_in_progress">Recording in progress</string>
+    <string name="record_ready">Recording finished</string>
 </resources>

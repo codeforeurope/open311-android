@@ -133,4 +133,16 @@
     <string name="record_stop">Höre auf, aufzunehmen</string>
     <string name="record_start">Starte die Aufnahme</string>
     <string name="missing_fields">Bitte füllen Sie alle Pflichtfelder aus.</string>
+    <string name="policy_intro_title">Information</string>
+    <string name="pg_upload_audio_message">Audio wird hochgeladen</string>
+    <string name="pg_upload_audio_title">Hochladen (%1$d/%2$d)</string>
+    <string name="pg_upload_image_title">Hochladen (%1$d/%2$d)</string>
+    <string name="pg_upload_image_message">Bild wird hochgeladen</string>
+    <string name="no_coordinates">lage</string>
+    <string name="no_description">beschreibung</string>
+    <string name="no_reports_text">Sie haben noch keine Berichte gesendet. Wenn Sie Ihren ersten Bericht erstellen, wird auf dieser Seite eine Übersicht aller Berichte angezeigt.</string>
+    <string name="no_reports_title">Keine Berichte</string>
+    <string name="no_servicecode">dienst</string>
+    <string name="record_in_progress">Aufnahme läuft</string>
+    <string name="record_ready">Aufnahme beendet</string>
 </resources>

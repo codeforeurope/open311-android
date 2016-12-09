@@ -133,4 +133,16 @@
     <string name="stop_dialog">Arrêter</string>
     <string name="record_start">Commencer l\'enregistrement</string>
     <string name="missing_fields">S\'il-vous-plaît complétez tous les champs requis.</string>
+    <string name="policy_intro_title">Information</string>
+    <string name="pg_upload_audio_message">Téléchargement d\'audio</string>
+    <string name="pg_upload_audio_title">Télécharger (%1$d/%2$d)</string>
+    <string name="pg_upload_image_title">Télécharger (%1$d/%2$d)</string>
+    <string name="pg_upload_image_message">Télécharger l\'image</string>
+    <string name="no_coordinates">emplacement</string>
+    <string name="no_description">description</string>
+    <string name="no_reports_text">Vous n\'avez pas encore envoyé de rapports. Lorsque vous créez votre premier rapport, cette page contiendra un aperçu de tous vos rapports.</string>
+    <string name="no_reports_title">Aucun rapport</string>
+    <string name="no_servicecode">service</string>
+    <string name="record_in_progress">Enregistrement en cours</string>
+    <string name="record_ready">Enregistrement terminé</string>
 </resources>

@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -28,13 +27,14 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -105,8 +105,9 @@ public class ReportFragment extends Fragment {
     private ViewSwitcher photoviewSwitcher;
     private ViewSwitcher audioviewSwitcher;
     private AudioStatus mAudioStatus;
+    private FloatingActionButton mSubmitBtn;
+    private EditText mDescriptionView;
     private int mPlayTime = 0;
-
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
     public static final int GALLERY_IMAGE_REQUEST = 103;
@@ -172,20 +173,38 @@ public class ReportFragment extends Fragment {
         LinearLayoutCompat btnService = (LinearLayoutCompat) view.findViewById(R.id.serviceButton);
         LinearLayoutCompat btnLocation = (LinearLayoutCompat) view.findViewById(R.id.locationButton);
         playBtn = (ImageView) view.findViewById(R.id.audioView2);
-        View descriptionView = view.findViewById(R.id.report_description_textbox);
-        FloatingActionButton btnSubmit = (FloatingActionButton) view.findViewById(R.id.report_submit);
+        mDescriptionView = (EditText) view.findViewById(R.id.report_description_textbox);
+        mSubmitBtn = (FloatingActionButton) view.findViewById(R.id.report_submit);
         photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
         audioviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
         //Hide the keyboard unless the descriptionView is selected
-        descriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
                     v.clearFocus();
                     hideKeyBoard(getActivity());
+                } else {
+                    mDescriptionView.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable editable) {
+                            validate();
+                        }
+                    });
                 }
+
             }
         });
         photoPlaceholder.setOnClickListener(new OnClickListener() {
@@ -241,7 +260,7 @@ public class ReportFragment extends Fragment {
             }
         });
 
-        btnSubmit.setOnClickListener(new OnClickListener() {
+        mSubmitBtn.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideKeyBoard(getActivity());
@@ -259,6 +278,7 @@ public class ReportFragment extends Fragment {
             ImageView icon = (ImageView) getActivity().findViewById(R.id.serviceView);
             icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
+        validate(); //required, so validate
     }
 
     private void updateLocation() {
@@ -275,6 +295,7 @@ public class ReportFragment extends Fragment {
             } else {
                 text.setText(R.string.report_hint_location);
             }
+            validate(); //required, so validate
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -434,7 +455,6 @@ public class ReportFragment extends Fragment {
         attributes = new LinkedList<Attribute>();
         attrInfoList = new LinkedList<AttributeInfo>();
         installationId = ((MainActivity) getActivity()).getInstallationId();
-
         new RetrieveServicesTask().execute(); // Load services-list in the background
 
         // Don't show the keyboard if it isn't already shown,
@@ -545,50 +565,28 @@ public class ReportFragment extends Fragment {
 
         boolean isValid = true;
 
-        EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
-
-        String descText = description.getText().toString();
-
-        // Filter description text. Replace everything that is not a word character,
-        // whitespace or one of the symbols .?(),!:;@
-        String pattern = "[^\\w\\s\\.\\?\\(\\),!:;@]";
-        description.setText(
-                Normalizer.normalize(descText, Normalizer.Form.NFD).replaceAll(pattern, "")
-        );
-
+        if (mDescriptionView.getText().length() == 0) {
+            isValid = false;
+        }
         if (serviceCode == null) {
             isValid = false;
-            resetLocation();
         }
 
         if (latitude == null || longitude == null) {
             isValid = false;
-            resetLocation();
         }
 
-        if (description.getText().length() == 0) {
-            isValid = false;
-            description.setHintTextColor(Color.RED);
-        }
 
         if (attrInfoList.size() != 0) {
             isValid = (attrInfoList.size() == attributes.size());
 
         }
         if (!isValid) {
-            String result = getString(R.string.failure_posting_service);
-            Snackbar.make(getView(), result, Snackbar.LENGTH_SHORT)
-                    .show();
+            mSubmitBtn.setVisibility(View.INVISIBLE);
         } else {
-            showFab();
+            mSubmitBtn.setVisibility(View.VISIBLE);
         }
-
         return isValid;
-    }
-
-    private void showFab() {
-        View fab = getActivity().findViewById(R.id.report_submit);
-        fab.setVisibility(View.VISIBLE);
     }
 
     private Boolean checkAnonymous() {
@@ -859,15 +857,18 @@ public class ReportFragment extends Fragment {
     }
 
     private void onSubmitButtonClicked() {
-        Log.d(LOG_TAG, "Submit Button was clicked.");
-
+        Log.d(LOG_TAG, "onSubmitButtonClicked");
+        final String pattern = "[^\\w\\s\\.\\?\\(\\),!:;@]";
         // Check the form result and post the service request
         if (!validate()) {
+            String result = getString(R.string.failure_posting_service);
+            Snackbar.make(getView(), result, Snackbar.LENGTH_SHORT)
+                    .show();
             return;
         }
 
+
         final TextView address = (TextView) getActivity().findViewById(R.id.location_text);
-        final EditText description = (EditText) getActivity().findViewById(R.id.report_description_textbox);
 
         final POSTServiceRequestDataWrapper data = new POSTServiceRequestDataWrapper(
                 serviceCode,
@@ -884,9 +885,13 @@ public class ReportFragment extends Fragment {
             if (name != null) data.setName(name);
             if (email != null) data.setEmail(email);
             if (phone != null) data.setPhone(phone);
+
             data.setDeviceId(installationId)
                     .setAddress(address.getText().toString())
-                    .setDescription(description.getText().toString());
+                    .setDescription(
+                            Normalizer.normalize(
+                                    mDescriptionView.getText().toString(), Normalizer.Form.NFD)
+                                    .replaceAll(pattern, ""));
 
             if (imageUri != null) {
                 Glide.with(getActivity().getApplicationContext())
@@ -923,7 +928,9 @@ public class ReportFragment extends Fragment {
                         public void onClick(DialogInterface dialog, int which) {
                             data.setDeviceId(installationId)
                                     .setAddress(address.getText().toString())
-                                    .setDescription(description.getText().toString());
+                                    .setDescription(Normalizer.normalize(
+                                            mDescriptionView.getText().toString(), Normalizer.Form.NFD)
+                                            .replaceAll(pattern, ""));
 
                             if (imageUri != null) {
                                 Glide.with(getActivity().getApplicationContext())

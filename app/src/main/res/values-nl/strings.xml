@@ -157,4 +157,8 @@
     <string name="no_servicecode">categorie</string>
     <string name="no_reports_title">Geen meldingen</string>
     <string name="no_reports_text">Je hebt nog geen meldingen gedaan. Zodra de eerste melding is verstuurd, zal op deze pagina het overzicht van je meldingen verschijnen.</string>
+    <string name="pg_upload_audio_message">Audio uploaden</string>
+    <string name="pg_upload_audio_title">Uploaden (%1$d/%2$d)</string>
+    <string name="pg_upload_image_title">Uploaden (%1$d/%2$d)</string>
+    <string name="pg_upload_image_message">Afbeelding uploaden</string>
 </resources>
