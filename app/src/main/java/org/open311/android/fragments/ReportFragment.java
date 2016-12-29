@@ -61,7 +61,9 @@ import org.open311.android.MainActivity;
 import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.SoundRecorderActivity;
+import org.open311.android.adapters.AttachmentAdapter;
 import org.open311.android.helpers.MyReportsFile;
+import org.open311.android.models.Attachment;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.adapters.ServicesAdapter;
 
@@ -70,6 +72,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -89,8 +92,6 @@ public class ReportFragment extends Fragment {
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
     private List<Service> services;
-    private String imageUri;
-    private Uri audioUri;
     private ProgressDialog progress;
 
     private String location;
@@ -107,6 +108,7 @@ public class ReportFragment extends Fragment {
     private AudioStatus mAudioStatus;
     private FloatingActionButton mSubmitBtn;
     private EditText mDescriptionView;
+    private AttachmentAdapter attachmentAdapter;
     private int mPlayTime = 0;
     public static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
@@ -303,11 +305,11 @@ public class ReportFragment extends Fragment {
 
     }
 
-    public void playAudio() {
+    public void playAudio(Uri uri) {
         try {
 
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setDataSource(getContext(), audioUri);
+            mMediaPlayer.setDataSource(getContext(), uri);
             mMediaPlayer.prepare();
             mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -338,9 +340,12 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    public void updateAudio() {
-        if (audioUri != null) {
-            Log.d(LOG_TAG, "updateAudio " + audioUri);
+    public void updateAudio(final Uri uri) {
+        if (uri != null) {
+            Attachment _attachment = new Attachment();
+            _attachment.setUri(uri);
+            attachmentAdapter.add(_attachment);
+            Log.d(LOG_TAG, "updateAudio " + uri);
             TextView filename = (TextView) getActivity().findViewById(R.id.audio_text2);
             OnClickListener playClicked = new OnClickListener() {
                 public void onClick(View v) {
@@ -350,15 +355,15 @@ public class ReportFragment extends Fragment {
                         mPlayTime = 0;
                         mAudioStatus = AudioStatus.STOPPED;
                     } else {
-                        playAudio();
+                        playAudio(uri);
                     }
                 }
             };
             playBtn.setOnClickListener(playClicked);
-            filename.setText(niceName(audioUri));
+            filename.setText(niceName(uri));
             audioviewSwitcher.setDisplayedChild(1);
         } else {
-            resetPhoto();
+            resetAudio();
         }
     }
 
@@ -381,20 +386,21 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    public void updatePhoto(Boolean broadcast) {
-        if (imageUri != null) {
-            Log.d(LOG_TAG, "updatePhoto " + imageUri);
+    public void updatePhoto(Uri uri, Boolean broadcast) {
+        if (uri != null) {
+            Attachment _attachment = new Attachment();
+            _attachment.setUri(uri);
+            attachmentAdapter.add(_attachment);
+            Log.d(LOG_TAG, "updatePhoto " + uri);
             if (broadcast) {
                 // Tell the media gallery the photo is created
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                File f = new File(imageUri);
-                Uri contentUri = Uri.fromFile(f);
-                mediaScanIntent.setData(contentUri);
+                mediaScanIntent.setData(uri);
                 getContext().sendBroadcast(mediaScanIntent);
             }
             ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
             Log.d(LOG_TAG, "imageView " + image.toString());
-            Glide.with(getContext()).load(imageUri).asBitmap().into(image);
+            Glide.with(getContext()).load(uri).asBitmap().into(image);
             Log.d(LOG_TAG, "gonna switch!");
             photoviewSwitcher.setDisplayedChild(1);
         } else {
@@ -404,14 +410,12 @@ public class ReportFragment extends Fragment {
 
     private void resetAudio() {
         audioviewSwitcher.setDisplayedChild(0);
-        audioUri = null;
         TextView audioText = (TextView) getActivity().findViewById(R.id.audio_text);
         audioText.setText(R.string.report_hint_sound);
     }
 
     private void resetPhoto() {
         photoviewSwitcher.setDisplayedChild(0);
-        imageUri = null;
         TextView photoText = (TextView) getActivity().findViewById(R.id.photo_text);
         photoText.setText(R.string.report_hint_photo);
     }
@@ -469,8 +473,13 @@ public class ReportFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("imageUri")) {
-                imageUri = savedInstanceState.getString("imageUri");
+            if (savedInstanceState.containsKey("attachments")) {
+                Serializable _att = savedInstanceState.getSerializable("attachments");
+                try {
+                    attachmentAdapter = new AttachmentAdapter((LinkedList<Attachment>) _att);
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
+                }
             }
             if (savedInstanceState.containsKey("location")) {
                 location = savedInstanceState.getString("location");
@@ -510,8 +519,8 @@ public class ReportFragment extends Fragment {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(savedInstanceState);
-        if (imageUri != null) {
-            savedInstanceState.putString("imageUri", imageUri);
+        if (attachmentAdapter != null) {
+            savedInstanceState.putSerializable("attachments", attachmentAdapter.getList());
         }
         if (location != null) {
             savedInstanceState.putString("location", location);
@@ -540,8 +549,8 @@ public class ReportFragment extends Fragment {
     public void onResume() {
         Log.d(LOG_TAG, "onResume");
         super.onResume();
-        updatePhoto(true);
-        updateAudio();
+        updatePhoto(null, false);
+        updateAudio(null);
         updateService();
         updateLocation();
     }
@@ -964,24 +973,21 @@ public class ReportFragment extends Fragment {
         }
         if (requestCode == GALLERY_AUDIO_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                audioUri = data.getData();
-                updateAudio();
+                updateAudio(data.getData());
             } else {
                 resetAudio();
             }
         }
         if (requestCode == RECORDER_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                audioUri = data.getData();
-                updateAudio();
+                updateAudio(data.getData());
             } else {
                 resetAudio();
             }
         }
         if (requestCode == GALLERY_IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                imageUri = data.getData().toString();
-                updatePhoto(false);
+                updatePhoto(data.getData(), false);
             } else {
                 resetPhoto();
             }
@@ -989,8 +995,8 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                if (imageUri == null) return;
-                updatePhoto(true);
+                if (data.getData() == null) return;
+                updatePhoto(data.getData(), true);
             } else {
                 resetPhoto();
             }
@@ -1029,6 +1035,7 @@ public class ReportFragment extends Fragment {
             String result;
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
+                // todo this has to go as the app should check the attachments
                 if (imageUri != null) {
                     HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
                     wrapperFactory.setNetworkManager(networkManager);
@@ -1226,15 +1233,7 @@ public class ReportFragment extends Fragment {
                 extension,         /* suffix */
                 storageDir      /* directory */
         );
-        // Save a file: path for use with ACTION_VIEW intents
-        switch (type) {
-            case AUDIO:
-                audioUri = Uri.fromFile(file);
-                break;
-            case IMAGE:
-            default:
-                imageUri = Uri.fromFile(file).getPath();
-        }
+
         return file;
     }
 
