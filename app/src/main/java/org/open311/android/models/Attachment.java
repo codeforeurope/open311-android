@@ -12,8 +12,30 @@ import java.io.Serializable;
 
 public class Attachment implements Serializable {
 
+    public enum AttachmentType {
+        IMAGE("Image", 0),
+        AUDIO("Audio", 1);
+
+        private String stringValue;
+        private int intValue;
+
+        AttachmentType(String toString, int value) {
+            stringValue = toString;
+            intValue = value;
+        }
+
+        @Override
+        public String toString() {
+            return stringValue;
+        }
+        public int toInt(){
+            return intValue;
+        }
+    }
     private Uri uri;
     private int status;
+    private AttachmentType type;
+
 
     public int getStatus() {
         return status;
@@ -30,5 +52,9 @@ public class Attachment implements Serializable {
     public Attachment setUri(Uri uri) {
         this.uri = uri;
         return this;
+    }
+
+    public Attachment(AttachmentType type){
+        this.type = type;
     }
 }

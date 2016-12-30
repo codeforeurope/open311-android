@@ -137,24 +137,6 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    enum GalleryType {
-        IMAGE("Image", 0),
-        AUDIO("Audio", 1);
-
-        private String stringValue;
-        private int intValue;
-
-        GalleryType(String toString, int value) {
-            stringValue = toString;
-            intValue = value;
-        }
-
-        @Override
-        public String toString() {
-            return stringValue;
-        }
-    }
-
     public ReportFragment() {
         // Required empty public constructor
     }
@@ -342,7 +324,7 @@ public class ReportFragment extends Fragment {
 
     public void updateAudio(final Uri uri) {
         if (uri != null) {
-            Attachment _attachment = new Attachment();
+            Attachment _attachment = new Attachment(Attachment.AttachmentType.AUDIO);
             _attachment.setUri(uri);
             attachmentAdapter.add(_attachment);
             Log.d(LOG_TAG, "updateAudio " + uri);
@@ -388,7 +370,7 @@ public class ReportFragment extends Fragment {
 
     public void updatePhoto(Uri uri, Boolean broadcast) {
         if (uri != null) {
-            Attachment _attachment = new Attachment();
+            Attachment _attachment = new Attachment(Attachment.AttachmentType.IMAGE);
             _attachment.setUri(uri);
             attachmentAdapter.add(_attachment);
             Log.d(LOG_TAG, "updatePhoto " + uri);
@@ -455,7 +437,7 @@ public class ReportFragment extends Fragment {
 
         // Retain this fragment across configuration changes
         setRetainInstance(true);
-
+        attachmentAdapter = new AttachmentAdapter(getContext());
         attributes = new LinkedList<Attribute>();
         attrInfoList = new LinkedList<AttributeInfo>();
         installationId = ((MainActivity) getActivity()).getInstallationId();
@@ -702,7 +684,7 @@ public class ReportFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                 READ_STORAGE_REQUEST);
                     } else {
-                        handleGallery(GalleryType.AUDIO);
+                        handleGallery(Attachment.AttachmentType.AUDIO);
                     }
                 }
             }
@@ -743,7 +725,7 @@ public class ReportFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                 READ_STORAGE_REQUEST);
                     } else {
-                        handleGallery(GalleryType.IMAGE);
+                        handleGallery(Attachment.AttachmentType.IMAGE);
                     }
                 }
             }
@@ -780,7 +762,7 @@ public class ReportFragment extends Fragment {
      * Because we check permissions for Android 6+, this function is also used to propagate
      * actions from the checker
      */
-    private void handleGallery(GalleryType type) {
+    private void handleGallery(Attachment.AttachmentType type) {
         Log.d(LOG_TAG, "HandleGallery");
         View v = getActivity().findViewById(R.id.report_submit);
         if (!isExternalStorageWritable()) {
@@ -791,7 +773,7 @@ public class ReportFragment extends Fragment {
         }
         // Pass the GalleryType to the intent
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-        intent.putExtra("GalleryType", type.intValue);
+        intent.putExtra("GalleryType", type.toInt());
         intent.putExtra("return_data", true);
         // Initiate the correct type of Gallery
         switch (type) {
@@ -819,7 +801,7 @@ public class ReportFragment extends Fragment {
         }
         Intent audioIntent = new Intent(getActivity(), SoundRecorderActivity.class);
         try {
-            File audio = createFile(GalleryType.AUDIO);
+            File audio = createFile(Attachment.AttachmentType.AUDIO);
             audioIntent.setAction(ACTION_EDIT);
             audioIntent.setData(Uri.fromFile(audio));
             startActivityForResult(audioIntent, RECORDER_REQUEST);
@@ -851,7 +833,7 @@ public class ReportFragment extends Fragment {
             // Create the File where the photo should go
             File photo;
             try {
-                photo = createFile(GalleryType.IMAGE);
+                photo = createFile(Attachment.AttachmentType.IMAGE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
@@ -901,23 +883,23 @@ public class ReportFragment extends Fragment {
                             Normalizer.normalize(
                                     mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                     .replaceAll(pattern, ""));
-
-            if (imageUri != null) {
-                Glide.with(getActivity().getApplicationContext())
-                        .load(imageUri)
-                        .asBitmap()
-                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .into(new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-                                bgTask.execute();
-                            }
-                        });
-            } else {
+            // todo, if single attachment and the type is image
+//            if (imageUri != null) {
+//                Glide.with(getActivity().getApplicationContext())
+//                        .load(imageUri)
+//                        .asBitmap()
+//                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+//                        .into(new SimpleTarget<Bitmap>() {
+//                            @Override
+//                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+//                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+//                                bgTask.execute();
+//                            }
+//                        });
+//            } else {
                 PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
                 bgTask.execute();
-            }
+//            }
         } else {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
@@ -941,22 +923,22 @@ public class ReportFragment extends Fragment {
                                             mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                             .replaceAll(pattern, ""));
 
-                            if (imageUri != null) {
-                                Glide.with(getActivity().getApplicationContext())
-                                        .load(imageUri)
-                                        .asBitmap()
-                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                                        .into(new SimpleTarget<Bitmap>() {
-                                            @Override
-                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-                                                bgTask.execute();
-                                            }
-                                        });
-                            } else {
+//                            if (imageUri != null) {
+//                                Glide.with(getActivity().getApplicationContext())
+//                                        .load(imageUri)
+//                                        .asBitmap()
+//                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+//                                        .into(new SimpleTarget<Bitmap>() {
+//                                            @Override
+//                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+//                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+//                                                bgTask.execute();
+//                                            }
+//                                        });
+//                            } else {
                                 PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
                                 bgTask.execute();
-                            }
+//                            }
                         }
                     })
                     .show();
@@ -1036,10 +1018,10 @@ public class ReportFragment extends Fragment {
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
                 // todo this has to go as the app should check the attachments
-                if (imageUri != null) {
-                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
-                    wrapperFactory.setNetworkManager(networkManager);
-                }
+//                if (imageUri != null) {
+//                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
+//                    wrapperFactory.setNetworkManager(networkManager);
+//                }
                 wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentCity().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
@@ -1175,11 +1157,11 @@ public class ReportFragment extends Fragment {
         }
         if (requestCode == GALLERY_AUDIO_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.AUDIO);
+            handleGallery(Attachment.AttachmentType.AUDIO);
         }
         if (requestCode == GALLERY_IMAGE_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.IMAGE);
+            handleGallery(Attachment.AttachmentType.IMAGE);
         }
         if (requestCode == LOCATION_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1206,7 +1188,7 @@ public class ReportFragment extends Fragment {
         return true;
     }
 
-    private File createFile(GalleryType type) throws IOException {
+    private File createFile(Attachment.AttachmentType type) throws IOException {
         String prefix;
         String extension;
         File storageDir;
@@ -1233,7 +1215,6 @@ public class ReportFragment extends Fragment {
                 extension,         /* suffix */
                 storageDir      /* directory */
         );
-
         return file;
     }
 
