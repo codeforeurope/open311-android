@@ -31,6 +31,7 @@ import org.open311.android.helpers.Installation;
 
 import java.util.List;
 
+import static org.open311.android.fragments.ReportFragment.LOCATION_REQUEST;
 import static org.open311.android.helpers.Utils.*;
 
 import io.tus.android.client.TusPreferencesURLStore;
@@ -92,9 +93,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         final List<Server> servers = new Servers().getCollection();
         getMenuInflater().inflate(R.menu.main, menu);
-
-        MenuItem actionItem = menu.findItem(R.id.setting_general);
-        actionItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem mapItem = menu.findItem(R.id.setting_map);
+        MenuItem cityItem = menu.findItem(R.id.setting_general);
+        cityItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -134,6 +135,15 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
                 builder.show();
+                return false;
+            }
+        });
+        mapItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                //Show the map
+                Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                startActivityForResult(intent, LOCATION_REQUEST);
                 return false;
             }
         });

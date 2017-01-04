@@ -147,4 +147,5 @@
     <string name="id">Id</string>
     <string name="citiesListUnavailable">Settings not available, missing Cities list.</string>
     <string name="report_hint_cities">Select your city</string>
+    <string name="setting_map">Map</string>
 </resources>

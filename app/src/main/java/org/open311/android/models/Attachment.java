@@ -3,13 +3,8 @@ package org.open311.android.models;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.webkit.MimeTypeMap;
-
-import com.google.gson.annotations.SerializedName;
 
 import org.open311.android.R;
-
-import java.io.Serializable;
 
 /**
  * Class for attachments that can be part of a open311 report
@@ -88,7 +83,7 @@ public class Attachment implements Parcelable {
         return uri.toString();
     }
 
-    public int getIcon(){
+    public int getIcon() {
         switch (type) {
             case AUDIO:
                 return R.drawable.ic_play_arrow;
