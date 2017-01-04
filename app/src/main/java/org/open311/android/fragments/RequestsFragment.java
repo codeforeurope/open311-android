@@ -9,6 +9,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.open311.android.helpers.Utils.getReportsForCity;
 import static org.open311.android.helpers.Utils.hideKeyBoard;
 
 /**
@@ -142,17 +144,20 @@ public class RequestsFragment extends Fragment {
             Bundle bundle = null;
             APIWrapperFactory factory;
             try {
-                factory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
-                //.setCache(new NoCache())
-                //.withLogs();
-
-
+                MainActivity mActivity = (MainActivity) getActivity();
+                City mCity = mActivity.getCurrentCity();
+                factory = new APIWrapperFactory(mCity, EndpointType.PRODUCTION);
+                String[] mReports = getReportsForCity(mActivity,mCity.getCityName());
+                if(mReports != null) {
+                    Log.d(LOG_TAG, "RetrieveServiceRequestsTask doInBackground - Reports: " + TextUtils.join(", ", mReports));
+                }
                 APIWrapper wrapper;
                 wrapper = factory.build();
                 GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
 
                 MyReportsFile file = new MyReportsFile(getContext());
                 String id = file.getServiceRequestIds();
+
                 if (id == null || id.isEmpty()) {
                     id = "9999"; // FIXME: 12-04-16 temporary fix; id cannot be empty
                 }
@@ -185,7 +190,7 @@ public class RequestsFragment extends Fragment {
             if (data != null) {
                 ArrayList<ServiceRequest> result = data.getParcelableArrayList("Requests");
                 if (result != null) {
-                    Log.d(LOG_TAG, "Request results: " + result.toString());
+                    Log.d(LOG_TAG, "RetrieveServiceRequestsTask onPostExecute - Requests: " + result.toString());
                     // Update the adapter with the result.
                     recyclerViewAdapter.setRequests(result);
                     //
@@ -198,10 +203,10 @@ public class RequestsFragment extends Fragment {
                                         getActivity().findViewById(R.id.intro_container)));
                     }
                 } else {
-                    Log.w(LOG_TAG, "No data received!");
+                    Log.w(LOG_TAG, "RetrieveServiceRequestsTask onPostExecute - No data received!");
                 }
             } else {
-                Log.w(LOG_TAG, "No data received!");
+                Log.w(LOG_TAG, "RetrieveServiceRequestsTask onPostExecute - No data received!");
             }
             swipeRefreshLayout.setRefreshing(false);
         }

@@ -145,4 +145,6 @@
     <string name="no_servicecode">tiedoksianto</string>
     <string name="record_in_progress">Tallennus käynnissä</string>
     <string name="record_ready">Tallennus päättynyt</string>
+    <string name="title">Title</string>
+    <string name="id">Id</string>
 </resources>

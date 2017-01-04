@@ -17,7 +17,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 
+import org.open311.android.MainActivity;
 import org.open311.android.R;
+
+import static org.open311.android.helpers.Utils.getSettings;
+import static org.open311.android.helpers.Utils.saveSetting;
 
 /**
  * Profile {@link Fragment} subclass.
@@ -36,7 +40,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        settings = getActivity().getPreferences(Context.MODE_PRIVATE);
+        settings = getSettings(getActivity());
     }
 
     @Override
@@ -52,9 +56,9 @@ public class ProfileFragment extends Fragment {
         inputEmail = (EditText) view.findViewById(R.id.input_email);
         inputPhone = (EditText) view.findViewById(R.id.input_phone);
 
-        inputName.setText(settings.getString("name", null));
-        inputEmail.setText(settings.getString("email", null));
-        inputPhone.setText(settings.getString("phone", null));
+        inputName.setText(settings.getString("profile_name", null));
+        inputEmail.setText(settings.getString("profile_email", null));
+        inputPhone.setText(settings.getString("profile_phone", null));
 
         inputName.addTextChangedListener(new MyTextWatcher(inputName));
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
@@ -72,21 +76,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void onSubmitButtonClicked(View v) {
-        SharedPreferences.Editor editor = settings.edit();
         String result;
         if (!validate()) {
             return;
         }
 
-        editor.putString("name", inputName.getText().toString());
-        editor.putString("phone", inputPhone.getText().toString());
-        editor.putString("email", inputEmail.getText().toString());
-
-        if (editor.commit()) {
-            result = getString(R.string.settings_saved);
-        } else {
-            result = getString(R.string.error_occurred);
-        }
+        saveSetting(getActivity(), "profile_name", inputName.getText().toString());
+        saveSetting(getActivity(), "profile_phone", inputPhone.getText().toString());
+        result = saveSetting(getActivity(), "profile_email", inputEmail.getText().toString());
         Snackbar.make(v, result, Snackbar.LENGTH_SHORT)
                 .show();
     }

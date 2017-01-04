@@ -22,6 +22,8 @@ import org.open311.android.filters.RequestsFilter;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -31,21 +33,6 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
     private ArrayList<ServiceRequest> filteredRequests;
     private Context context;
 
-    public ArrayList<ServiceRequest> getFilteredRequests() {
-        return filteredRequests;
-    }
-
-    public List<ServiceRequest> getRequests() {
-        return requests;
-    }
-
-    public void appendRequests(List<ServiceRequest> requests) {
-        this.requests.addAll(requests);
-        if (this.requests != null) {
-            setFilteredRequests(this.requests);
-        }
-    }
-
     public void setRequests(List<ServiceRequest> requests) {
         this.requests = requests;
 
@@ -54,22 +41,23 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         }
     }
 
-    public void setFilteredRequests(List<ServiceRequest> requests) {
+    private void setFilteredRequests(List<ServiceRequest> requests) {
         ArrayList<ServiceRequest> filteredRequests = new ArrayList<ServiceRequest>(requests);
         this.filteredRequests.clear();
-        // TODO sort?
         for (final ServiceRequest sr : filteredRequests) {
             this.filteredRequests.add(sr);
         }
-        // The latest version of the API returns a descending list, ordered by input date
-        // Collections.reverse(this.filteredRequests);
-        // TODO filter?
+        Collections.sort(this.filteredRequests, new Comparator<ServiceRequest>() {
+            @Override
+            public int compare(ServiceRequest serviceRequest, ServiceRequest t1) {
+                return serviceRequest.getUpdatedDatetime().compareTo(t1.getUpdatedDatetime());
+            }
+        });
         this.notifyDataSetChanged();
     }
 
     public RequestsAdapter(List<ServiceRequest> requests, RequestsFragment.OnListFragmentInteractionListener mListener) {
         this.requests = requests;
-        RequestsFragment.OnListFragmentInteractionListener mListener1 = mListener;
         if (requests != null) {
             filteredRequests = new ArrayList<ServiceRequest>(requests);
         } else {
@@ -116,14 +104,11 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
             holder.requestImage.setImageDrawable(null);
             holder.requestImage.setVisibility(View.GONE);
         }
-        //Service
-        String code = filteredRequests.get(position).getServiceCode();
-        String name = filteredRequests.get(position).getServiceName();
-        String notice = filteredRequests.get(position).getServiceNotice();
-        String agency = filteredRequests.get(position).getAgencyResponsible();
 
+        String name = filteredRequests.get(position).getServiceName();
         holder.requestName.setText(name);
         holder.requestAddress.setText(address);
+        holder.requestId.setText(id);
 
         if (status != null) {
             holder.requestStatus.setText(context.getText(getResId(status)));
@@ -179,26 +164,26 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         return resId;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final CardView requestCardView;
-        public final TextView requestName;
-        public final TextView requestDescription;
+    class ViewHolder extends RecyclerView.ViewHolder {
+        final View mView;
+        final CardView requestCardView;
+        final TextView requestId;
+        final TextView requestName;
+        final TextView requestDescription;
         //public final TextView requestRequested;
-        public final TextView requestUpdated;
-        public final TextView requestStatus;
-        public final TextView requestAddress;
-        public final ImageView requestImage;
-        public ServiceRequest mItem;
+        final TextView requestUpdated;
+        final TextView requestStatus;
+        final TextView requestAddress;
+        final ImageView requestImage;
 
         ViewHolder(View view) {
             super(view);
             mView = view;
             requestCardView = (CardView) view.findViewById(R.id.requests_list);
+            requestId = (TextView) view.findViewById(R.id.request_id);
             requestName = (TextView) view.findViewById(R.id.request_title);
             requestAddress = (TextView) view.findViewById(R.id.request_address);
             requestDescription = (TextView) view.findViewById(R.id.request_description);
-            //requestRequested = (TextView) view.findViewById(R.id.request_requested);
             requestUpdated = (TextView) view.findViewById(R.id.request_updated);
             requestImage = (ImageView) view.findViewById(R.id.request_image);
             requestStatus = (TextView) view.findViewById(R.id.request_status);

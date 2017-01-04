@@ -145,4 +145,6 @@
     <string name="no_servicecode">dienst</string>
     <string name="record_in_progress">Aufnahme läuft</string>
     <string name="record_ready">Aufnahme beendet</string>
+    <string name="title">Title</string>
+    <string name="id">Id</string>
 </resources>
