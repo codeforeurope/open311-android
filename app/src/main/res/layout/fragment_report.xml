@@ -163,7 +163,7 @@
                         android:layout_marginTop="16dp"
                         android:contentDescription="@string/report_hint_sound"
                         android:scaleType="fitStart"
-                        android:src="@drawable/ic_mic_black_24dp"
+                        android:src="@drawable/ic_mic_black"
                         android:tint="@color/iconColorMutedDark" />
 
                     <LinearLayout

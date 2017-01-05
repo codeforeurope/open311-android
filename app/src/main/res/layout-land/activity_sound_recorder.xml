@@ -53,7 +53,7 @@
         android:id="@+id/record_audio_control_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_mic_white_24dp"
+        android:src="@drawable/ic_mic_white"
         app:backgroundTint="?attr/colorPrimary"
         android:layout_alignTop="@+id/record_submit"
         android:layout_alignLeft="@+id/record_submit"

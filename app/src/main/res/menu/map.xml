@@ -4,7 +4,7 @@
     <!-- Search / will display always -->
     <item android:id="@+id/action_search"
         android:title="@string/menu_search"
-        android:icon="@drawable/ic_search_white_24dp"
+        android:icon="@drawable/ic_search_white"
         app:showAsAction="ifRoom|collapseActionView"
         app:actionViewClass="org.open311.android.widgets.GeocoderView" />
 </menu>

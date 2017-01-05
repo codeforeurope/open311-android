@@ -19,10 +19,10 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     private final List<Fragment> mFragmentList = new ArrayList<Fragment>();
     private Context context;
     private int[] imageResId = {
-            R.drawable.ic_add_alert_white_24dp,
+            R.drawable.ic_add_alert_white,
             R.drawable.ic_notifications_active,
-            R.drawable.ic_person_white_24dp,
-            R.drawable.ic_info_white_24dp
+            R.drawable.ic_person_white,
+            R.drawable.ic_info_white
     };
     public ViewPagerAdapter(FragmentManager manager, Context context) {
         super(manager);

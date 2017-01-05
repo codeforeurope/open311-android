@@ -51,7 +51,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="10dp"
-        android:src="@drawable/ic_mic_white_24dp"
+        android:src="@drawable/ic_mic_white"
         app:backgroundTint="?attr/colorPrimary" />
 
     <android.support.design.widget.FloatingActionButton
