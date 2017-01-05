@@ -65,7 +65,7 @@ import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.SoundRecorderActivity;
 
-import org.open311.android.adapters.AttachmentAdapter;
+//import org.open311.android.adapters.AttachmentAdapter;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.models.Attachment;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
@@ -100,7 +100,7 @@ public class ReportFragment extends Fragment {
     private LinkedList<Attachment> attachments;
     private List<Service> services;
 
-    private AttachmentAdapter attachmentAdapter;
+    //private AttachmentAdapter attachmentAdapter;
 
     private ProgressDialog progress;
 
@@ -170,9 +170,9 @@ public class ReportFragment extends Fragment {
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
         new RetrieveServicesTask().execute(); // Load services-list in the background
-        attachmentAdapter = new AttachmentAdapter(getActivity(), attachments);
-        ListView listView = (ListView) view.findViewById(R.id.attachment_list);
-        listView.setAdapter(attachmentAdapter);
+        //attachmentAdapter = new AttachmentAdapter(getActivity(), attachments);
+        //ListView listView = (ListView) view.findViewById(R.id.attachment_list);
+        //listView.setAdapter(attachmentAdapter);
         //Hide the keyboard unless the descriptionView is selected
         mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -334,7 +334,7 @@ public class ReportFragment extends Fragment {
 
     public void updateAudio(final Uri uri) {
         if (uri != null) {
-            attachmentAdapter.add(new Attachment(Attachment.AttachmentType.AUDIO, uri));
+            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.AUDIO, uri));
             Log.d(LOG_TAG, "updateAudio - Uri:" + uri);
             TextView filename = (TextView) getActivity().findViewById(R.id.audio_text2);
             OnClickListener playClicked = new OnClickListener() {
@@ -378,7 +378,7 @@ public class ReportFragment extends Fragment {
 
     public void updatePhoto(Uri uri, Boolean broadcast) {
         if (uri != null) {
-            attachmentAdapter.add(new Attachment(Attachment.AttachmentType.IMAGE, uri));
+            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.IMAGE, uri));
             Log.d(LOG_TAG, "updatePhoto - Uri:" + uri);
             if (broadcast) {
                 // Tell the media gallery the photo is created

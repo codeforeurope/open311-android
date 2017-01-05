@@ -119,6 +119,13 @@ public class MainActivity extends AppCompatActivity
                                 if (!currentCity.getCityName().equals(values[index])) {
                                     Log.d(LOG_TAG, "onCreateOptionsMenu - Selected City: " + values[index]);
                                     result = saveSetting(MainActivity.this, "current_city", values[index]);
+
+                                    //remove sharedSettings for Map so map resets
+                                    removeSetting(MainActivity.this, "map_address_string");
+                                    removeSetting(MainActivity.this, "map_latitude");
+                                    removeSetting(MainActivity.this, "map.longitude");
+                                    removeSetting(MainActivity.this, "map_zoom");
+
                                     getCurrentCity();
                                     recreate();
                                 }

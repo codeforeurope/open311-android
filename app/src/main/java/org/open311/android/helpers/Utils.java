@@ -72,6 +72,19 @@ public class Utils {
         return sb.toString();
     }
 
+    public static String saveSetting(Activity activity, String key, Float value) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        String result = null;
+        editor.putFloat(key.replace(',', '_').replace(' ', '_').toLowerCase(), value);
+        if (editor.commit()) {
+            result = activity.getString(R.string.settings_saved);
+        } else {
+            result = activity.getString(R.string.error_occurred);
+        }
+        return result;
+    }
+
     public static String saveSetting(Activity activity, String key, String value) {
         SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
         SharedPreferences.Editor editor = settings.edit();
@@ -85,7 +98,7 @@ public class Utils {
         return result;
     }
 
-    public static String saveSetting(Activity activity, String key, List<String> values){
+    public static String saveSetting(Activity activity, String key, List<String> values) {
         SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
         SharedPreferences.Editor editor = settings.edit();
         String result;
@@ -102,17 +115,25 @@ public class Utils {
         return result;
     }
 
+    public static Boolean removeSetting(Activity activity, String key) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove(key.replace(',', '_').replace(' ', '_').toLowerCase());
+        return editor.commit();
+    }
 
-
-    public static String[] updateReportsForCity(Activity activity, String city, String value){
+    public static String[] updateReportsForCity(Activity activity, String city, String value) {
         List<String> mList = new ArrayList<String>();
-        Collections.addAll(mList, getReportsForCity(activity, city));
+        String[] existingReports = getReportsForCity(activity, city);
+        if(existingReports != null){
+            Collections.addAll(mList, existingReports);
+        }
         mList.add(value);
         saveSetting(activity, city, mList);
         return getReportsForCity(activity, city);
     }
 
-    public static String[] getReportsForCity(Activity activity, String city){
+    public static String[] getReportsForCity(Activity activity, String city) {
         SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
         Gson gson = new Gson();
         String jsonText = settings.getString(city.replace(',', '_').replace(' ', '_').toLowerCase(), null);

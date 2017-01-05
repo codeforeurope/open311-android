@@ -293,7 +293,7 @@
                         android:tint="@color/iconColorMutedDark" />
                 </android.support.v7.widget.LinearLayoutCompat>
             </ViewSwitcher>
-            <android.support.v7.widget.ListViewCompat xmlns:android="http://schemas.android.com/apk/res/android"
+            <!--<android.support.v7.widget.ListViewCompat xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 xmlns:tools="http://schemas.android.com/tools"
                 android:id="@+id/attachment_list"
@@ -307,7 +307,7 @@
                 android:padding="0dp"
                 app:layoutManager="LinearLayoutManager"
                 tools:context=".fragments.ReportFragment"
-                tools:listitem="@layout/item_attachment" />
+                tools:listitem="@layout/item_attachment" />-->
         </android.support.v7.widget.LinearLayoutCompat>
     </ScrollView>
 

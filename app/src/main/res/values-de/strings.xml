@@ -145,6 +145,9 @@
     <string name="no_servicecode">dienst</string>
     <string name="record_in_progress">Aufnahme läuft</string>
     <string name="record_ready">Aufnahme beendet</string>
-    <string name="title">Title</string>
+    <string name="title">Titel</string>
     <string name="id">Id</string>
+    <string name="citiesListUnavailable">Einstellungen nicht vorhanden, fehlende Städteliste.</string>
+    <string name="report_hint_cities">Wählen Sie Ihre Stadt</string>
+    <string name="setting_map">Karte</string>
 </resources>
