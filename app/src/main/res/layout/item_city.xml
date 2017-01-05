@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/service_text_container"
+    android:id="@+id/item_city"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
@@ -11,19 +11,12 @@
     android:paddingRight="24dp">
 
     <TextView
-        android:id="@+id/item_service_name"
+        android:id="@+id/item_city_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:lines="1"
         android:maxLines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
         android:paddingTop="12dp"/>
-
-    <TextView
-        android:id="@+id/item_service_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:paddingBottom="12dp"/>
 
 </android.support.v7.widget.LinearLayoutCompat>

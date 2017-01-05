@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.database.Cursor;
 import android.media.MediaPlayer;
+import android.preference.Preference;
 import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -27,6 +28,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -38,6 +40,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
@@ -51,17 +54,20 @@ import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.EndpointType;
 import org.codeforamerica.open311.facade.data.Attribute;
 import org.codeforamerica.open311.facade.data.AttributeInfo;
+import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.POSTServiceRequestResponse;
 import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
-import org.codeforamerica.open311.internals.network.HTTPNetworkManager;
 import org.open311.android.MainActivity;
 import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.SoundRecorderActivity;
+
+//import org.open311.android.adapters.AttachmentAdapter;
 import org.open311.android.helpers.MyReportsFile;
+import org.open311.android.models.Attachment;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.adapters.ServicesAdapter;
 
@@ -70,6 +76,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,7 +84,9 @@ import java.util.List;
 import java.util.Locale;
 
 import static android.content.Intent.ACTION_EDIT;
+import static org.open311.android.helpers.Utils.getSettings;
 import static org.open311.android.helpers.Utils.hideKeyBoard;
+import static org.open311.android.helpers.Utils.updateReportsForCity;
 
 /**
  * Report {@link Fragment} subclass.
@@ -88,9 +97,11 @@ public class ReportFragment extends Fragment {
 
     private LinkedList<AttributeInfo> attrInfoList;
     private LinkedList<Attribute> attributes;
+    private LinkedList<Attachment> attachments;
     private List<Service> services;
-    private String imageUri;
-    private Uri audioUri;
+
+    //private AttachmentAdapter attachmentAdapter;
+
     private ProgressDialog progress;
 
     private String location;
@@ -116,6 +127,7 @@ public class ReportFragment extends Fragment {
     public static final int GALLERY_AUDIO_REQUEST = 107;
 
     private static final boolean ATTRIBUTES_ENABLED = false;
+    private SharedPreferences settings;
 
     enum AudioStatus {
         PLAYING("Playing", 0),
@@ -135,24 +147,6 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    enum GalleryType {
-        IMAGE("Image", 0),
-        AUDIO("Audio", 1);
-
-        private String stringValue;
-        private int intValue;
-
-        GalleryType(String toString, int value) {
-            stringValue = toString;
-            intValue = value;
-        }
-
-        @Override
-        public String toString() {
-            return stringValue;
-        }
-    }
-
     public ReportFragment() {
         // Required empty public constructor
     }
@@ -160,10 +154,6 @@ public class ReportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         Log.d(LOG_TAG, "onCreateView");
-        if (state != null)
-            Log.d(LOG_TAG, state.toString());
-
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_report, container, false);
 
         LinearLayoutCompat btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
@@ -179,6 +169,10 @@ public class ReportFragment extends Fragment {
         audioviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
+        new RetrieveServicesTask().execute(); // Load services-list in the background
+        //attachmentAdapter = new AttachmentAdapter(getActivity(), attachments);
+        //ListView listView = (ListView) view.findViewById(R.id.attachment_list);
+        //listView.setAdapter(attachmentAdapter);
         //Hide the keyboard unless the descriptionView is selected
         mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -286,11 +280,11 @@ public class ReportFragment extends Fragment {
             TextView text = (TextView) getActivity().findViewById(R.id.location_text);
             if (location == null && source != null) {
                 String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
-                Log.d(LOG_TAG, "Coordinates: " + coordText);
+                Log.d(LOG_TAG, "updateLocation - Coordinates: " + coordText);
                 text.setText(coordText);
             }
             if (location != null && source != null) {
-                Log.d(LOG_TAG, "Address: " + location);
+                Log.d(LOG_TAG, "updateLocation - Address: " + location);
                 text.setText(location);
             } else {
                 text.setText(R.string.report_hint_location);
@@ -303,11 +297,11 @@ public class ReportFragment extends Fragment {
 
     }
 
-    public void playAudio() {
+    public void playAudio(Uri uri) {
         try {
 
             mMediaPlayer = new MediaPlayer();
-            mMediaPlayer.setDataSource(getContext(), audioUri);
+            mMediaPlayer.setDataSource(getContext(), uri);
             mMediaPlayer.prepare();
             mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -333,14 +327,15 @@ public class ReportFragment extends Fragment {
             });
 
         } catch (Exception e) {
-            Log.e(LOG_TAG, "Exception: " + e.getMessage());
+            Log.e(LOG_TAG, "playAudio - Exception: " + e.getMessage());
             mAudioStatus = AudioStatus.STOPPED;
         }
     }
 
-    public void updateAudio() {
-        if (audioUri != null) {
-            Log.d(LOG_TAG, "updateAudio " + audioUri);
+    public void updateAudio(final Uri uri) {
+        if (uri != null) {
+            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.AUDIO, uri));
+            Log.d(LOG_TAG, "updateAudio - Uri:" + uri);
             TextView filename = (TextView) getActivity().findViewById(R.id.audio_text2);
             OnClickListener playClicked = new OnClickListener() {
                 public void onClick(View v) {
@@ -350,15 +345,15 @@ public class ReportFragment extends Fragment {
                         mPlayTime = 0;
                         mAudioStatus = AudioStatus.STOPPED;
                     } else {
-                        playAudio();
+                        playAudio(uri);
                     }
                 }
             };
             playBtn.setOnClickListener(playClicked);
-            filename.setText(niceName(audioUri));
+            filename.setText(niceName(uri));
             audioviewSwitcher.setDisplayedChild(1);
         } else {
-            resetPhoto();
+            resetAudio();
         }
     }
 
@@ -381,21 +376,20 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    public void updatePhoto(Boolean broadcast) {
-        if (imageUri != null) {
-            Log.d(LOG_TAG, "updatePhoto " + imageUri);
+    public void updatePhoto(Uri uri, Boolean broadcast) {
+        if (uri != null) {
+            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.IMAGE, uri));
+            Log.d(LOG_TAG, "updatePhoto - Uri:" + uri);
             if (broadcast) {
                 // Tell the media gallery the photo is created
                 Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-                File f = new File(imageUri);
-                Uri contentUri = Uri.fromFile(f);
-                mediaScanIntent.setData(contentUri);
+                mediaScanIntent.setData(uri);
                 getContext().sendBroadcast(mediaScanIntent);
             }
             ImageView image = (ImageView) getActivity().findViewById(R.id.photoPlaceholder);
-            Log.d(LOG_TAG, "imageView " + image.toString());
-            Glide.with(getContext()).load(imageUri).asBitmap().into(image);
-            Log.d(LOG_TAG, "gonna switch!");
+            Log.d(LOG_TAG, "updatePhoto - imageView: " + image.toString());
+            Glide.with(getContext()).load(uri).asBitmap().into(image);
+            Log.d(LOG_TAG, "updatePhoto - switching displayedChild");
             photoviewSwitcher.setDisplayedChild(1);
         } else {
             resetPhoto();
@@ -404,14 +398,12 @@ public class ReportFragment extends Fragment {
 
     private void resetAudio() {
         audioviewSwitcher.setDisplayedChild(0);
-        audioUri = null;
         TextView audioText = (TextView) getActivity().findViewById(R.id.audio_text);
         audioText.setText(R.string.report_hint_sound);
     }
 
     private void resetPhoto() {
         photoviewSwitcher.setDisplayedChild(0);
-        imageUri = null;
         TextView photoText = (TextView) getActivity().findViewById(R.id.photo_text);
         photoText.setText(R.string.report_hint_photo);
     }
@@ -448,30 +440,27 @@ public class ReportFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        settings = getSettings(getActivity());
         // Retain this fragment across configuration changes
         setRetainInstance(true);
-
         attributes = new LinkedList<Attribute>();
         attrInfoList = new LinkedList<AttributeInfo>();
+        attachments = new LinkedList<Attachment>();
         installationId = ((MainActivity) getActivity()).getInstallationId();
-        new RetrieveServicesTask().execute(); // Load services-list in the background
 
         // Don't show the keyboard if it isn't already shown,
         // but if it was open when entering the activity, leave it open.
         // To always hide the keyboard when the activity starts: SOFT_INPUT_STATE_ALWAYS_HIDDEN
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-    }
+
+     }
 
     @Override
     @SuppressWarnings("unchecked")
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("imageUri")) {
-                imageUri = savedInstanceState.getString("imageUri");
-            }
             if (savedInstanceState.containsKey("location")) {
                 location = savedInstanceState.getString("location");
             }
@@ -487,6 +476,7 @@ public class ReportFragment extends Fragment {
             if (savedInstanceState.containsKey("serviceCode")) {
                 serviceCode = savedInstanceState.getString("serviceCode");
             }
+
             if (savedInstanceState.containsKey("attributes")) {
                 Serializable state = savedInstanceState.getSerializable("attributes");
                 try {
@@ -495,6 +485,7 @@ public class ReportFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
             if (savedInstanceState.containsKey("attrInfoList")) {
                 Serializable state = savedInstanceState.getSerializable("attrInfoList");
                 try {
@@ -503,6 +494,22 @@ public class ReportFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
+
+            if (savedInstanceState.containsKey("attachments")) {
+                Serializable state = savedInstanceState.getSerializable("attachments");
+                try {
+                    attachments = (LinkedList<Attachment>) state;
+                } catch (ClassCastException e) {
+                    e.printStackTrace();
+                }
+            }
+//            for (Attachment item : attachments) {
+//                if(item.getType() == Attachment.AttachmentType.AUDIO){
+//                    updateAudio(item.getUri());
+//                } else if(item.getType() == Attachment.AttachmentType.IMAGE){
+//                    updatePhoto(item.getUri(), true);
+//                }
+//            }
         }
     }
 
@@ -510,9 +517,7 @@ public class ReportFragment extends Fragment {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onSaveInstanceState");
         super.onSaveInstanceState(savedInstanceState);
-        if (imageUri != null) {
-            savedInstanceState.putString("imageUri", imageUri);
-        }
+
         if (location != null) {
             savedInstanceState.putString("location", location);
         }
@@ -534,14 +539,15 @@ public class ReportFragment extends Fragment {
         if (attrInfoList != null) {
             savedInstanceState.putSerializable("attrInfoList", attrInfoList);
         }
+        if (attachments != null) {
+            savedInstanceState.putSerializable("attachments", attachments);
+        }
     }
 
     @Override
     public void onResume() {
         Log.d(LOG_TAG, "onResume");
         super.onResume();
-        updatePhoto(true);
-        updateAudio();
         updateService();
         updateLocation();
     }
@@ -590,9 +596,8 @@ public class ReportFragment extends Fragment {
     }
 
     private Boolean checkAnonymous() {
-        SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-        String email = settings.getString("email", null);
-        String phone = settings.getString("phone", null);
+        String email = settings.getString("profile_email", null);
+        String phone = settings.getString("profile_phone", null);
         Boolean anonymous = true;
         if (email != null) {
             anonymous = false;
@@ -622,7 +627,7 @@ public class ReportFragment extends Fragment {
         while (iterator.hasNext()) {
             final AttributeInfo attr = iterator.next();
             if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
-                Log.d(LOG_TAG, "ATTR-INFO: " + attr.getDatatype());
+                Log.d(LOG_TAG, "addAttributesToForm - Attribute info: " + attr.getDatatype());
             }
         }
     }
@@ -644,15 +649,16 @@ public class ReportFragment extends Fragment {
             values[index] = item.getServiceName();
             index++;
         }
+        ServicesAdapter servicesAdapter = new ServicesAdapter(getActivity(), services);
         builder.setTitle(R.string.report_hint_service)
                 .setCancelable(false)
-                .setAdapter(new ServicesAdapter(getActivity(), services),
+                .setAdapter(servicesAdapter,
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int index) {
                                 serviceName = values[index];
                                 serviceCode = codes[index];
-                                Log.d(LOG_TAG, "SELECTED SERVICE: " + serviceName);
+                                Log.d(LOG_TAG, "onServiceButtonClicked - Selected: " + serviceName);
                                 updateService();
                                 if (ATTRIBUTES_ENABLED) {
                                     new RetrieveAttributesTask(codes[index]).execute();
@@ -693,7 +699,7 @@ public class ReportFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                 READ_STORAGE_REQUEST);
                     } else {
-                        handleGallery(GalleryType.AUDIO);
+                        handleGallery(Attachment.AttachmentType.AUDIO);
                     }
                 }
             }
@@ -734,7 +740,7 @@ public class ReportFragment extends Fragment {
                         requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                                 READ_STORAGE_REQUEST);
                     } else {
-                        handleGallery(GalleryType.IMAGE);
+                        handleGallery(Attachment.AttachmentType.IMAGE);
                     }
                 }
             }
@@ -771,7 +777,7 @@ public class ReportFragment extends Fragment {
      * Because we check permissions for Android 6+, this function is also used to propagate
      * actions from the checker
      */
-    private void handleGallery(GalleryType type) {
+    private void handleGallery(Attachment.AttachmentType type) {
         Log.d(LOG_TAG, "HandleGallery");
         View v = getActivity().findViewById(R.id.report_submit);
         if (!isExternalStorageWritable()) {
@@ -782,7 +788,7 @@ public class ReportFragment extends Fragment {
         }
         // Pass the GalleryType to the intent
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT, null);
-        intent.putExtra("GalleryType", type.intValue);
+        intent.putExtra("GalleryType", type.toInt());
         intent.putExtra("return_data", true);
         // Initiate the correct type of Gallery
         switch (type) {
@@ -810,7 +816,7 @@ public class ReportFragment extends Fragment {
         }
         Intent audioIntent = new Intent(getActivity(), SoundRecorderActivity.class);
         try {
-            File audio = createFile(GalleryType.AUDIO);
+            File audio = createFile(Attachment.AttachmentType.AUDIO);
             audioIntent.setAction(ACTION_EDIT);
             audioIntent.setData(Uri.fromFile(audio));
             startActivityForResult(audioIntent, RECORDER_REQUEST);
@@ -842,7 +848,7 @@ public class ReportFragment extends Fragment {
             // Create the File where the photo should go
             File photo;
             try {
-                photo = createFile(GalleryType.IMAGE);
+                photo = createFile(Attachment.AttachmentType.IMAGE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
                 startActivityForResult(cameraIntent, CAMERA_REQUEST);
 
@@ -877,10 +883,9 @@ public class ReportFragment extends Fragment {
                 attributes);
 
         if (!checkAnonymous()) {
-            SharedPreferences settings = getActivity().getPreferences(Context.MODE_PRIVATE);
-            String name = settings.getString("name", null);
-            String email = settings.getString("email", null);
-            String phone = settings.getString("phone", null);
+            String name = settings.getString("profile_name", null);
+            String email = settings.getString("profile_email", null);
+            String phone = settings.getString("profile_phone", null);
 
             if (name != null) data.setName(name);
             if (email != null) data.setEmail(email);
@@ -892,23 +897,23 @@ public class ReportFragment extends Fragment {
                             Normalizer.normalize(
                                     mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                     .replaceAll(pattern, ""));
-
-            if (imageUri != null) {
-                Glide.with(getActivity().getApplicationContext())
-                        .load(imageUri)
-                        .asBitmap()
-                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                        .into(new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-                                bgTask.execute();
-                            }
-                        });
-            } else {
+            // todo, if single attachment and the type is image
+//            if (imageUri != null) {
+//                Glide.with(getActivity().getApplicationContext())
+//                        .load(imageUri)
+//                        .asBitmap()
+//                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+//                        .into(new SimpleTarget<Bitmap>() {
+//                            @Override
+//                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+//                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+//                                bgTask.execute();
+//                            }
+//                        });
+//            } else {
                 PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
                 bgTask.execute();
-            }
+//            }
         } else {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
@@ -932,22 +937,22 @@ public class ReportFragment extends Fragment {
                                             mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                             .replaceAll(pattern, ""));
 
-                            if (imageUri != null) {
-                                Glide.with(getActivity().getApplicationContext())
-                                        .load(imageUri)
-                                        .asBitmap()
-                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                                        .into(new SimpleTarget<Bitmap>() {
-                                            @Override
-                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-                                                bgTask.execute();
-                                            }
-                                        });
-                            } else {
+//                            if (imageUri != null) {
+//                                Glide.with(getActivity().getApplicationContext())
+//                                        .load(imageUri)
+//                                        .asBitmap()
+//                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+//                                        .into(new SimpleTarget<Bitmap>() {
+//                                            @Override
+//                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+//                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
+//                                                bgTask.execute();
+//                                            }
+//                                        });
+//                            } else {
                                 PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
                                 bgTask.execute();
-                            }
+//                            }
                         }
                     })
                     .show();
@@ -964,24 +969,21 @@ public class ReportFragment extends Fragment {
         }
         if (requestCode == GALLERY_AUDIO_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                audioUri = data.getData();
-                updateAudio();
+                updateAudio(data.getData());
             } else {
                 resetAudio();
             }
         }
         if (requestCode == RECORDER_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                audioUri = data.getData();
-                updateAudio();
+                updateAudio(data.getData());
             } else {
                 resetAudio();
             }
         }
         if (requestCode == GALLERY_IMAGE_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                imageUri = data.getData().toString();
-                updatePhoto(false);
+                updatePhoto(data.getData(), false);
             } else {
                 resetPhoto();
             }
@@ -989,8 +991,8 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                if (imageUri == null) return;
-                updatePhoto(true);
+                if (data.getData() == null) return;
+                updatePhoto(data.getData(), true);
             } else {
                 resetPhoto();
             }
@@ -1029,10 +1031,11 @@ public class ReportFragment extends Fragment {
             String result;
             try {
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
-                if (imageUri != null) {
-                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
-                    wrapperFactory.setNetworkManager(networkManager);
-                }
+                // todo this has to go as the app should check the attachments
+//                if (imageUri != null) {
+//                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
+//                    wrapperFactory.setNetworkManager(networkManager);
+//                }
                 wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentCity().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
@@ -1059,6 +1062,9 @@ public class ReportFragment extends Fragment {
 
         private boolean saveServiceRequestId(String id) {
             MyReportsFile file = new MyReportsFile(getContext());
+            MainActivity mActivity = (MainActivity) getActivity();
+            City mCity = mActivity.getCurrentCity();
+            updateReportsForCity(mActivity, mCity.getCityName(), id);
             try {
                 return file.addServiceRequestId(id);
             } catch (IOException e) {
@@ -1078,13 +1084,13 @@ public class ReportFragment extends Fragment {
             if (progress != null && progress.isShowing()) {
                 progress.dismiss();
             }
-            Log.d(LOG_TAG, "POST RESULT: " + result);
+            Log.d(LOG_TAG, "PostServiceRequestTask onPostExecute - Post result: " + result);
 
             if (success) resetAll();
 
             MyReportsFile file = new MyReportsFile(getContext());
             int reqs = file.getServiceRequestLength();
-            Log.d(LOG_TAG, "requests for user: " + reqs);
+            Log.d(LOG_TAG, "PostServiceRequestTask onPostExecute - Requests for user: " + reqs);
 
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.report_dialog_title))
@@ -1125,7 +1131,7 @@ public class ReportFragment extends Fragment {
                     attrInfoList.add(o);
                 }
                 count = attrInfoList.size();
-                Log.d(LOG_TAG, "ATTRIBUTE COUNT: " + count);
+                Log.d(LOG_TAG, "RetrieveAttributesTask doInBackground - Attribute count: " + count);
 
             } catch (APIWrapperException e) {
                 e.printStackTrace();
@@ -1139,23 +1145,71 @@ public class ReportFragment extends Fragment {
 
         protected void onPostExecute(Integer count) {
             if (count == 0) {
-                Log.d(LOG_TAG, "THE SELECTED SERVICE HAS NO ATTRIBUTES");
+                Log.d(LOG_TAG, "RetrieveAttributesTask onPostExecute - Service has no attributes");
             }
         }
     }
 
-    private class RetrieveServicesTask extends AsyncTask<Void, Void, Void> {
-        /**
-         * Get services in the background.
-         *
-         * @param ignore the parameters of the task
-         */
+    private class RetrieveServicesTask  extends AsyncTask<String, Void, List<Service>> {
+
+        ProgressDialog progressDialog;
+
         @Override
-        protected Void doInBackground(Void... ignore) {
-            if (services != null) return null;
-            services = ((MainActivity) getActivity()).getServices();
+        protected List<Service> doInBackground(String... params) {
+            Log.d(LOG_TAG, "RetrieveServicesTask - doInBackground");
+            services = null; //reset services
+            APIWrapper wrapper;
+            try {
+                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION).build();
+                publishProgress();
+                return wrapper.getServiceList();
+            } catch (APIWrapperException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return null;
         }
+
+        @Override
+        protected void onPostExecute(List<Service> result) {
+            progressDialog.cancel();
+            Log.d(LOG_TAG, "RetrieveServicesTask onPostExecute - Result: " + result);
+            if (result != null) {
+                // todo, reactivate the services list on the Report Fragment
+                services = result;
+                resetAll();
+            } else {
+                Log.w(LOG_TAG, "RetrieveServicesTask onPostExecute - Could not download services!");
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {
+
+            progressDialog = new ProgressDialog(
+                    getActivity());
+
+            progressDialog.setMessage(getString(R.string.contactingServer) + " " + ((MainActivity) getActivity()).getCurrentCity().getCityName());
+            getActivity().setTitle(getString(R.string.app_name) + " " + ((MainActivity) getActivity()).getCurrentCity().getTitle());
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            if (services == null) {
+                progressDialog.setMessage(getString(R.string.connectionEstablished));
+            } else {
+                if (services.size() > 0) {
+                    progressDialog.setMessage(services.size() + " " + getString(R.string.servicesDownloaded));
+                }
+            }
+        }
+
     }
 
     @Override
@@ -1168,11 +1222,11 @@ public class ReportFragment extends Fragment {
         }
         if (requestCode == GALLERY_AUDIO_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.AUDIO);
+            handleGallery(Attachment.AttachmentType.AUDIO);
         }
         if (requestCode == GALLERY_IMAGE_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            handleGallery(GalleryType.IMAGE);
+            handleGallery(Attachment.AttachmentType.IMAGE);
         }
         if (requestCode == LOCATION_REQUEST
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1199,7 +1253,7 @@ public class ReportFragment extends Fragment {
         return true;
     }
 
-    private File createFile(GalleryType type) throws IOException {
+    private File createFile(Attachment.AttachmentType type) throws IOException {
         String prefix;
         String extension;
         File storageDir;
@@ -1226,15 +1280,6 @@ public class ReportFragment extends Fragment {
                 extension,         /* suffix */
                 storageDir      /* directory */
         );
-        // Save a file: path for use with ACTION_VIEW intents
-        switch (type) {
-            case AUDIO:
-                audioUri = Uri.fromFile(file);
-                break;
-            case IMAGE:
-            default:
-                imageUri = Uri.fromFile(file).getPath();
-        }
         return file;
     }
 

@@ -161,4 +161,9 @@
     <string name="pg_upload_audio_title">Uploaden (%1$d/%2$d)</string>
     <string name="pg_upload_image_title">Uploaden (%1$d/%2$d)</string>
     <string name="pg_upload_image_message">Afbeelding uploaden</string>
+    <string name="title">Titel</string>
+    <string name="id">Id</string>
+    <string name="citiesListUnavailable">Instellingen niet beschikbaar, stedenlijst ontbreekt.</string>
+    <string name="report_hint_cities">Kies je gemeente</string>
+    <string name="setting_map">Kaart</string>
 </resources>

@@ -143,4 +143,9 @@
     <string name="policy_intro_title">Information</string>
     <string name="record_in_progress">Recording in progress</string>
     <string name="record_ready">Recording finished</string>
+    <string name="title">Title</string>
+    <string name="id">Id</string>
+    <string name="citiesListUnavailable">Settings not available, missing Cities list.</string>
+    <string name="report_hint_cities">Select your city</string>
+    <string name="setting_map">Map</string>
 </resources>

@@ -2,6 +2,9 @@ package org.open311.android.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +14,6 @@ import android.widget.TextView;
 import org.codeforamerica.open311.facade.data.Service;
 import org.open311.android.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,17 +33,25 @@ public class ServicesAdapter extends ArrayAdapter<Service> {
     public ServicesAdapter(Activity activity, List<Service> services) {
         super(activity, R.layout.item_service, services);
         this.activity = activity;
-        if (services == null) {
-            services = new ArrayList<Service>();
-        } else {
-            this.services = services;
-        }
-    }
-    @Override
-    public int getCount() {
-        return services.size();
+        this.services = services;
     }
 
+    @Override
+    public int getCount() {
+        if (services != null) {
+            return services.size();
+        } else {
+            return 0;
+        }
+    }
+
+    public void setServices(List<Service> services) {
+        this.services = services;
+
+        if (services != null) {
+            this.notifyDataSetChanged();
+        }
+    }
     @Override
     public Service getItem(int location) {
         return services.get(location);
@@ -70,8 +80,15 @@ public class ServicesAdapter extends ArrayAdapter<Service> {
         // name
         name.setText(m.getServiceName());
         // description
-        description.setText(m.getDescription());
-
+        if (m.getDescription() != null) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                description.setText(Html.fromHtml(m.getDescription(), Html.FROM_HTML_MODE_COMPACT));
+            } else {
+                description.setText(Html.fromHtml(m.getDescription()));
+            }
+        } else {
+            description.setVisibility(View.INVISIBLE);
+        }
         return convertView;
     }
 

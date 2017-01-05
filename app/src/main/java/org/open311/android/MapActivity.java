@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Location;
@@ -48,7 +49,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import static org.open311.android.helpers.Utils.getSettings;
+import static org.open311.android.helpers.Utils.saveSetting;
+
 public class MapActivity extends AppCompatActivity {
+    private SharedPreferences settings;
     private MapView mapView;
     private MapboxMap map;
 
@@ -83,7 +88,7 @@ public class MapActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
+        settings = getSettings(this);
         // Mapbox access token only needs to be configured once in your app
         MapboxAccountManager.start(this, getString(R.string.mapbox_api_key));
         setContentView(R.layout.activity_map);
@@ -99,12 +104,24 @@ public class MapActivity extends AppCompatActivity {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
-                City city = City.fromString(getString(R.string.open311_endpoint));
+                City city = City.fromString(settings.getString("current_city", getString(R.string.open311_endpoint)));
                 if (city.getMap() != null) {
-                    LatLng point = new LatLng(city.getMap().getLat(), city.getMap().getLon());
+                    LatLng point = new LatLng(
+                            settings.getFloat("map_latitude", city.getMap().getLat()),
+                            settings.getFloat("map_longitude", city.getMap().getLon())
+                    );
                     mapboxMap.setCameraPosition(new CameraPosition.Builder()
                             .target(point)
-                            .zoom(new Double(city.getMap().getZoom()))
+                            .zoom((double) settings.getFloat("map_zoom", city.getMap().getZoom()))
+                            .build());
+                } else {
+                    LatLng point = new LatLng(
+                            settings.getFloat("map_latitude", 0.0f),
+                            settings.getFloat("map_longitude", 0.0f)
+                    );
+                    mapboxMap.setCameraPosition(new CameraPosition.Builder()
+                            .target(point)
+                            .zoom((double) settings.getFloat("map_zoom", 0.0f))
                             .build());
                 }
                 map = mapboxMap;
@@ -115,6 +132,7 @@ public class MapActivity extends AppCompatActivity {
                         sourceType = source.CLICK.value;
                         latitude = (float) point.getLatitude();
                         longitude = (float) point.getLongitude();
+
                         //updateMap, but don't center it
                         updateMap(false);
                     }
@@ -137,10 +155,14 @@ public class MapActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent data = new Intent();
+
                 data.putExtra("address_string", Utils.formatAddress(address));
                 data.putExtra("latitude", latitude);
                 data.putExtra("longitude", longitude);
                 data.putExtra("source", sourceType);
+                saveSetting(MapActivity.this, "map_latitude", latitude);
+                saveSetting(MapActivity.this, "map_longitude", longitude);
+                saveSetting(MapActivity.this, "map_zoom", (float) map.getCameraPosition().zoom);
                 setResult(RESULT_OK, data);
                 finish();
             }

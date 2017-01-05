@@ -7,16 +7,23 @@ import android.location.Address;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.google.gson.Gson;
+
+import org.open311.android.R;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
 public class Utils {
-    public static final String OPEN311_SETTINGS = "open311_settings";
+    private static final String OPEN311_SETTINGS = "open311_settings";
 
     public static void hideKeyBoard(Activity activity) {
         InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -30,8 +37,6 @@ public class Utils {
 
     public static SharedPreferences getSettings(Activity activity) {
         return activity.getSharedPreferences(OPEN311_SETTINGS, 0);
-
-
     }
 
     private static String removeAllRedundantSpaces(String str) {
@@ -44,8 +49,8 @@ public class Utils {
         //get the Locale
         String housenumber = address.getSubThoroughfare() == null ? "" : address.getSubThoroughfare();
         String street = address.getThoroughfare() == null ? "" : address.getThoroughfare();
-        String city =  address.getLocality() == null ? "" : address.getLocality();
-        if(Locale.getDefault() == Locale.US){
+        String city = address.getLocality() == null ? "" : address.getLocality();
+        if (Locale.getDefault() == Locale.US) {
             //housenumber first
             return removeAllRedundantSpaces(housenumber + " " + street + ", " + city);
         } else {
@@ -67,13 +72,72 @@ public class Utils {
         return sb.toString();
     }
 
-    public static boolean saveSettings(Activity activity) {
+    public static String saveSetting(Activity activity, String key, Float value) {
         SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
         SharedPreferences.Editor editor = settings.edit();
-        //handle all settings
-        editor.commit();
-        return true;
+        String result = null;
+        editor.putFloat(key.replace(',', '_').replace(' ', '_').toLowerCase(), value);
+        if (editor.commit()) {
+            result = activity.getString(R.string.settings_saved);
+        } else {
+            result = activity.getString(R.string.error_occurred);
+        }
+        return result;
+    }
 
+    public static String saveSetting(Activity activity, String key, String value) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        String result = null;
+        editor.putString(key.replace(',', '_').replace(' ', '_').toLowerCase(), value);
+        if (editor.commit()) {
+            result = activity.getString(R.string.settings_saved);
+        } else {
+            result = activity.getString(R.string.error_occurred);
+        }
+        return result;
+    }
+
+    public static String saveSetting(Activity activity, String key, List<String> values) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        String result;
+        Gson gson = new Gson();
+        List<String> mList = new ArrayList<String>();
+        mList.addAll(values);
+        String jsonText = gson.toJson(mList);
+        editor.putString(key.replace(',', '_').replace(' ', '_').toLowerCase(), jsonText);
+        if (editor.commit()) {
+            result = activity.getString(R.string.settings_saved);
+        } else {
+            result = activity.getString(R.string.error_occurred);
+        }
+        return result;
+    }
+
+    public static Boolean removeSetting(Activity activity, String key) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.remove(key.replace(',', '_').replace(' ', '_').toLowerCase());
+        return editor.commit();
+    }
+
+    public static String[] updateReportsForCity(Activity activity, String city, String value) {
+        List<String> mList = new ArrayList<String>();
+        String[] existingReports = getReportsForCity(activity, city);
+        if(existingReports != null){
+            Collections.addAll(mList, existingReports);
+        }
+        mList.add(value);
+        saveSetting(activity, city, mList);
+        return getReportsForCity(activity, city);
+    }
+
+    public static String[] getReportsForCity(Activity activity, String city) {
+        SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
+        Gson gson = new Gson();
+        String jsonText = settings.getString(city.replace(',', '_').replace(' ', '_').toLowerCase(), null);
+        return gson.fromJson(jsonText, String[].class);
     }
 
     public static String randomString(int MAX_LENGTH) {
@@ -122,7 +186,7 @@ public class Utils {
         }
     }
 
-    public static boolean deleteDir(File dir) {
+    private static boolean deleteDir(File dir) {
         if (dir != null && dir.isDirectory()) {
             String[] children = dir.list();
             for (String aChildren : children) {

@@ -213,7 +213,7 @@ public class SoundRecorderActivity extends Activity {
 
         Log.i(LOG_TAG, "Recording stopped");
         mCurrentRecordingState = RecordingState.STOPPED;
-        mRecordAudioControlButton.setImageDrawable(ContextCompat.getDrawable(SoundRecorderActivity.this.getApplication().getBaseContext(), R.drawable.ic_mic_white_24dp));
+        mRecordAudioControlButton.setImageDrawable(ContextCompat.getDrawable(SoundRecorderActivity.this.getApplication().getBaseContext(), R.drawable.ic_mic_white));
         mRecordSubmitButton.setVisibility(View.VISIBLE);
     }
 
