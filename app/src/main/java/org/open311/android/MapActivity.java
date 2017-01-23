@@ -38,7 +38,8 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 
-import org.codeforamerica.open311.facade.data.City;
+import org.codeforamerica.open311.facade.Servers;
+import org.codeforamerica.open311.facade.data.Server;
 import org.open311.android.adapters.GeocoderAdapter;
 import org.open311.android.helpers.Utils;
 import org.open311.android.widgets.GeocoderView;
@@ -104,15 +105,16 @@ public class MapActivity extends AppCompatActivity {
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
-                City city = City.fromString(settings.getString("current_city", getString(R.string.open311_endpoint)));
-                if (city.getMap() != null) {
+                Servers servers = new Servers();
+                Server server = servers.getServer(settings.getString("current_server", getString(R.string.open311_endpoint)));
+                if (server.getMap() != null) {
                     LatLng point = new LatLng(
-                            settings.getFloat("map_latitude", city.getMap().getLat()),
-                            settings.getFloat("map_longitude", city.getMap().getLon())
+                            settings.getFloat("map_latitude", server.getMap().getLat()),
+                            settings.getFloat("map_longitude", server.getMap().getLon())
                     );
                     mapboxMap.setCameraPosition(new CameraPosition.Builder()
                             .target(point)
-                            .zoom((double) settings.getFloat("map_zoom", city.getMap().getZoom()))
+                            .zoom((double) settings.getFloat("map_zoom", server.getMap().getZoom()))
                             .build());
                 } else {
                     LatLng point = new LatLng(
@@ -145,7 +147,6 @@ public class MapActivity extends AppCompatActivity {
         gpsActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //todo implement GPS
                 if (map != null) {
                     toggleGps(!map.isMyLocationEnabled());
                 }

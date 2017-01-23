@@ -19,11 +19,10 @@ import android.widget.ViewSwitcher;
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.EndpointType;
-import org.codeforamerica.open311.facade.data.City;
+import org.codeforamerica.open311.facade.data.Server;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
-import org.codeforamerica.open311.internals.caching.NoCache;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
@@ -33,8 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.open311.android.helpers.Utils.getReportsForCity;
-import static org.open311.android.helpers.Utils.hideKeyBoard;
+import static org.open311.android.helpers.Utils.getReports;
 
 /**
  * Requests {@link Fragment} subclass.
@@ -145,10 +143,10 @@ public class RequestsFragment extends Fragment {
             APIWrapperFactory factory;
             try {
                 MainActivity mActivity = (MainActivity) getActivity();
-                City mCity = mActivity.getCurrentCity();
-                factory = new APIWrapperFactory(mCity, EndpointType.PRODUCTION);
-                String[] mReports = getReportsForCity(mActivity,mCity.getCityName());
-                if(mReports != null) {
+                Server mServer = mActivity.getCurrentServer();
+                factory = new APIWrapperFactory(mServer, EndpointType.PRODUCTION);
+                String[] mReports = getReports(mActivity, mServer.getName());
+                if (mReports != null) {
                     Log.d(LOG_TAG, "RetrieveServiceRequestsTask doInBackground - Reports: " + TextUtils.join(", ", mReports));
                 }
                 APIWrapper wrapper;

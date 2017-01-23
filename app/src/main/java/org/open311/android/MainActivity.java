@@ -16,11 +16,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.codeforamerica.open311.facade.Servers;
-import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.Server;
-import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
-import org.open311.android.adapters.CitiesAdapter;
+import org.open311.android.adapters.ServersAdapter;
 import org.open311.android.adapters.ViewPagerAdapter;
 
 import org.open311.android.fragments.PolicyFragment;
@@ -41,27 +39,25 @@ public class MainActivity extends AppCompatActivity
         RequestsFragment.OnListFragmentInteractionListener,
         FragmentManager.OnBackStackChangedListener {
     private String installationId;
-
-    private List<Service> services;
-
-    private City currentCity;
+    private Servers servers = new Servers();
+    private Server currentServer;
     private static final String LOG_TAG = "MainActivity";
 
     protected SharedPreferences settings;
 
-    public City getCurrentCity() {
+    public Server getCurrentServer() {
         settings = getSettings(this);
-        String cur_city = settings.getString("current_city", null);
-        if (cur_city != null) {
-            setCurrentCity(City.fromString(cur_city));
+        String cur_server = settings.getString("current_server", null);
+        if (cur_server != null) {
+            setCurrentServer(servers.getServer(cur_server));
         } else {
-            setCurrentCity(City.fromString(getString(R.string.open311_endpoint)));
+            setCurrentServer(servers.getServer(getString(R.string.open311_endpoint)));
         }
-        return currentCity;
+        return currentServer;
     }
 
-    public MainActivity setCurrentCity(City currentCity) {
-        this.currentCity = currentCity;
+    public MainActivity setCurrentServer(Server server) {
+        this.currentServer = server;
         return this;
     }
 
@@ -94,8 +90,8 @@ public class MainActivity extends AppCompatActivity
         final List<Server> servers = new Servers().getCollection();
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem mapItem = menu.findItem(R.id.setting_map);
-        MenuItem cityItem = menu.findItem(R.id.setting_general);
-        cityItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+        MenuItem serverItem = menu.findItem(R.id.setting_general);
+        serverItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -111,14 +107,14 @@ public class MainActivity extends AppCompatActivity
                     values[index] = srv.getName();
                     index++;
                 }
-                builder.setAdapter(new CitiesAdapter(MainActivity.this, servers),
+                builder.setAdapter(new ServersAdapter(MainActivity.this, servers),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int index) {
                                 String result = null;
-                                if (!currentCity.getCityName().equals(values[index])) {
-                                    Log.d(LOG_TAG, "onCreateOptionsMenu - Selected City: " + values[index]);
-                                    result = saveSetting(MainActivity.this, "current_city", values[index]);
+                                if (!currentServer.getName().equals(values[index])) {
+                                    Log.d(LOG_TAG, "onCreateOptionsMenu - Selected Server: " + values[index]);
+                                    result = saveSetting(MainActivity.this, "current_server", values[index]);
 
                                     //remove sharedSettings for Map so map resets
                                     removeSetting(MainActivity.this, "map_address_string");
@@ -126,7 +122,7 @@ public class MainActivity extends AppCompatActivity
                                     removeSetting(MainActivity.this, "map.longitude");
                                     removeSetting(MainActivity.this, "map_zoom");
 
-                                    getCurrentCity();
+                                    getCurrentServer();
                                     recreate();
                                 }
                                 if (result != null) {

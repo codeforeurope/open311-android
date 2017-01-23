@@ -18,17 +18,17 @@ import java.util.List;
  * Created by miblon on 11/14/16.
  */
 
-public class CitiesAdapter extends ArrayAdapter<Server> {
+public class ServersAdapter extends ArrayAdapter<Server> {
     private Activity activity;
     private List<Server> servers;
 
     private LayoutInflater inflater;
 
-    public CitiesAdapter(Context context, int resource) {
+    public ServersAdapter(Context context, int resource) {
         super(context, resource);
     }
 
-    public CitiesAdapter(Activity activity, List<Server> servers) {
+    public ServersAdapter(Activity activity, List<Server> servers) {
         super(activity, R.layout.item_server, servers);
         this.activity = activity;
         this.servers = servers;

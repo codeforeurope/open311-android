@@ -3,6 +3,7 @@ package org.open311.android.models;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.webkit.MimeTypeMap;
 
 import org.open311.android.R;
 
@@ -81,6 +82,10 @@ public class Attachment implements Parcelable {
 
     public String getDescription() {
         return uri.toString();
+    }
+
+    public String getExtension(){
+        return MimeTypeMap.getFileExtensionFromUrl(this.uri.toString());
     }
 
     public int getIcon() {

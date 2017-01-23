@@ -1,17 +1,26 @@
 package org.open311.android.helpers;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.location.Address;
+import android.net.Uri;
+import android.provider.OpenableColumns;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.webkit.MimeTypeMap;
 
 import com.google.gson.Gson;
 
 import org.open311.android.R;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,6 +30,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+
+import okhttp3.MediaType;
 
 public class Utils {
     private static final String OPEN311_SETTINGS = "open311_settings";
@@ -49,12 +60,12 @@ public class Utils {
         //get the Locale
         String housenumber = address.getSubThoroughfare() == null ? "" : address.getSubThoroughfare();
         String street = address.getThoroughfare() == null ? "" : address.getThoroughfare();
-        String city = address.getLocality() == null ? "" : address.getLocality();
+        String locality = address.getLocality() == null ? "" : address.getLocality();
         if (Locale.getDefault() == Locale.US) {
             //housenumber first
-            return removeAllRedundantSpaces(housenumber + " " + street + ", " + city);
+            return removeAllRedundantSpaces(housenumber + " " + street + ", " + locality);
         } else {
-            return removeAllRedundantSpaces(street + " " + housenumber + ", " + city);
+            return removeAllRedundantSpaces(street + " " + housenumber + ", " + locality);
         }
 
     }
@@ -122,21 +133,21 @@ public class Utils {
         return editor.commit();
     }
 
-    public static String[] updateReportsForCity(Activity activity, String city, String value) {
+    public static String[] updateReports(Activity activity, String server, String value) {
         List<String> mList = new ArrayList<String>();
-        String[] existingReports = getReportsForCity(activity, city);
-        if(existingReports != null){
+        String[] existingReports = getReports(activity, server);
+        if (existingReports != null) {
             Collections.addAll(mList, existingReports);
         }
         mList.add(value);
-        saveSetting(activity, city, mList);
-        return getReportsForCity(activity, city);
+        saveSetting(activity, server, mList);
+        return getReports(activity, server);
     }
 
-    public static String[] getReportsForCity(Activity activity, String city) {
+    public static String[] getReports(Activity activity, String server) {
         SharedPreferences settings = activity.getSharedPreferences(OPEN311_SETTINGS, 0);
         Gson gson = new Gson();
-        String jsonText = settings.getString(city.replace(',', '_').replace(' ', '_').toLowerCase(), null);
+        String jsonText = settings.getString(server.replace(',', '_').replace(' ', '_').toLowerCase(), null);
         return gson.fromJson(jsonText, String[].class);
     }
 
@@ -200,4 +211,68 @@ public class Utils {
         return dir.delete();
     }
 
+    public static okhttp3.MediaType getMediaType(Context context, Uri uri1) {
+        Uri uri = Uri.parse(uri1.toString());
+        String mimeType;
+        if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            ContentResolver cr = context.getContentResolver();
+            mimeType = cr.getType(uri);
+        } else {
+            String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri
+                    .toString());
+            mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
+                    fileExtension.toLowerCase());
+        }
+        return okhttp3.MediaType.parse(mimeType);
+    }
+
+    public static String getExtensionForMimeType(String mimeType) {
+        if (TextUtils.isEmpty(mimeType))
+            return "";
+
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        String fileExtensionFromMimeType = mimeTypeMap.getExtensionFromMimeType(mimeType);
+        if (TextUtils.isEmpty(fileExtensionFromMimeType)) {
+            // We're still without an extension - split the mime type and retrieve it
+            String[] split = mimeType.split("/");
+            fileExtensionFromMimeType = split.length > 1 ? split[1] : split[0];
+        }
+
+        return fileExtensionFromMimeType.toLowerCase();
+    }
+
+    public static String niceName(Context context, Uri uri) {
+        String scheme = uri.getScheme();
+        MediaType mediaType = getMediaType(context, uri);
+        if (scheme.equals("file")) {
+            return uri.getLastPathSegment();
+        } else if (scheme.equals("content")) {
+            Cursor returnCursor = context.getContentResolver().query(uri, null, null, null, null);
+            int nameIndex = 0;
+            if (returnCursor != null) {
+                nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                returnCursor.moveToFirst();
+                String name = returnCursor.getString(nameIndex);
+                String extension = getExtensionForMimeType(String.valueOf(mediaType));
+                name = name + "." + extension;
+                return name;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public static byte[] getBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
 }
