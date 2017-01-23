@@ -3,10 +3,7 @@ package org.open311.android.fragments;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.database.Cursor;
 import android.media.MediaPlayer;
-import android.preference.Preference;
-import android.provider.OpenableColumns;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
@@ -28,7 +25,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutCompat;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -40,22 +36,20 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.codeforamerica.open311.facade.APIWrapper;
 import org.codeforamerica.open311.facade.APIWrapperFactory;
 import org.codeforamerica.open311.facade.EndpointType;
 import org.codeforamerica.open311.facade.data.Attribute;
 import org.codeforamerica.open311.facade.data.AttributeInfo;
-import org.codeforamerica.open311.facade.data.City;
 import org.codeforamerica.open311.facade.data.POSTServiceRequestResponse;
+import org.codeforamerica.open311.facade.data.Server;
 import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
@@ -67,13 +61,18 @@ import org.open311.android.SoundRecorderActivity;
 
 //import org.open311.android.adapters.AttachmentAdapter;
 import org.open311.android.helpers.MyReportsFile;
+import org.open311.android.helpers.Utils;
 import org.open311.android.models.Attachment;
+import org.open311.android.models.UploadResult;
 import org.open311.android.network.POSTServiceRequestDataWrapper;
 import org.open311.android.adapters.ServicesAdapter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,10 +82,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import static android.content.Intent.ACTION_EDIT;
 import static org.open311.android.helpers.Utils.getSettings;
 import static org.open311.android.helpers.Utils.hideKeyBoard;
-import static org.open311.android.helpers.Utils.updateReportsForCity;
+import static org.open311.android.helpers.Utils.updateReports;
 
 /**
  * Report {@link Fragment} subclass.
@@ -99,8 +105,6 @@ public class ReportFragment extends Fragment {
     private LinkedList<Attribute> attributes;
     private LinkedList<Attachment> attachments;
     private List<Service> services;
-
-    //private AttachmentAdapter attachmentAdapter;
 
     private ProgressDialog progress;
 
@@ -170,9 +174,6 @@ public class ReportFragment extends Fragment {
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
         new RetrieveServicesTask().execute(); // Load services-list in the background
-        //attachmentAdapter = new AttachmentAdapter(getActivity(), attachments);
-        //ListView listView = (ListView) view.findViewById(R.id.attachment_list);
-        //listView.setAdapter(attachmentAdapter);
         //Hide the keyboard unless the descriptionView is selected
         mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -334,7 +335,7 @@ public class ReportFragment extends Fragment {
 
     public void updateAudio(final Uri uri) {
         if (uri != null) {
-            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.AUDIO, uri));
+            attachments.add(new Attachment(Attachment.AttachmentType.AUDIO, uri));
             Log.d(LOG_TAG, "updateAudio - Uri:" + uri);
             TextView filename = (TextView) getActivity().findViewById(R.id.audio_text2);
             OnClickListener playClicked = new OnClickListener() {
@@ -350,35 +351,16 @@ public class ReportFragment extends Fragment {
                 }
             };
             playBtn.setOnClickListener(playClicked);
-            filename.setText(niceName(uri));
+            filename.setText(Utils.niceName(getContext(), uri));
             audioviewSwitcher.setDisplayedChild(1);
         } else {
             resetAudio();
         }
     }
 
-    private String niceName(Uri uri) {
-        String scheme = uri.getScheme();
-        if (scheme.equals("file")) {
-            return uri.getLastPathSegment();
-        } else if (scheme.equals("content")) {
-            Cursor returnCursor = getContext().getContentResolver().query(uri, null, null, null, null);
-            int nameIndex = 0;
-            if (returnCursor != null) {
-                nameIndex = returnCursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-                returnCursor.moveToFirst();
-                return returnCursor.getString(nameIndex);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
     public void updatePhoto(Uri uri, Boolean broadcast) {
         if (uri != null) {
-            //attachmentAdapter.add(new Attachment(Attachment.AttachmentType.IMAGE, uri));
+            attachments.add(new Attachment(Attachment.AttachmentType.IMAGE, uri));
             Log.d(LOG_TAG, "updatePhoto - Uri:" + uri);
             if (broadcast) {
                 // Tell the media gallery the photo is created
@@ -454,7 +436,7 @@ public class ReportFragment extends Fragment {
         getActivity().getWindow().setSoftInputMode(
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 
-     }
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -503,13 +485,6 @@ public class ReportFragment extends Fragment {
                     e.printStackTrace();
                 }
             }
-//            for (Attachment item : attachments) {
-//                if(item.getType() == Attachment.AttachmentType.AUDIO){
-//                    updateAudio(item.getUri());
-//                } else if(item.getType() == Attachment.AttachmentType.IMAGE){
-//                    updatePhoto(item.getUri(), true);
-//                }
-//            }
         }
     }
 
@@ -897,6 +872,7 @@ public class ReportFragment extends Fragment {
                             Normalizer.normalize(
                                     mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                     .replaceAll(pattern, ""));
+
             // todo, if single attachment and the type is image
 //            if (imageUri != null) {
 //                Glide.with(getActivity().getApplicationContext())
@@ -911,8 +887,9 @@ public class ReportFragment extends Fragment {
 //                            }
 //                        });
 //            } else {
-                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
-                bgTask.execute();
+
+            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+            bgTask.execute();
 //            }
         } else {
 
@@ -950,8 +927,8 @@ public class ReportFragment extends Fragment {
 //                                            }
 //                                        });
 //                            } else {
-                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
-                                bgTask.execute();
+                            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+                            bgTask.execute();
 //                            }
                         }
                     })
@@ -1029,14 +1006,84 @@ public class ReportFragment extends Fragment {
         @Override
         protected String doInBackground(Void... ignore) {
             String result;
+
             try {
-                APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION);
-                // todo this has to go as the app should check the attachments
-//                if (imageUri != null) {
-//                    HTTPNetworkManager networkManager = new HTTPNetworkManager(bitmap);
-//                    wrapperFactory.setNetworkManager(networkManager);
-//                }
-                wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentCity().getApiKey());
+                // todo send check and send attachments first! Use url's retrieved for the final post.
+                if (attachments.size() > 0) {
+                    final OkHttpClient client = new OkHttpClient();
+
+
+                    MultipartBody.Builder requestBodyBuilder = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM);
+                    //each
+                    for (Attachment att : attachments) {
+                        Uri uri = att.getUri();
+                        String name = Utils.niceName(getContext(), uri);
+                        if (att.getType() == Attachment.AttachmentType.AUDIO) {
+                            name = name + ".3gp";
+                        }
+                        MediaType mediaType = Utils.getMediaType(getContext(), uri);
+                        InputStream inputstream = getContext().getContentResolver().openInputStream(uri);
+                        byte[] inputData = Utils.getBytes(inputstream);
+                        requestBodyBuilder.addFormDataPart("att", name, RequestBody.create(mediaType, inputData));
+                    }
+                    RequestBody requestBody = requestBodyBuilder.build();
+                    Request request = new Request.Builder()
+                            .url("https://www.open311.io/api/upload")
+                            .post(requestBody)
+                            .build();
+
+                    Response response1 = client.newCall(request).execute();
+                    if (!response1.isSuccessful())
+                        throw new IOException("Unexpected code " + response1);
+
+                    final Gson gson = new Gson();
+                    String responseBody = response1.body().string();
+                    try {
+                        Type uploadResultsType = new TypeToken<ArrayList<UploadResult>>() {
+                        }.getType();
+
+                        List<UploadResult> uploadResult = gson.fromJson(responseBody, uploadResultsType);
+                        List<String> list = new ArrayList<String>();
+                        Boolean mediaUrlSet = false;
+                        for (UploadResult temp : uploadResult) {
+                            if (!mediaUrlSet) {
+                                // Get the item and parse it into the media_url for legacy compatibility
+                                if (temp.getPath().startsWith("image")) {
+                                    data.setMediaUrl(temp.getPath());
+                                    mediaUrlSet = true;
+                                }
+
+                            }
+                            list.add(temp.getPath());
+                        }
+                        if (!mediaUrlSet) {
+                            // Did not set the mediaUrl? Set it with the first object
+                            data.setMediaUrl(uploadResult.get(0).getPath());
+                        }
+
+                        String[] stringArray = list.toArray(new String[0]);
+
+                        data.setMedia(stringArray);
+                    } catch (Exception e) {
+                        UploadResult uploadResult = gson.fromJson(responseBody, UploadResult.class);
+                        List<String> list = new ArrayList<String>();
+                        list.add(uploadResult.getPath());
+                        String[] stringArray = list.toArray(new String[0]);
+                        data.setMedia(stringArray);
+                        // Add it as media url too for legacy compatibility
+                        data.setMediaUrl(uploadResult.getPath());
+                        e.printStackTrace();
+                    }
+
+
+                    //Loop through the response,
+                    // If Legacy: grab the first media file that passes and store it in "media"
+                    // Store the rest of the links in the message body
+                    // Else (Not legacy) pass the array into media!
+                }
+                APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION);
+                wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentServer().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
@@ -1056,6 +1103,12 @@ public class ReportFragment extends Fragment {
             } catch (APIWrapperException e) {
                 e.printStackTrace();
                 result = e.getMessage();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return e.getMessage();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return e.getMessage();
             }
             return result;
         }
@@ -1063,8 +1116,8 @@ public class ReportFragment extends Fragment {
         private boolean saveServiceRequestId(String id) {
             MyReportsFile file = new MyReportsFile(getContext());
             MainActivity mActivity = (MainActivity) getActivity();
-            City mCity = mActivity.getCurrentCity();
-            updateReportsForCity(mActivity, mCity.getCityName(), id);
+            Server mServer = mActivity.getCurrentServer();
+            updateReports(mActivity, mServer.getName(), id);
             try {
                 return file.addServiceRequestId(id);
             } catch (IOException e) {
@@ -1125,7 +1178,7 @@ public class ReportFragment extends Fragment {
             attrInfoList.clear(); // Start with an empty list
             try {
 
-                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION).build();
+                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
                 definition = wrapper.getServiceDefinition(this.serviceCode);
                 for (AttributeInfo o : definition.getAttributes()) {
                     attrInfoList.add(o);
@@ -1150,7 +1203,7 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    private class RetrieveServicesTask  extends AsyncTask<String, Void, List<Service>> {
+    private class RetrieveServicesTask extends AsyncTask<String, Void, List<Service>> {
 
         ProgressDialog progressDialog;
 
@@ -1160,7 +1213,7 @@ public class ReportFragment extends Fragment {
             services = null; //reset services
             APIWrapper wrapper;
             try {
-                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentCity(), EndpointType.PRODUCTION).build();
+                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
                 publishProgress();
                 return wrapper.getServiceList();
             } catch (APIWrapperException e) {
@@ -1176,6 +1229,8 @@ public class ReportFragment extends Fragment {
         @Override
         protected void onPostExecute(List<Service> result) {
             progressDialog.cancel();
+            progressDialog.setCancelable(true);
+            progressDialog.setMessage("All done!");
             Log.d(LOG_TAG, "RetrieveServicesTask onPostExecute - Result: " + result);
             if (result != null) {
                 // todo, reactivate the services list on the Report Fragment
@@ -1192,8 +1247,8 @@ public class ReportFragment extends Fragment {
             progressDialog = new ProgressDialog(
                     getActivity());
 
-            progressDialog.setMessage(getString(R.string.contactingServer) + " " + ((MainActivity) getActivity()).getCurrentCity().getCityName());
-            getActivity().setTitle(getString(R.string.app_name) + " " + ((MainActivity) getActivity()).getCurrentCity().getTitle());
+            progressDialog.setMessage(getString(R.string.contactingServer) + " " + ((MainActivity) getActivity()).getCurrentServer().getName());
+            getActivity().setTitle(getString(R.string.app_name) + " " + ((MainActivity) getActivity()).getCurrentServer().getTitle());
             progressDialog.setCancelable(false);
             progressDialog.show();
 

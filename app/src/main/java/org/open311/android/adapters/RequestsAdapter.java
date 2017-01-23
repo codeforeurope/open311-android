@@ -50,7 +50,7 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.ViewHo
         Collections.sort(this.filteredRequests, new Comparator<ServiceRequest>() {
             @Override
             public int compare(ServiceRequest serviceRequest, ServiceRequest t1) {
-                return serviceRequest.getUpdatedDatetime().compareTo(t1.getUpdatedDatetime());
+                return t1.getUpdatedDatetime().compareTo(serviceRequest.getUpdatedDatetime());
             }
         });
         this.notifyDataSetChanged();

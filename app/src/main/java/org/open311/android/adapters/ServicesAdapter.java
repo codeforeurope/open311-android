@@ -2,9 +2,8 @@ package org.open311.android.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.text.Html;
-import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,17 +16,18 @@ import org.open311.android.R;
 import java.util.List;
 
 /**
+ * Retrieve services list for display in dialog
  * Created by miblon on 11/14/16.
  */
 
 public class ServicesAdapter extends ArrayAdapter<Service> {
     private Activity activity;
+    private LayoutInflater mInflater;
     private List<Service> services;
 
-    private LayoutInflater inflater;
-
-    public ServicesAdapter(Context context, int resource) {
-        super(context, resource);
+    static class ViewHolder {
+        private TextView name;
+        private TextView description;
     }
 
     public ServicesAdapter(Activity activity, List<Service> services) {
@@ -45,13 +45,6 @@ public class ServicesAdapter extends ArrayAdapter<Service> {
         }
     }
 
-    public void setServices(List<Service> services) {
-        this.services = services;
-
-        if (services != null) {
-            this.notifyDataSetChanged();
-        }
-    }
     @Override
     public Service getItem(int location) {
         return services.get(location);
@@ -62,33 +55,37 @@ public class ServicesAdapter extends ArrayAdapter<Service> {
         return 0;
     }
 
+    @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        ViewHolder holder;
+        if (convertView == null) {
 
+            holder = new ViewHolder();
+            mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = mInflater.inflate(R.layout.item_service, null);
 
-        if (inflater == null)
-            inflater = (LayoutInflater) activity
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null)
-            convertView = inflater.inflate(R.layout.item_service, null);
-
-        TextView name = (TextView) convertView.findViewById(R.id.item_service_name);
-        TextView description = (TextView) convertView.findViewById(R.id.item_service_description);
-
-        // getting data for the row
-        Service m = services.get(position);
-        // name
-        name.setText(m.getServiceName());
-        // description
-        if (m.getDescription() != null) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                description.setText(Html.fromHtml(m.getDescription(), Html.FROM_HTML_MODE_COMPACT));
-            } else {
-                description.setText(Html.fromHtml(m.getDescription()));
-            }
+            holder.name = (TextView) convertView.findViewById(R.id.item_service_name);
+            holder.description = (TextView) convertView.findViewById(R.id.item_service_description);
+            convertView.setTag(holder);
         } else {
-            description.setVisibility(View.INVISIBLE);
+            holder = (ViewHolder) convertView.getTag();
         }
+        // getting data for the row
+        Service m = getItem(position);
+        // name
+        if (m != null) {
+            holder.name.setText(m.getServiceName());
+            // description
+            if (m.getDescription() != null) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+                    holder.description.setText(Html.fromHtml(m.getDescription(), Html.FROM_HTML_MODE_LEGACY));
+                } else {
+                    holder.description.setText(Html.fromHtml(m.getDescription()));
+                }
+            }
+        }
+
         return convertView;
     }
 

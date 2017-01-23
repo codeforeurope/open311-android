@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_city"
+    android:id="@+id/item_server"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
@@ -11,7 +11,7 @@
     android:paddingRight="24dp">
 
     <TextView
-        android:id="@+id/item_city_name"
+        android:id="@+id/item_server_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:lines="1"

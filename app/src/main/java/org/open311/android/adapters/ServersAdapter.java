@@ -14,34 +14,34 @@ import org.open311.android.R;
 import java.util.List;
 
 /**
- * Picklist to select a current City
+ * Picklist to select a current Server
  * Created by miblon on 11/14/16.
  */
 
-public class CitiesAdapter extends ArrayAdapter<Server> {
+public class ServersAdapter extends ArrayAdapter<Server> {
     private Activity activity;
-    private List<Server> cities;
+    private List<Server> servers;
 
     private LayoutInflater inflater;
 
-    public CitiesAdapter(Context context, int resource) {
+    public ServersAdapter(Context context, int resource) {
         super(context, resource);
     }
 
-    public CitiesAdapter(Activity activity, List<Server> cities) {
-        super(activity, R.layout.item_city, cities);
+    public ServersAdapter(Activity activity, List<Server> servers) {
+        super(activity, R.layout.item_server, servers);
         this.activity = activity;
-        this.cities = cities;
+        this.servers = servers;
     }
 
     @Override
     public int getCount() {
-        return cities.size();
+        return servers.size();
     }
 
     @Override
     public Server getItem(int location) {
-        return cities.get(location);
+        return servers.get(location);
     }
 
     @Override
@@ -56,10 +56,10 @@ public class CitiesAdapter extends ArrayAdapter<Server> {
             inflater = (LayoutInflater) activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         if (convertView == null)
-            convertView = inflater.inflate(R.layout.item_city, null);
+            convertView = inflater.inflate(R.layout.item_server, null);
 
-        TextView name = (TextView) convertView.findViewById(R.id.item_city_name);
-        Server m = cities.get(position);
+        TextView name = (TextView) convertView.findViewById(R.id.item_server_name);
+        Server m = servers.get(position);
         name.setText(m.getName());
         return convertView;
     }
@@ -67,14 +67,14 @@ public class CitiesAdapter extends ArrayAdapter<Server> {
     @Override
     public void add(Server service) {
         super.add(service);
-        cities.add(service);
+        servers.add(service);
         notifyDataSetChanged();
     }
 
     @Override
     public void remove(Server service) {
         super.remove(service);
-        cities.remove(service);
+        servers.remove(service);
         notifyDataSetChanged();
     }
 }

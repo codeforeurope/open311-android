@@ -1,8 +1,8 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@android:color/white"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     tools:context=".fragments.PolicyFragment">
 
     <ScrollView
@@ -16,10 +16,12 @@
             android:layout_height="wrap_content">
             <TextView
                 style="@style/AppTheme.PolicyTitle"
+                android:id="@+id/policy_intro_title"
                 android:text="@string/policy_intro_title" />
 
             <TextView
                 style="@style/AppTheme.PolicyText"
+                android:id="@+id/policy_intro_text"
                 android:text="@string/policy_intro_text" />
 
             <TextView
