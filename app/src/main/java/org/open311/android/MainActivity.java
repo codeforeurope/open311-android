@@ -90,6 +90,21 @@ public class MainActivity extends AppCompatActivity
         final List<Server> servers = new Servers().getCollection();
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem mapItem = menu.findItem(R.id.setting_map);
+        if (currentServer.getMap() == null || currentServer.getMap().getRequestMapEnabled()) {
+                mapItem.setVisible(true);
+                mapItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        //Show the map
+                        Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                        startActivityForResult(intent, LOCATION_REQUEST);
+                        return false;
+                    }
+                });
+        } else {
+            mapItem.setVisible(false);
+        }
+
         MenuItem serverItem = menu.findItem(R.id.setting_general);
         serverItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
@@ -141,15 +156,7 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
-        mapItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem menuItem) {
-                //Show the map
-                Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                startActivityForResult(intent, LOCATION_REQUEST);
-                return false;
-            }
-        });
+
         return true;
     }
 
