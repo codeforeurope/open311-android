@@ -107,7 +107,7 @@ public class ReportFragment extends Fragment {
     private List<Service> services;
 
     private ProgressDialog progress;
-
+    private File photo;
     private String location;
     private String serviceName;
     private String serviceCode;
@@ -821,7 +821,7 @@ public class ReportFragment extends Fragment {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (cameraIntent.resolveActivity(getContext().getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photo;
+
             try {
                 photo = createFile(Attachment.AttachmentType.IMAGE);
                 cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photo));
@@ -968,8 +968,13 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                if (data.getData() == null) return;
-                updatePhoto(data.getData(), true);
+                if(data != null) {
+                    if (data.getData() == null) return;
+                    updatePhoto(data.getData(), true);
+                } else {
+                    if(photo.length() == 0) return;
+                    updatePhoto(Uri.fromFile(photo), true);
+                }
             } else {
                 resetPhoto();
             }
@@ -1212,8 +1217,14 @@ public class ReportFragment extends Fragment {
             Log.d(LOG_TAG, "RetrieveServicesTask - doInBackground");
             services = null; //reset services
             APIWrapper wrapper;
+            EndpointType endpointType;
+            Server currentServer = ((MainActivity) getActivity()).getCurrentServer();
+            // todo Check if server has a base URL, then check if it has a test Url. determine the EndpointType by that.
+            endpointType = EndpointType.PRODUCTION;
+
             try {
-                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
+
+                wrapper = new APIWrapperFactory(currentServer, endpointType).build();
                 publishProgress();
                 return wrapper.getServiceList();
             } catch (APIWrapperException e) {
