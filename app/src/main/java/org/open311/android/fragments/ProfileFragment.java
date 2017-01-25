@@ -2,6 +2,7 @@ package org.open311.android.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.widget.EditText;
 
@@ -21,6 +23,7 @@ import org.open311.android.MainActivity;
 import org.open311.android.R;
 
 import static org.open311.android.helpers.Utils.getSettings;
+import static org.open311.android.helpers.Utils.hideKeyBoard;
 import static org.open311.android.helpers.Utils.saveSetting;
 
 /**
@@ -31,11 +34,8 @@ public class ProfileFragment extends Fragment {
     private SharedPreferences settings;
     private EditText inputName, inputEmail, inputPhone;
     private TextInputLayout inputLayoutName, inputLayoutEmail, inputLayoutPhone;
+    private FloatingActionButton mHideKeyboard;
     private FloatingActionButton mSubmitBtn;
-
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        final View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
         inputLayoutName = (TextInputLayout) view.findViewById(R.id.input_layout_name);
         inputLayoutEmail = (TextInputLayout) view.findViewById(R.id.input_layout_email);
@@ -71,11 +71,44 @@ public class ProfileFragment extends Fragment {
                 onSubmitButtonClicked(v);
             }
         });
+        mHideKeyboard = (FloatingActionButton) view.findViewById(R.id.profile_keyboard_close);
+        mHideKeyboard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View parent = getActivity().findViewById(R.id.fragment_profile_ll);
+                parent.clearFocus();
+                hideKeyBoard(getActivity());
+            }
+        });
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                view.getWindowVisibleDisplayFrame(r);
+                int screenHeight = view.getRootView().getHeight();
+
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
+
+                Log.d(LOG_TAG, "keypadHeight = " + keypadHeight);
+
+                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                    // keyboard is opened
+                    mHideKeyboard.setVisibility(View.VISIBLE);
+                } else {
+                    // keyboard is closed
+                    mHideKeyboard.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         return view;
     }
 
     private void onSubmitButtonClicked(View v) {
+        hideKeyBoard(getActivity());
         String result;
         if (!validate()) {
             return;
@@ -135,7 +168,6 @@ public class ProfileFragment extends Fragment {
 
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
         }
 
         public void afterTextChanged(Editable editable) {

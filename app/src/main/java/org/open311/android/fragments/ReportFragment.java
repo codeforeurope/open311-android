@@ -14,7 +14,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -32,7 +31,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -59,7 +57,6 @@ import org.open311.android.MapActivity;
 import org.open311.android.R;
 import org.open311.android.SoundRecorderActivity;
 
-//import org.open311.android.adapters.AttachmentAdapter;
 import org.open311.android.helpers.MyReportsFile;
 import org.open311.android.helpers.Utils;
 import org.open311.android.models.Attachment;
@@ -120,6 +117,7 @@ public class ReportFragment extends Fragment {
     private ViewSwitcher photoviewSwitcher;
     private ViewSwitcher audioviewSwitcher;
     private AudioStatus mAudioStatus;
+    private FloatingActionButton mHideKeyboard;
     private FloatingActionButton mSubmitBtn;
     private EditText mDescriptionView;
     private int mPlayTime = 0;
@@ -151,10 +149,6 @@ public class ReportFragment extends Fragment {
         }
     }
 
-    public ReportFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         Log.d(LOG_TAG, "onCreateView");
@@ -169,19 +163,24 @@ public class ReportFragment extends Fragment {
         playBtn = (ImageView) view.findViewById(R.id.audioView2);
         mDescriptionView = (EditText) view.findViewById(R.id.report_description_textbox);
         mSubmitBtn = (FloatingActionButton) view.findViewById(R.id.report_submit);
+        mHideKeyboard = (FloatingActionButton) view.findViewById(R.id.report_keyboard_close);
         photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
         audioviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
-        new RetrieveServicesTask().execute(); // Load services-list in the background
-        //Hide the keyboard unless the descriptionView is selected
+        // Load services-list in the background
+        new RetrieveServicesTask().execute();
         mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
+                    //Hide a close keyboard button
+                    mHideKeyboard.setVisibility(View.INVISIBLE);
                     v.clearFocus();
                     hideKeyBoard(getActivity());
                 } else {
+                    //Show a close keyboard Button
+                    mHideKeyboard.setVisibility(View.VISIBLE);
                     mDescriptionView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -262,6 +261,14 @@ public class ReportFragment extends Fragment {
                 onSubmitButtonClicked();
             }
         });
+        mHideKeyboard.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mHideKeyboard.setVisibility(View.INVISIBLE);
+                mDescriptionView.clearFocus();
+                hideKeyBoard(getActivity());
+            }
+        });
 
         return view;
     }
@@ -273,7 +280,7 @@ public class ReportFragment extends Fragment {
             ImageView icon = (ImageView) getActivity().findViewById(R.id.serviceView);
             icon.setColorFilter(ContextCompat.getColor(getContext(), R.color.colorAccent), android.graphics.PorterDuff.Mode.MULTIPLY);
         }
-        validate(); //required, so validate
+        validate();
     }
 
     private void updateLocation() {
@@ -429,13 +436,6 @@ public class ReportFragment extends Fragment {
         attrInfoList = new LinkedList<AttributeInfo>();
         attachments = new LinkedList<Attachment>();
         installationId = ((MainActivity) getActivity()).getInstallationId();
-
-        // Don't show the keyboard if it isn't already shown,
-        // but if it was open when entering the activity, leave it open.
-        // To always hide the keyboard when the activity starts: SOFT_INPUT_STATE_ALWAYS_HIDDEN
-        getActivity().getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
-
     }
 
     @Override
@@ -742,7 +742,6 @@ public class ReportFragment extends Fragment {
     }
 
     private void handleLocation() {
-        // todo, save to the backstack so that when we get back, we remain where we were.
         Intent intent = new Intent(getActivity(), MapActivity.class);
         startActivityForResult(intent, LOCATION_REQUEST);
     }
@@ -872,25 +871,8 @@ public class ReportFragment extends Fragment {
                             Normalizer.normalize(
                                     mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                     .replaceAll(pattern, ""));
-
-            // todo, if single attachment and the type is image
-//            if (imageUri != null) {
-//                Glide.with(getActivity().getApplicationContext())
-//                        .load(imageUri)
-//                        .asBitmap()
-//                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-//                        .into(new SimpleTarget<Bitmap>() {
-//                            @Override
-//                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-//                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-//                                bgTask.execute();
-//                            }
-//                        });
-//            } else {
-
-            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+            PostServiceRequestTask bgTask = new PostServiceRequestTask(data);
             bgTask.execute();
-//            }
         } else {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AppTheme_Dialog);
@@ -898,7 +880,6 @@ public class ReportFragment extends Fragment {
                     .setMessage(getString(R.string.post_anonymous_description))
                     .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            // TODO redirect to profile
                             TabLayout tabLayout = (TabLayout) getActivity().findViewById(R.id.tabs);
                             TabLayout.Tab tab = tabLayout.getTabAt(2);
                             if (tab != null) {
@@ -913,23 +894,8 @@ public class ReportFragment extends Fragment {
                                     .setDescription(Normalizer.normalize(
                                             mDescriptionView.getText().toString(), Normalizer.Form.NFD)
                                             .replaceAll(pattern, ""));
-
-//                            if (imageUri != null) {
-//                                Glide.with(getActivity().getApplicationContext())
-//                                        .load(imageUri)
-//                                        .asBitmap()
-//                                        .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-//                                        .into(new SimpleTarget<Bitmap>() {
-//                                            @Override
-//                                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
-//                                                PostServiceRequestTask bgTask = new PostServiceRequestTask(data, bitmap);
-//                                                bgTask.execute();
-//                                            }
-//                                        });
-//                            } else {
-                            PostServiceRequestTask bgTask = new PostServiceRequestTask(data, null);
+                            PostServiceRequestTask bgTask = new PostServiceRequestTask(data);
                             bgTask.execute();
-//                            }
                         }
                     })
                     .show();
@@ -968,11 +934,11 @@ public class ReportFragment extends Fragment {
 
         if (requestCode == CAMERA_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
-                if(data != null) {
+                if (data != null) {
                     if (data.getData() == null) return;
                     updatePhoto(data.getData(), true);
                 } else {
-                    if(photo.length() == 0) return;
+                    if (photo.length() == 0) return;
                     updatePhoto(Uri.fromFile(photo), true);
                 }
             } else {
@@ -995,12 +961,10 @@ public class ReportFragment extends Fragment {
     private class PostServiceRequestTask extends AsyncTask<Void, Void, String> {
 
         private POSTServiceRequestData data;
-        private Bitmap bitmap;
         private boolean success = true;
 
-        PostServiceRequestTask(POSTServiceRequestData data, Bitmap bitmap) {
+        PostServiceRequestTask(POSTServiceRequestData data) {
             this.data = data;
-            this.bitmap = bitmap;
         }
 
         /**
@@ -1013,7 +977,6 @@ public class ReportFragment extends Fragment {
             String result;
 
             try {
-                // todo send check and send attachments first! Use url's retrieved for the final post.
                 if (attachments.size() > 0) {
                     final OkHttpClient client = new OkHttpClient();
 
@@ -1219,7 +1182,7 @@ public class ReportFragment extends Fragment {
             APIWrapper wrapper;
             EndpointType endpointType;
             Server currentServer = ((MainActivity) getActivity()).getCurrentServer();
-            // todo Check if server has a base URL, then check if it has a test Url. determine the EndpointType by that.
+            // TODO Check if server has a base URL, then check if it has a test Url. determine the EndpointType by that.
             endpointType = EndpointType.PRODUCTION;
 
             try {
@@ -1244,7 +1207,6 @@ public class ReportFragment extends Fragment {
             progressDialog.setMessage("All done!");
             Log.d(LOG_TAG, "RetrieveServicesTask onPostExecute - Result: " + result);
             if (result != null) {
-                // todo, reactivate the services list on the Report Fragment
                 services = result;
                 resetAll();
             } else {
@@ -1341,12 +1303,11 @@ public class ReportFragment extends Fragment {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
         String fileName = prefix + timeStamp + "_";
 
-        File file = File.createTempFile(
-                fileName,  /* prefix */
-                extension,         /* suffix */
-                storageDir      /* directory */
+        return File.createTempFile(
+                fileName,
+                extension,
+                storageDir
         );
-        return file;
     }
 
 }
