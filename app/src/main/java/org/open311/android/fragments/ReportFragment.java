@@ -3,6 +3,7 @@ package org.open311.android.fragments;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -31,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -152,7 +154,7 @@ public class ReportFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         Log.d(LOG_TAG, "onCreateView");
-        View view = inflater.inflate(R.layout.fragment_report, container, false);
+        final View view = inflater.inflate(R.layout.fragment_report, container, false);
 
         LinearLayoutCompat btnPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoButton);
         LinearLayoutCompat layoutPhoto = (LinearLayoutCompat) view.findViewById(R.id.photoLayout);
@@ -170,17 +172,34 @@ public class ReportFragment extends Fragment {
 
         // Load services-list in the background
         new RetrieveServicesTask().execute();
+        view.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+
+                Rect r = new Rect();
+                view.getWindowVisibleDisplayFrame(r);
+                int screenHeight = view.getRootView().getHeight();
+
+                // r.bottom is the position above soft keypad or device button.
+                // if keypad is shown, the r.bottom is smaller than that before.
+                int keypadHeight = screenHeight - r.bottom;
+                if (keypadHeight > screenHeight * 0.15) { // 0.15 ratio is perhaps enough to determine keypad height.
+                    // keyboard is opened
+                    mHideKeyboard.setVisibility(View.VISIBLE);
+                } else {
+                    // keyboard is closed
+                    mHideKeyboard.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
         mDescriptionView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {
-                    //Hide a close keyboard button
-                    mHideKeyboard.setVisibility(View.INVISIBLE);
                     v.clearFocus();
                     hideKeyBoard(getActivity());
                 } else {
                     //Show a close keyboard Button
-                    mHideKeyboard.setVisibility(View.VISIBLE);
                     mDescriptionView.addTextChangedListener(new TextWatcher() {
                         @Override
                         public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -264,7 +283,6 @@ public class ReportFragment extends Fragment {
         mHideKeyboard.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mHideKeyboard.setVisibility(View.INVISIBLE);
                 mDescriptionView.clearFocus();
                 hideKeyBoard(getActivity());
             }
@@ -419,6 +437,8 @@ public class ReportFragment extends Fragment {
     }
 
     private void resetAll() {
+        //Clear attachments array
+        attachments = new LinkedList<Attachment>();
         resetPhoto();
         resetAudio();
         resetService();
@@ -1025,11 +1045,6 @@ public class ReportFragment extends Fragment {
                             }
                             list.add(temp.getPath());
                         }
-                        if (!mediaUrlSet) {
-                            // Did not set the mediaUrl? Set it with the first object
-                            data.setMediaUrl(uploadResult.get(0).getPath());
-                        }
-
                         String[] stringArray = list.toArray(new String[0]);
 
                         data.setMedia(stringArray);
@@ -1043,17 +1058,12 @@ public class ReportFragment extends Fragment {
                         data.setMediaUrl(uploadResult.getPath());
                         e.printStackTrace();
                     }
-
-
-                    //Loop through the response,
-                    // If Legacy: grab the first media file that passes and store it in "media"
-                    // Store the rest of the links in the message body
-                    // Else (Not legacy) pass the array into media!
                 }
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION);
                 wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentServer().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
+                wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
 
                 if (response != null) {
@@ -1147,6 +1157,7 @@ public class ReportFragment extends Fragment {
             try {
 
                 wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
+                wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 definition = wrapper.getServiceDefinition(this.serviceCode);
                 for (AttributeInfo o : definition.getAttributes()) {
                     attrInfoList.add(o);
@@ -1186,8 +1197,8 @@ public class ReportFragment extends Fragment {
             endpointType = EndpointType.PRODUCTION;
 
             try {
-
                 wrapper = new APIWrapperFactory(currentServer, endpointType).build();
+                wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 publishProgress();
                 return wrapper.getServiceList();
             } catch (APIWrapperException e) {

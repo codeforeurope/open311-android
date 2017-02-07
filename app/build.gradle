@@ -8,8 +8,8 @@ android {
         applicationId "org.open311.android"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 7
-        versionName "1.6-alpha"
+        versionCode 8
+        versionName "1.7-alpha"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
