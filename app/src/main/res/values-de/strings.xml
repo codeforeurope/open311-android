@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="menu_settings">Einstellungen</string>
-    <string name="menu_report">Bericht</string>
-    <string name="menu_archive">Meine berichte</string>
+    <string name="menu_report">Hinweise</string>
+    <string name="menu_archive">Meine Berichte</string>
     <string name="menu_about">Über</string>
     <string name="tab_personal_info">Persönliche Angaben</string>
     <string name="tab_servers">Server</string>
@@ -14,8 +14,8 @@
     <string name="phone">Telefon</string>
     <string name="name">Name</string>
     <string name="url">Url</string>
-    <string name="jurisdiction_id">Zuständigkeit ID</string>
-    <string name="api_key">Api Key</string>
+    <string name="jurisdiction_id">Jurisdiction-ID</string>
+    <string name="api_key">API Key</string>
     <string name="format">Format</string>
     <string name="supports_media">Unterstützt Medien</string>
     <string name="dialog_loading_services">Lade Service Information</string>
@@ -43,26 +43,26 @@
     <string name="failure_posting_service">Der Hinweis konnte nicht gespeichert werden</string>
     <string name="error_403">Dieser App scheinen Berechtigungen zu fehlen</string>
     <string name="app_name">Open311</string>
-    <string name="list_latest_messages">Aktuelle berichte</string>
-    <string name="list_user_messages">Meine berichte</string>
+    <string name="list_latest_messages">Aktuelle Hinweise</string>
+    <string name="list_user_messages">Meine Hinweise</string>
     <string name="storageNotWritable">Externer Speicher ist nicht beschreibbar</string>
     <string name="policy_faq_title">Fragen</string>
-    <string name="ApplicationEmail">Kontakt mit den Behörden</string>
+    <string name="ApplicationEmail">Behördenkontakt</string>
     <string name="updated">Aktualisiert</string>
     <string name="status_unknown">unbekannt</string>
-    <string name="status_open">geöffnet</string>
+    <string name="status_open">offen</string>
     <string name="status_closed">abgeschlossen</string>
     <string name="settings_saved">Einstellungen gespeichert</string>
     <string name="setting_user">Benutzer</string>
     <string name="setting_general">Einstellungen</string>
     <string name="setting_cloud">Server</string>
-    <string name="serviceListUnavailable">Kategorien können nicht abgerufen werden. Versuchen Sie es später noch einmal.</string>
+    <string name="serviceListUnavailable">Service-Kategorien können nicht abgerufen werden. Versuchen Sie es später noch einmal.</string>
     <string name="ApplicationIcon">Anwendungssymbol</string>
     <string name="Communicate">Kommunizieren</string>
     <string name="Gallery">Galerie</string>
     <string name="Import">Einführen</string>
     <string name="Send">Senden</string>
-    <string name="Share">Aktie</string>
+    <string name="Share">Teilen</string>
     <string name="Slideshow">Diashow</string>
     <string name="Tools">Werkzeuge</string>
     <string name="description">Beschreibung</string>
@@ -74,44 +74,44 @@
     <string name="hint_password">Passwort</string>
     <string name="hint_phone">Telefon</string>
     <string name="policy_intro_text">
-        Kommunizieren Sie Service Requests mit Ihrer Regierung\n\n
-        Ihre vorherige Anfrage werden hier angezeigt, nachdem Sie Ihre erste Anfrage erstellt haben
+        Geben Sie Ihrer Verwaltung Hinweise\n\n
+        Ihre letzten Hinweise werden angezeigt, sobald Sie eine erste Meldung eingereicht haben.
     </string>
     <string name="invalid_email">Ungültige E-Mail Adresse</string>
     <string name="invalid_name">Name ist ungültig</string>
     <string name="invalid_phone">Die Telefonnummer ist ungültig</string>
     <string name="map">Wählen Sie einen Ort</string>
-    <string name="map_hint_gps">Erwerben Sie GPS-Position</string>
-    <string name="menu_reports_recent">Aktuelle Berichte</string>
+    <string name="map_hint_gps">Bestimme GPS-Position</string>
+    <string name="menu_reports_recent">Aktuelle Hinweise</string>
     <string name="menu_search">Suche</string>
     <string name="next">Nächster</string>
     <string name="notImplemented">Noch nicht implementiert</string>
     <string name="okay">OK</string>
     <string name="policy_privacy_text">
-        Wir sind uns bewusst, Ihr Vertrauen in uns. Deshalb haben wir es als unsere primäre Verantwortung nehmen Ihre Privatsphäre zu schützen.
-        Wir werden jedoch Informationen sammeln. Wir werden erklären, warum und was.\n\n
+        Wir sind uns deines Vertrauens bewußt. Deshalb ist unser oberstes Ziel, deine Privatssphäre zu schützen.
+        Dennoch erheben wir einige Informationen, welches wir hier erläutern möchten.\n\n
 
-        Unsere Datenschutzerklärung gilt für die Anwendung und den Service. Durch die Nutzung unserer Anwendung verwenden, können Sie unsere Datenschutzbestimmungen akzeptieren.\n\n
+        Unsere Datenschutzerklärung gilt sowohl für die Anwendung selbst, als auch den Service. Durch deine Nutzung akzeptierst du unsere Datenschutzbestimmungen.\n\n
 
-        Wir respektieren die Privatsphäre aller Nutzer und stellen Sie sicher, dass persönliche Informationen vertraulich verwendet wird.
+        Wir respektieren die Privatsphäre aller Nutzer und stellen Sie sicher, dass persönliche Informationen vertraulich behandelt werden.
     </string>
     <string name="policy_privacy_title">Datenschutz-Bestimmungen</string>
-    <string name="policy_faq_text">Wir überwachen ständig, wenn wir in unseren Datenschutzbestimmungen einhalten. Bei Fragen zum Datenschutz wenden Sie sich bitte an uns.</string>
+    <string name="policy_faq_text">Wir überwachen ständig, ob wir unseren Datenschutzbestimmungen einhalten. Bei Fragen zum Datenschutz wende dich bitte an uns.</string>
     <string name="report_address">Gib eine Adresse ein</string>
     <string name="report_dialog_message">Warten Sie, während das Senden</string>
-    <string name="report_dialog_title">Service-Anfrage</string>
-    <string name="report_failure_message">Erfolglos, bitte versuchen Sie es später noch einmal</string>
-    <string name="report_hint_description">Geben Sie eine Beschreibung</string>
-    <string name="report_hint_location">Wählen Sie einen Ort</string>
+    <string name="report_dialog_title">Hinweis</string>
+    <string name="report_failure_message">Fehlgeschlagen, bitte versuche es später noch einmal</string>
+    <string name="report_hint_description">Gibt eine Beschreibung ein</string>
+    <string name="report_hint_location">Wähle einen Ort</string>
     <string name="report_hint_photo">Foto hinzufügen</string>
-    <string name="report_hint_service">Wählen Sie eine Kategorie</string>
+    <string name="report_hint_service">Wähle eine Kategorie</string>
     <string name="report_loading">Laden...</string>
     <string name="report_location">Ort</string>
     <string name="report_photo">Foto</string>
     <string name="report_required_field">Pflichtfeld</string>
-    <string name="report_service">Bedienung</string>
-    <string name="report_success_message">Ihr Bericht wurde gesendet</string>
-    <string name="report_visibility">Teilen Bericht mit öffentlichen</string>
+    <string name="report_service">Dienst</string>
+    <string name="report_success_message">Hinweis wurde gesendet</string>
+    <string name="report_visibility">Hinweis öffentlich teilen</string>
     <string name="request_ago_icon">Letzte Aktualisierung</string>
     <string name="request_image">Bild</string>
     <string name="contactingServer">Verbinden mit</string>
@@ -122,7 +122,7 @@
     <string name="connectionEstablished">Verbindung hergestellt</string>
     <string name="no_anonymous">Nein</string>
     <string name="post_anonymous">Anonym</string>
-    <string name="post_anonymous_description">Sie haben keine Kontaktdaten gesetzt. Dies bedeutet, dass verantwortliche Partei nicht in der Lage sein wird, um Sie zu kontaktieren. Wollen Sie Kontaktdaten jetzt hinzufügen?</string>
+    <string name="post_anonymous_description">Kontaktdaten fehlen. Dies bedeutet, dass die Verwaltung nicht in der Lage sein wird, um dich zu kontaktieren. Willst du die Kontaktdaten jetzt hinzufügen?</string>
     <string name="street">Straße</string>
     <string name="house_number">Hausnummer</string>
     <string name="edit_address">Adresse</string>
@@ -130,23 +130,23 @@
     <string name="choose_audio_source">Audioquelle auswählen</string>
     <string name="recorder">Mikrofon</string>
     <string name="stop_dialog">Halt</string>
-    <string name="record_stop">Höre auf, aufzunehmen</string>
-    <string name="record_start">Starte die Aufnahme</string>
-    <string name="missing_fields">Bitte füllen Sie alle Pflichtfelder aus.</string>
+    <string name="record_stop">Stoppe Aufnahme</string>
+    <string name="record_start">Starte Aufnahme</string>
+    <string name="missing_fields">Bitte fülle alle Pflichtfelder aus.</string>
     <string name="policy_intro_title">Information</string>
     <string name="pg_upload_audio_message">Audio wird hochgeladen</string>
     <string name="pg_upload_audio_title">Hochladen (%1$d/%2$d)</string>
     <string name="pg_upload_image_title">Hochladen (%1$d/%2$d)</string>
     <string name="pg_upload_image_message">Bild wird hochgeladen</string>
-    <string name="no_coordinates">lage</string>
-    <string name="no_description">beschreibung</string>
-    <string name="no_reports_text">Sie haben noch keine Berichte gesendet. Wenn Sie Ihren ersten Bericht erstellen, wird auf dieser Seite eine Übersicht aller Berichte angezeigt.</string>
-    <string name="no_reports_title">Keine Berichte</string>
-    <string name="no_servicecode">dienst</string>
+    <string name="no_coordinates">Lage</string>
+    <string name="no_description">Beschreibung</string>
+    <string name="no_reports_text">Du hast noch keine Hinweise eingereicht. Wenn du Hinweise meldest, werden diese hier angezeigt.</string>
+    <string name="no_reports_title">Keine Hinweise</string>
+    <string name="no_servicecode">Dienst</string>
     <string name="record_in_progress">Aufnahme läuft</string>
     <string name="record_ready">Aufnahme beendet</string>
     <string name="title">Titel</string>
-    <string name="id">Id</string>
+    <string name="id">ID</string>
     <string name="citiesListUnavailable">Einstellungen nicht vorhanden, fehlende Städteliste.</string>
     <string name="report_hint_cities">Wählen Sie Ihre Stadt</string>
     <string name="setting_map">Karte</string>
