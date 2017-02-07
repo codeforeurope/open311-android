@@ -25,6 +25,7 @@ import org.codeforamerica.open311.facade.data.Server;
 import org.codeforamerica.open311.facade.data.ServiceRequest;
 import org.codeforamerica.open311.facade.data.operations.GETServiceRequestsFilter;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
+import org.codeforamerica.open311.internals.caching.AndroidCache;
 import org.open311.android.MainActivity;
 import org.open311.android.R;
 import org.open311.android.adapters.RequestsAdapter;
@@ -147,6 +148,7 @@ public class RequestsFragment extends Fragment {
                 MainActivity mActivity = (MainActivity) getActivity();
                 Server mServer = mActivity.getCurrentServer();
                 factory = new APIWrapperFactory(mServer, EndpointType.PRODUCTION);
+                //factory.setCache(AndroidCache.getInstance(getActivity().getApplicationContext()));
                 String[] mReports = getReports(mActivity, mServer.getName());
                 if (mReports != null) {
                     Log.d(LOG_TAG, "RetrieveServiceRequestsTask doInBackground - Reports: " + TextUtils.join(", ", mReports));

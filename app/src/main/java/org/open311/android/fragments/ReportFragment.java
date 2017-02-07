@@ -55,6 +55,7 @@ import org.codeforamerica.open311.facade.data.Service;
 import org.codeforamerica.open311.facade.data.ServiceDefinition;
 import org.codeforamerica.open311.facade.data.operations.POSTServiceRequestData;
 import org.codeforamerica.open311.facade.exceptions.APIWrapperException;
+import org.codeforamerica.open311.internals.caching.AndroidCache;
 import org.open311.android.MainActivity;
 import org.open311.android.MapActivity;
 import org.open311.android.R;
@@ -1061,12 +1062,13 @@ public class ReportFragment extends Fragment {
                     }
                 }
                 APIWrapperFactory wrapperFactory = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION);
+                wrapperFactory.setCache(AndroidCache.getInstance(getActivity().getApplicationContext()));
                 wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentServer().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
                 PackageManager manager = getActivity().getPackageManager();
                 PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
-                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
+                wrapper.setHeader("User-Agent", "open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
 
@@ -1163,10 +1165,12 @@ public class ReportFragment extends Fragment {
             attrInfoList.clear(); // Start with an empty list
             try {
 
-                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
+                wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION)
+                        .setCache(AndroidCache.getInstance(getActivity().getApplicationContext()))
+                        .build();
                 PackageManager manager = getActivity().getPackageManager();
                 PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
-                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
+                wrapper.setHeader("User-Agent", "open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 definition = wrapper.getServiceDefinition(this.serviceCode);
                 for (AttributeInfo o : definition.getAttributes()) {
@@ -1209,10 +1213,12 @@ public class ReportFragment extends Fragment {
             endpointType = EndpointType.PRODUCTION;
 
             try {
-                wrapper = new APIWrapperFactory(currentServer, endpointType).build();
+                wrapper = new APIWrapperFactory(currentServer, endpointType)
+                        .setCache(AndroidCache.getInstance(getActivity().getApplicationContext()))
+                        .build();
                 PackageManager manager = getActivity().getPackageManager();
                 PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
-                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
+                wrapper.setHeader("User-Agent", "open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 publishProgress();
                 return wrapper.getServiceList();
