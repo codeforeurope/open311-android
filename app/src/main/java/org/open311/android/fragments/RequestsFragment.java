@@ -151,6 +151,7 @@ public class RequestsFragment extends Fragment {
                 }
                 APIWrapper wrapper;
                 wrapper = factory.build();
+
                 GETServiceRequestsFilter filter = new GETServiceRequestsFilter();
 
                 MyReportsFile file = new MyReportsFile(getContext());
@@ -163,6 +164,7 @@ public class RequestsFragment extends Fragment {
 
                 List<ServiceRequest> result = null;
                 if (wrapper != null) {
+                    wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                     result = wrapper.getServiceRequests(filter);
                 }
                 ArrayList<ServiceRequest> requests = new ArrayList<ServiceRequest>();
