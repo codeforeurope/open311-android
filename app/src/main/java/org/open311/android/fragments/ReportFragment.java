@@ -3,6 +3,7 @@ package org.open311.android.fragments;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.pm.PackageInfo;
 import android.graphics.Rect;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
@@ -1063,6 +1064,9 @@ public class ReportFragment extends Fragment {
                 wrapperFactory.setApiKey(((MainActivity) getActivity()).getCurrentServer().getApiKey());
 
                 APIWrapper wrapper = wrapperFactory.build();
+                PackageManager manager = getActivity().getPackageManager();
+                PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 POSTServiceRequestResponse response = wrapper.postServiceRequest(data);
 
@@ -1085,6 +1089,9 @@ public class ReportFragment extends Fragment {
                 e.printStackTrace();
                 return e.getMessage();
             } catch (IOException e) {
+                e.printStackTrace();
+                return e.getMessage();
+            } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
                 return e.getMessage();
             }
@@ -1157,6 +1164,9 @@ public class ReportFragment extends Fragment {
             try {
 
                 wrapper = new APIWrapperFactory(((MainActivity) getActivity()).getCurrentServer(), EndpointType.PRODUCTION).build();
+                PackageManager manager = getActivity().getPackageManager();
+                PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 definition = wrapper.getServiceDefinition(this.serviceCode);
                 for (AttributeInfo o : definition.getAttributes()) {
@@ -1170,6 +1180,8 @@ public class ReportFragment extends Fragment {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
             return count;
@@ -1198,6 +1210,9 @@ public class ReportFragment extends Fragment {
 
             try {
                 wrapper = new APIWrapperFactory(currentServer, endpointType).build();
+                PackageManager manager = getActivity().getPackageManager();
+                PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+                wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
                 wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                 publishProgress();
                 return wrapper.getServiceList();
@@ -1206,6 +1221,8 @@ public class ReportFragment extends Fragment {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
             return null;

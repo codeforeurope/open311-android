@@ -1,6 +1,8 @@
 package org.open311.android.fragments;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -164,6 +166,9 @@ public class RequestsFragment extends Fragment {
 
                 List<ServiceRequest> result = null;
                 if (wrapper != null) {
+                    PackageManager manager = getActivity().getPackageManager();
+                    PackageInfo info = manager.getPackageInfo(getActivity().getPackageName(), 0);
+                    wrapper.setHeader("User-Agent","open311-android/" + info.versionName);
                     wrapper.setHeader("open311-deviceid", ((MainActivity) getActivity()).getInstallationId());
                     result = wrapper.getServiceRequests(filter);
                 }
@@ -181,6 +186,8 @@ public class RequestsFragment extends Fragment {
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
             return bundle;
