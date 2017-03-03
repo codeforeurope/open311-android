@@ -15,7 +15,7 @@ The current version of the specification is documented at http://wiki.open311.or
 
 * Clone this repository (recursive as it depends on open311_java)
 ```
-git clone --recursive https://github.com/CodeForEindhoven/open311-android.git
+git clone --recursive https://github.com/codeforeurope/open311-android.git
 ```
 
 * Start Android Studio
@@ -32,7 +32,7 @@ There is an issue with the `servers.json` resource, sometimes I cannot load or r
 ## Contributing
 Online documentation is in the [Wiki](https://github.com/City-of-Bloomington/open311-android/wiki) here on GitHub.  Questions not addressed in the wiki should be sent to the [Google Group](https://groups.google.com/forum/?fromgroups#!forum/open311-mobile).
 
-If you find the app not behaving as expected, please create an issue in our [Github issue tracker](https://github.com/City-of-Bloomington/open311-android/issues)
+If you find the app not behaving as expected, please create an issue in our [Github issue tracker](https://github.com/codeforeurope/open311-android/issues)
 
 ## License
 The files in this repository are released under the GPL 3 license.
