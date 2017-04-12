@@ -105,7 +105,7 @@
     <string name="report_hint_location">Wähle einen Ort</string>
     <string name="report_hint_photo">Foto hinzufügen</string>
     <string name="report_hint_service">Wähle eine Kategorie</string>
-    <string name="report_loading">Laden...</string>
+    <string name="report_loading">Laden…</string>
     <string name="report_location">Ort</string>
     <string name="report_photo">Foto</string>
     <string name="report_required_field">Pflichtfeld</string>

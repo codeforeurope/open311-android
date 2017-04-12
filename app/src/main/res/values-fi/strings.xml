@@ -103,7 +103,7 @@
     <string name="report_hint_location">Valitse sijainti</string>
     <string name="report_hint_photo">Lisää kuva</string>
     <string name="report_hint_service">Valitse kategoria</string>
-    <string name="report_loading">Ladataan...</string>
+    <string name="report_loading">Ladataan…</string>
     <string name="report_location">Sijainti</string>
     <string name="report_photo">Kuva</string>
     <string name="report_required_field">Vaadittu kenttä</string>

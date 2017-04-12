@@ -20,7 +20,7 @@
     <string name="report_address">Vul een adres in</string>
     <string name="report_visibility">Deel met het publiek</string>
     <string name="report_required_field">Verplicht veld</string>
-    <string name="report_loading">Laden...</string>
+    <string name="report_loading">Laden…</string>
     <string name="report_dialog_title">Overlast Melding</string>
     <string name="report_dialog_message">Wordt verstuurd</string>
     <string name="report_success_message">Uw melding is verstuurd</string>
@@ -92,7 +92,7 @@
     <string name= "policy_intro_title">Informatie</string>
     <string name="policy_intro_text">Er is geen extra informatie beschikbaar voor de gekozen stad.</string>
     <string name="policy_faq_title">Over</string>
-    <string name="policy_faq_text">Deze applicatie is Open Source en wordt o.a. ontwikkeld door de <b>Code fellows</b> van de Code For NL.\nWe controleren regelmatig of de applicatie correct werkt. Mocht er onverhoopt iets niet goed gaan, neem dan contact op via <b>info@open311.io</b></string>
+    <string name="policy_faq_text">Deze applicatie is Open Source en wordt ontwikkeld door <b>Code For Europe</b>.\nWe controleren regelmatig of de applicatie correct werkt. Mocht er onverhoopt iets niet goed gaan, neem dan contact op via <b>info@codefor.eu</b></string>
     <string name="updated">bewerkt</string>
     <string name="serviceListUnavailable">Categorieën niet beschikbaar. Probeer het later nog eens.</string>
     <string name="setting_user">Gebruiker</string>
