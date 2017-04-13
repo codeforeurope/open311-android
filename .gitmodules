@@ -1,6 +1,6 @@
 [submodule "org.codeforamerica.open311"]
 	path = org.codeforamerica.open311
-	url = https://github.com/CodeForEindhoven/open311_java.git
+	url = https://github.com/codeforeurope/open311_java.git
 	branch = master
 
 
