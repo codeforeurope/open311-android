@@ -1,11 +1,9 @@
 apply plugin: 'com.android.application'
-
 android {
-
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
-        applicationId "org.open311.android"
+        applicationId "nl.eindhoven.open311"
         minSdkVersion 16
         targetSdkVersion 24
         versionCode 8
@@ -21,7 +19,6 @@ android {
         release {
             resValue "string", "mapbox_api_key", "pk.eyJ1IjoibWlibG9uIiwiYSI6IjRJak9WYUkifQ.NOqcZh0hQeYTp6BQIZr0GQ"
             resValue "string", "open311_endpoint", "Eindhoven, NL"
-
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -38,10 +35,9 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile project(':org.codeforamerica.open311')
-
     // add the Mapbox SDK dependency below
     compile('com.mapbox.mapboxsdk:mapbox-android-sdk:4.1.0@aar') {
         transitive = true
@@ -49,7 +45,7 @@ dependencies {
     compile 'com.github.MKergall.osmbonuspack:OSMBonusPack:v5.8.1@aar'
     compile 'org.osmdroid:osmdroid-android:5.2@aar'
     compile 'org.apache.commons:commons-lang3:3.3.2'
-    compile 'com.google.code.gson:gson:2.4'
+    compile 'com.google.code.gson:gson:2.7'
     compile 'com.squareup.okhttp:okhttp:2.6.0'
     compile 'com.android.support:appcompat-v7:24.2.0'
     compile 'com.android.support:support-v4:24.2.0'
