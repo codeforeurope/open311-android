@@ -6,8 +6,8 @@ android {
         applicationId "nl.eindhoven.open311"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 9
-        versionName "1.8"
+        versionCode 10
+        versionName "1.9"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
