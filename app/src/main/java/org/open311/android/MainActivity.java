@@ -14,6 +14,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 
 import org.codeforamerica.open311.facade.Servers;
 import org.codeforamerica.open311.facade.data.Server;
@@ -31,8 +33,6 @@ import java.util.List;
 
 import static org.open311.android.fragments.ReportFragment.LOCATION_REQUEST;
 import static org.open311.android.helpers.Utils.*;
-
-import io.tus.android.client.TusPreferencesURLStore;
 
 public class MainActivity extends AppCompatActivity
         implements
@@ -65,6 +65,28 @@ public class MainActivity extends AppCompatActivity
         return installationId;
     }
 
+    private boolean isFirstTime() {
+        settings = getPreferences(MODE_PRIVATE);
+        boolean ranBefore = settings.getBoolean("RanBefore", false);
+        if (!ranBefore) {
+
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putBoolean("RanBefore", true);
+            editor.apply();
+            final View topLevelLayout = findViewById(R.id.top_layout);
+            topLevelLayout.setVisibility(View.VISIBLE);
+            topLevelLayout.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    topLevelLayout.setVisibility(View.INVISIBLE);
+                    return false;
+                }
+            });
+        }
+        return ranBefore;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(LOG_TAG, "onCreate");
@@ -73,16 +95,22 @@ public class MainActivity extends AppCompatActivity
         installationId = Installation.id(this);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+
         setSupportActionBar(toolbar);
         getSupportFragmentManager().addOnBackStackChangedListener(this);
-
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        View topLevelLayout = findViewById(R.id.top_layout);
+        if (isFirstTime()) {
+            topLevelLayout.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -91,16 +119,16 @@ public class MainActivity extends AppCompatActivity
         getMenuInflater().inflate(R.menu.main, menu);
         MenuItem mapItem = menu.findItem(R.id.setting_map);
         if (currentServer.getMap() == null || currentServer.getMap().getRequestMapEnabled()) {
-                mapItem.setVisible(true);
-                mapItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        //Show the map
-                        Intent intent = new Intent(MainActivity.this, MapActivity.class);
-                        startActivityForResult(intent, LOCATION_REQUEST);
-                        return false;
-                    }
-                });
+            mapItem.setVisible(true);
+            mapItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    //Show the map
+                    Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                    startActivityForResult(intent, LOCATION_REQUEST);
+                    return false;
+                }
+            });
         } else {
             mapItem.setVisible(false);
         }

@@ -76,7 +76,6 @@ import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -116,33 +115,32 @@ public class ReportFragment extends Fragment {
     private String source;
     private ImageView playBtn;
     private MediaPlayer mMediaPlayer;
-    private ViewSwitcher photoviewSwitcher;
-    private ViewSwitcher audioviewSwitcher;
+    private ViewSwitcher photoViewSwitcher;
+    private ViewSwitcher audioViewSwitcher;
     private AudioStatus mAudioStatus;
     private FloatingActionButton mHideKeyboard;
     private FloatingActionButton mSubmitBtn;
     private EditText mDescriptionView;
     private int mPlayTime = 0;
-    public static final int CAMERA_REQUEST = 101;
+    private static final int CAMERA_REQUEST = 101;
     public static final int LOCATION_REQUEST = 102;
-    public static final int GALLERY_IMAGE_REQUEST = 103;
-    public static final int READ_STORAGE_REQUEST = 104;
-    public static final int RECORDER_REQUEST = 105;
-    public static final int GALLERY_AUDIO_REQUEST = 107;
+    private static final int GALLERY_IMAGE_REQUEST = 103;
+    private static final int READ_STORAGE_REQUEST = 104;
+    private static final int RECORDER_REQUEST = 105;
+    private static final int GALLERY_AUDIO_REQUEST = 107;
 
     private static final boolean ATTRIBUTES_ENABLED = false;
     private SharedPreferences settings;
 
-    enum AudioStatus {
-        PLAYING("Playing", 0),
-        STOPPED("Stopped", 2);
+    private enum AudioStatus {
+        PLAYING("Playing"),
+        STOPPED("Stopped");
 
-        private String stringValue;
-        private int intValue;
+        final String stringValue;
 
-        AudioStatus(String toString, int value) {
+
+        AudioStatus(String toString) {
             stringValue = toString;
-            intValue = value;
         }
 
         @Override
@@ -166,8 +164,8 @@ public class ReportFragment extends Fragment {
         mDescriptionView = (EditText) view.findViewById(R.id.report_description_textbox);
         mSubmitBtn = (FloatingActionButton) view.findViewById(R.id.report_submit);
         mHideKeyboard = (FloatingActionButton) view.findViewById(R.id.report_keyboard_close);
-        photoviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
-        audioviewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
+        photoViewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_photoviewswitcher);
+        audioViewSwitcher = (ViewSwitcher) view.findViewById(R.id.report_audioviewswitcher);
         ImageView photoPlaceholder = (ImageView) view.findViewById((R.id.photoPlaceholder));
 
         // Load services-list in the background
@@ -305,9 +303,9 @@ public class ReportFragment extends Fragment {
         try {
             TextView text = (TextView) getActivity().findViewById(R.id.location_text);
             if (location == null && source != null) {
-                String coordText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
-                Log.d(LOG_TAG, "updateLocation - Coordinates: " + coordText);
-                text.setText(coordText);
+                String coordinateText = String.format(Locale.getDefault(), "(%f, %f)", latitude, longitude);
+                Log.d(LOG_TAG, "updateLocation - Coordinates: " + coordinateText);
+                text.setText(coordinateText);
             }
             if (location != null && source != null) {
                 Log.d(LOG_TAG, "updateLocation - Address: " + location);
@@ -377,7 +375,7 @@ public class ReportFragment extends Fragment {
             };
             playBtn.setOnClickListener(playClicked);
             filename.setText(Utils.niceName(getContext(), uri));
-            audioviewSwitcher.setDisplayedChild(1);
+            audioViewSwitcher.setDisplayedChild(1);
         } else {
             resetAudio();
         }
@@ -397,20 +395,20 @@ public class ReportFragment extends Fragment {
             Log.d(LOG_TAG, "updatePhoto - imageView: " + image.toString());
             Glide.with(getContext()).load(uri).asBitmap().into(image);
             Log.d(LOG_TAG, "updatePhoto - switching displayedChild");
-            photoviewSwitcher.setDisplayedChild(1);
+            photoViewSwitcher.setDisplayedChild(1);
         } else {
             resetPhoto();
         }
     }
 
     private void resetAudio() {
-        audioviewSwitcher.setDisplayedChild(0);
+        audioViewSwitcher.setDisplayedChild(0);
         TextView audioText = (TextView) getActivity().findViewById(R.id.audio_text);
         audioText.setText(R.string.report_hint_sound);
     }
 
     private void resetPhoto() {
-        photoviewSwitcher.setDisplayedChild(0);
+        photoViewSwitcher.setDisplayedChild(0);
         TextView photoText = (TextView) getActivity().findViewById(R.id.photo_text);
         photoText.setText(R.string.report_hint_photo);
     }
@@ -612,19 +610,6 @@ public class ReportFragment extends Fragment {
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
         return Environment.MEDIA_MOUNTED.equals(state);
-    }
-
-    private void addAttributesToForm() {
-        // TODO process attributes
-        Iterator<AttributeInfo> iterator = attrInfoList.iterator();
-        LinearLayoutCompat layout = (LinearLayoutCompat) getActivity().findViewById(R.id.report_attributes);
-        layout.removeAllViews(); // Make sure the ViewGroup is empty (i.e. has no child views)
-        while (iterator.hasNext()) {
-            final AttributeInfo attr = iterator.next();
-            if (attr.getDatatype() != AttributeInfo.Datatype.SINGLEVALUELIST) {
-                Log.d(LOG_TAG, "addAttributesToForm - Attribute info: " + attr.getDatatype());
-            }
-        }
     }
 
     private void onServiceButtonClicked() {
@@ -858,12 +843,14 @@ public class ReportFragment extends Fragment {
 
     private void onSubmitButtonClicked() {
         Log.d(LOG_TAG, "onSubmitButtonClicked");
-        final String pattern = "[^\\w\\s\\.\\?\\(\\),!:;@]";
+        final String pattern = "[^\\w\\s.?(),!:;@]";
         // Check the form result and post the service request
         if (!validate()) {
             String result = getString(R.string.failure_posting_service);
-            Snackbar.make(getView(), result, Snackbar.LENGTH_SHORT)
-                    .show();
+            if(getView() != null) {
+                Snackbar.make(getView(), result, Snackbar.LENGTH_SHORT)
+                        .show();
+            }
             return;
         }
 
@@ -980,7 +967,7 @@ public class ReportFragment extends Fragment {
 
     private class PostServiceRequestTask extends AsyncTask<Void, Void, String> {
 
-        private POSTServiceRequestData data;
+        final POSTServiceRequestData data;
         private boolean success = true;
 
         PostServiceRequestTask(POSTServiceRequestData data) {
@@ -1069,8 +1056,13 @@ public class ReportFragment extends Fragment {
                 if (response != null) {
                     success = true;
                     result = response.getServiceNotice();
-                    saveServiceRequestId(response.getServiceRequestId());
-                    Log.d(LOG_TAG, "SERVICE REQUEST ID: " + response.getServiceRequestId());
+                     boolean sr = saveServiceRequestId(response.getServiceRequestId());
+                    if(sr){
+                        Log.d(LOG_TAG, "Saved " + response.getServiceRequestId());
+                    } else {
+                        Log.d(LOG_TAG, "Failed to save " + response.getServiceRequestId());
+                    }
+
                 } else {
                     success = false;
                     result = getString(R.string.report_failure_message);
@@ -1120,8 +1112,8 @@ public class ReportFragment extends Fragment {
             if (success) resetAll();
 
             MyReportsFile file = new MyReportsFile(getContext());
-            int reqs = file.getServiceRequestLength();
-            Log.d(LOG_TAG, "PostServiceRequestTask onPostExecute - Requests for user: " + reqs);
+            int requests = file.getServiceRequestLength();
+            Log.d(LOG_TAG, "PostServiceRequestTask onPostExecute - Requests for user: " + requests);
 
             new AlertDialog.Builder(getContext())
                     .setTitle(getString(R.string.report_dialog_title))
@@ -1137,7 +1129,7 @@ public class ReportFragment extends Fragment {
 
     private class RetrieveAttributesTask extends AsyncTask<Void, Void, Integer> {
 
-        private String serviceCode;
+        final String serviceCode;
 
         RetrieveAttributesTask(String serviceCode) {
             this.serviceCode = serviceCode;
@@ -1193,7 +1185,6 @@ public class ReportFragment extends Fragment {
             APIWrapper wrapper;
             EndpointType endpointType;
             Server currentServer = ((MainActivity) getActivity()).getCurrentServer();
-            // TODO Check if server has a base URL, then check if it has a test Url. determine the EndpointType by that.
             endpointType = EndpointType.PRODUCTION;
 
             try {

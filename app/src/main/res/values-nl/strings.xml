@@ -144,4 +144,8 @@
     <string name="citiesListUnavailable">Instellingen niet beschikbaar, stedenlijst ontbreekt.</string>
     <string name="report_hint_cities">Kies je gemeente</string>
     <string name="setting_map">Kaart</string>
+    <string name="launcher_icon">launcher_icon</string>
+    <string name="welcome_message">Welkom bij meld-app Woonoverlast</string>
+    <string name="welcome_intro">Met deze applicatie kun je woonoverlast melden. Wanneer je alle benodigde gegevens hebt ingevuld verschijnt rechtsonder een rode knop. Wanneer je de knop hebt gedrukt kun je kiezen om anoniem te versturen of met contactgegevens. Wanneer je je contactgegevens ingevuld hebt, wordt het voor ons natuurlijk wel eenvoudiger!</string>
+    <string name="welcome_submit">Ik snap het!</string>
 </resources>

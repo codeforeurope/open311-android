@@ -150,4 +150,8 @@
     <string name="citiesListUnavailable">Asetukset eivät ole käytettävissä, puuttuu kaupunkeja luetteloon.</string>
     <string name="report_hint_cities">Valitse kaupunki</string>
     <string name="setting_map">Kartta</string>
+    <string name="launcher_icon">launcher_icon</string>
+    <string name="welcome_message">Welcome to the open311 app!</string>
+    <string name="welcome_intro">Welcome Intro</string>
+    <string name="welcome_submit">Welcome submit</string>
 </resources>

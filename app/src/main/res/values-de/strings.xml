@@ -150,4 +150,8 @@
     <string name="citiesListUnavailable">Einstellungen nicht vorhanden, fehlende Städteliste.</string>
     <string name="report_hint_cities">Wählen Sie Ihre Stadt</string>
     <string name="setting_map">Karte</string>
+    <string name="launcher_icon">launcher_icon</string>
+    <string name="welcome_message">Welcome to the open311 app!</string>
+    <string name="welcome_intro">Welcome Intro</string>
+    <string name="welcome_submit">Welcome submit</string>
 </resources>

@@ -207,7 +207,7 @@
     <color name="silent_glass">#88ffffff</color>
     <color name="silent_dark_orange">#ffa42206</color>
     <color name="progress_color">#D23D44</color>
-    <color name="solid_white">#ffffffff</color>
+    <color name="solid_white">#ffffff</color>
     <color name="theme_dark_text_primary">@color/solid_white</color>
     <color name="translucent_white">#80ffffff</color>
     <color name="theme_dark_text_secondary">@color/translucent_white</color>
