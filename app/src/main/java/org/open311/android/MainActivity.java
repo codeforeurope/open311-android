@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 import org.codeforamerica.open311.facade.Servers;
 import org.codeforamerica.open311.facade.data.Server;
@@ -75,6 +76,13 @@ public class MainActivity extends AppCompatActivity
             editor.apply();
             final View topLevelLayout = findViewById(R.id.top_layout);
             topLevelLayout.setVisibility(View.VISIBLE);
+            final Button welcomeClose = (Button) findViewById(R.id.button_welcome_close);
+            welcomeClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    topLevelLayout.setVisibility(View.INVISIBLE);
+                }
+            });
             topLevelLayout.setOnTouchListener(new View.OnTouchListener() {
 
                 @Override
